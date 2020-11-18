@@ -2,7 +2,7 @@
 /**
  * Admin setup for the plugin
  *
- * @since 1.0
+ * @since 0.1.0
  * @function	loginid_dwp_add_menu_links()		Add admin menu pages
  * @function	loginid_dwp_register_settings	Register Settings
  * @function	loginid_dwp_validater_and_sanitizer()	Validate And Sanitize User Input Before Its Saved To Database
@@ -15,7 +15,7 @@ if ( ! defined('ABSPATH') ) exit;
 /**
  * Add admin menu pages
  *
- * @since 1.0
+ * @since 0.1.0
  * @refer https://developer.wordpress.org/plugins/administration-menus/
  */
 function loginid_dwp_add_menu_links() {
@@ -26,7 +26,7 @@ add_action( 'admin_menu', 'loginid_dwp_add_menu_links' );
 /**
  * Register Settings
  *
- * @since 1.0
+ * @since 0.1.0
  */
 function loginid_dwp_register_settings() {
 
@@ -60,7 +60,7 @@ add_action( 'admin_init', 'loginid_dwp_register_settings' );
 /**
  * Validate and sanitize user input before its saved to database
  *
- * @since 1.0
+ * @since 0.1.0
  */
 function loginid_dwp_validater_and_sanitizer ( $settings ) {
 	
@@ -75,7 +75,7 @@ function loginid_dwp_validater_and_sanitizer ( $settings ) {
  *
  * @return	Array	A merged array of default and settings saved in database. 
  *
- * @since 1.0
+ * @since 0.1.0
  */
 function loginid_dwp_get_settings() {
 
@@ -92,7 +92,7 @@ function loginid_dwp_get_settings() {
 /**
  * Enqueue Admin CSS and JS
  *
- * @since 1.0
+ * @since 0.1.0
  */
 function loginid_dwp_enqueue_css_js( $hook ) {
 	

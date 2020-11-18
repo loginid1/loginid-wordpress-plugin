@@ -2,7 +2,7 @@
 /**
  * Admin UI setup and render
  *
- * @since 1.0
+ * @since 0.1.0
  * @function	loginid_dwp_general_settings_section_callback()	Callback function for General Settings section
  * @function	loginid_dwp_general_settings_field_callback()	Callback function for General Settings field
  * @function	loginid_dwp_admin_interface_render()				Admin interface renderer
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Callback function for General Settings section
  *
- * @since 1.0
+ * @since 0.1.0
  */
 function loginid_dwp_general_settings_section_callback() {
 	echo '<p>' . __('A long description for the settings section goes here.', 'loginid-directweb-plugin') . '</p>';
@@ -23,7 +23,7 @@ function loginid_dwp_general_settings_section_callback() {
 /**
  * Callback function for General Settings field
  *
- * @since 1.0
+ * @since 0.1.0
  */
 function loginid_dwp_general_settings_field_callback() {	
 
@@ -57,7 +57,7 @@ function loginid_dwp_general_settings_field_callback() {
 /**
  * Admin interface renderer
  *
- * @since 1.0
+ * @since 0.1.0
  */ 
 function loginid_dwp_admin_interface_render () {
 	
@@ -70,13 +70,15 @@ function loginid_dwp_admin_interface_render () {
 	 * @refer	https://core.trac.wordpress.org/ticket/31000
 	 * If the user have submitted the settings, WordPress will add the "settings-updated" $_GET parameter to the url
 	 *
-	if ( isset( $_GET['settings-updated'] ) ) {
-		// Add settings saved message with the class of "updated"
-		add_settings_error( 'loginid_dwp_settings_saved_message', 'loginid_dwp_settings_saved_message', __( 'Settings are Saved', 'loginid-directweb-plugin' ), 'updated' );
-	}
- 
-	// Show Settings Saved Message
-	settings_errors( 'loginid_dwp_settings_saved_message' ); */?> 
+		if ( isset( $_GET['settings-updated'] ) ) {
+			// Add settings saved message with the class of "updated"
+			add_settings_error( 'loginid_dwp_settings_saved_message', 'loginid_dwp_settings_saved_message', __( 'Settings are Saved', 'loginid-directweb-plugin' ), 'updated' );
+		}
+	
+		// Show Settings Saved Message
+		settings_errors( 'loginid_dwp_settings_saved_message' ); 
+	*/
+	?> 
 	
 	<div class="wrap">	
 		<h1>LoginID DirectWeb Plugin</h1>

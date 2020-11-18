@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Define constants
  *
- * @since 1.0
+ * @since 0.1.0
  */
 if ( ! defined( 'LOGINID_DWP_VERSION_NUM' ) ) 		define( 'LOGINID_DWP_VERSION_NUM'		, '0.1.0 Alpha' ); // Plugin version constant
 if ( ! defined( 'LOGINID_DWP_STARTER_PLUGIN' ) )		define( 'LOGINID_DWP_STARTER_PLUGIN'		, trim( dirname( plugin_basename( __FILE__ ) ), '/' ) ); // Name of the plugin folder eg - 'loginid-directweb-plugin'
@@ -60,7 +60,7 @@ if ( ! defined( 'LOGINID_DWP_STARTER_PLUGIN_URL' ) )	define( 'LOGINID_DWP_STARTE
  * Add plugin version to database
  *
  * @refer https://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
- * @since 1.0
+ * @since 0.1.0
  */
 update_option( 'abl_loginid_dwp_version', LOGINID_DWP_VERSION_NUM );	// Change this to add_option if a release needs to check installed version.
 
