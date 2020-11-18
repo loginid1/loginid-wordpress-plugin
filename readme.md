@@ -15,14 +15,12 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-<!-- 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
--->
 
 <!-- PROJECT LOGO -->
 <br />
@@ -143,7 +141,7 @@ Project Link: [https://github.com/loginid1/loginid-directweb-plugin](https://git
 [issues-shield]: https://img.shields.io/github/issues/loginid1/repo.svg?style=flat-square
 [issues-url]: https://github.com/loginid1/repo/issues
 [license-shield]: https://img.shields.io/github/license/loginid1/repo.svg?style=flat-square
-[license-url]: https://github.com/loginid1/repo/blob/master/LICENSE.txt
+[license-url]: https://github.com/loginid1/repo/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/loginid1
+[linkedin-url]: https://linkedin.com/in/loginid
 [product-screenshot]: images/screenshot.png
