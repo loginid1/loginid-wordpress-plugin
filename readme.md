@@ -58,6 +58,7 @@
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
+- [Acknowledgements](#acknowledgements)
 
 
 
@@ -128,6 +129,11 @@ LoginID - dev@loginid.io
 
 Project Link: [https://github.com/loginid1/loginid-directweb-plugin](https://github.com/loginid1/loginid-directweb-plugin)
 
+
+<!-- ACKNOWLEDGEMENTS -->
+## Acknowledgements
+* [The Best Readme Template on Github](https://github.com/othneildrew/Best-README-Template)
+* [Wordpress Starter Plugin](https://github.com/arunbasillal/WordPress-Starter-Plugin)
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
