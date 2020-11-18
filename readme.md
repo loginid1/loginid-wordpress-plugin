@@ -26,7 +26,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/loginid1/loginid-directweb-plugin">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    TODO:<img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">LoginID DirectWeb Plugin</h3>
