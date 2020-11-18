@@ -132,16 +132,16 @@ Project Link: [https://github.com/loginid1/loginid-directweb-plugin](https://git
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/loginid1/repo.svg?style=flat-square
-[contributors-url]: https://github.com/loginid1/repo/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/loginid1/repo.svg?style=flat-square
-[forks-url]: https://github.com/loginid1/repo/network/members
-[stars-shield]: https://img.shields.io/github/stars/loginid1/repo.svg?style=flat-square
-[stars-url]: https://github.com/loginid1/repo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/loginid1/repo.svg?style=flat-square
-[issues-url]: https://github.com/loginid1/repo/issues
-[license-shield]: https://img.shields.io/github/license/loginid1/repo.svg?style=flat-square
-[license-url]: https://github.com/loginid1/repo/blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/loginid1/loginid-directweb-plugin.svg?style=flat-square
+[contributors-url]: https://github.com/loginid1/loginid-directweb-plugin/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/loginid1/loginid-directweb-plugin.svg?style=flat-square
+[forks-url]: https://github.com/loginid1/loginid-directweb-plugin/network/members
+[stars-shield]: https://img.shields.io/github/stars/loginid1/loginid-directweb-plugin.svg?style=flat-square
+[stars-url]: https://github.com/loginid1/loginid-directweb-plugin/stargazers
+[issues-shield]: https://img.shields.io/github/issues/loginid1/loginid-directweb-plugin.svg?style=flat-square
+[issues-url]: https://github.com/loginid1/loginid-directweb-plugin/issues
+[license-shield]: https://img.shields.io/github/license/loginid1/loginid-directweb-plugin.svg?style=flat-square
+[license-url]: https://github.com/loginid1/loginid-directweb-plugin/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/loginid
 [product-screenshot]: images/screenshot.png
