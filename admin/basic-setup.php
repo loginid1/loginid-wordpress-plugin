@@ -23,6 +23,18 @@ if (!defined('ABSPATH')) exit;
  */
 function loginid_dwp_activate_plugin()
 {
+	// we want to create the login and register pages here
+
+	    // Create register post object
+			$register_post = array(
+				'post_title'    => wp_strip_all_tags( 'Register' ),
+				'post_content'  => '[loginid_registration]',
+				'post_status'   => 'publish',
+				'post_type'     => 'page',
+			);
+	
+			// Insert the post into the database
+			wp_insert_post( $register_post );
 }
 
 /**
