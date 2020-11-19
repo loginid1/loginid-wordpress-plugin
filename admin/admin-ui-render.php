@@ -24,6 +24,7 @@ function loginid_dwp_minimum_settings_section_callback() {
  * Callback function for creating text input fields
  * 
  * @since 0.1.0
+ * @param Array $args contains a list of settings in the following order [$settings_id, $description]
  */
 function loginid_dwp_text_input_field_callback($args) {
 		// destructure args
