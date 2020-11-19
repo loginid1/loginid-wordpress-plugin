@@ -113,10 +113,10 @@ function loginid_dwp_get_settings()
  *
  * @since 0.1.0
  */
-function loginid_dwp_enqueue_css_js($hook)
+function loginid_dwp_admin_enqueue_css_js($hook)
 {
 
-	// Load only on Starer Plugin plugin pages
+	// Load only on  plugin pages
 	if ($hook != "settings_page_loginid-directweb-plugin") {
 		return;
 	}
@@ -127,4 +127,4 @@ function loginid_dwp_enqueue_css_js($hook)
 	// Main JS
 	// wp_enqueue_script( 'loginid_dwp-admin-main-js', LOGINID_DIRECTWEB_PLUGIN_URL . 'admin/js/main.js', array( 'jquery' ), false, true );
 }
-add_action('admin_enqueue_scripts', 'loginid_dwp_enqueue_css_js');
+add_action('admin_enqueue_scripts', 'loginid_dwp_admin_enqueue_css_js');

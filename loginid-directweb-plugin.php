@@ -24,7 +24,6 @@
  * /functions/			          - Functions and plugin operations.
  * /includes/					        - External third party classes and libraries.
  * /languages/				        - Translation files go here. 
- * /public/						        - Front end files and functions that matter on the front end go here.
  * index.php					        - Dummy file.
  * (this file).php            - Main plugin file containing plugin name and other version info for WordPress.
  * uninstall.php				      - Fired when the plugin is uninstalled. 
