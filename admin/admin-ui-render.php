@@ -3,7 +3,7 @@
  * Admin UI setup and render
  *
  * @since 0.1.0
- * @function	loginid_dwp_general_settings_section_callback()	Callback function for General Settings section
+ * @function	loginid_dwp_minimum_settings_section_callback()	Callback function for General Settings section
  * @function	loginid_dwp_general_settings_field_callback()	Callback function for General Settings field
  * @function	loginid_dwp_admin_interface_render()				Admin interface renderer
  */
@@ -16,42 +16,28 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since 0.1.0
  */
-function loginid_dwp_general_settings_section_callback() {
-	echo '<p>' . __('A long description for the settings section goes here.', 'loginid-directweb-plugin') . '</p>';
+function loginid_dwp_minimum_settings_section_callback() {
+	echo '<p>' . __('Required configurations for the plugin to work', 'loginid-directweb-plugin') . '</p>';
 }
 
 /**
- * Callback function for General Settings field
- *
+ * Callback function for creating text input fields
+ * 
  * @since 0.1.0
  */
-function loginid_dwp_general_settings_field_callback() {	
+function loginid_dwp_text_input_field_callback($args) {
+		// destructure args
+		[$settings_id, $description] = $args;
 
-	// Get Settings
-	$settings = loginid_dwp_get_settings();
-
-	// General Settings. Name of form element should be same as the setting name in register_setting(). ?>
-	
-	<fieldset>
-	
-		<!-- Setting one -->
-		<input type="checkbox" name="loginid_dwp_settings[setting_one]" id="loginid_dwp_settings[setting_one]" value="1" 
-			<?php if ( isset( $settings['setting_one'] ) ) { checked( '1', $settings['setting_one'] ); } ?>>
-			<label for="loginid_dwp_settings[setting_one]"><?php _e('Setting one', 'loginid-directweb-plugin') ?></label>
-			<br>
-			
-		<!-- Setting two -->
-		<input type="checkbox" name="loginid_dwp_settings[setting_two]" id="loginid_dwp_settings[setting_two]" value="1" 
-			<?php if ( isset( $settings['setting_two'] ) ) { checked( '1', $settings['setting_two'] ); } ?>>
-			<label for="loginid_dwp_settings[setting_two]"><?php _e('Setting two', 'loginid-directweb-plugin') ?></label>
-			<br>
+		// Get Settings
+		$settings = loginid_dwp_get_settings();?>
 		
-		<!-- Text Input -->
-		<input type="text" name="loginid_dwp_settings[text_input]" class="regular-text" value="<?php if ( isset( $settings['text_input'] ) && ( ! empty($settings['text_input']) ) ) echo esc_attr($settings['text_input']); ?>"/>
-		<p class="description"><?php _e('Description of the text input field', 'loginid-directweb-plugin'); ?></p>
-		
-	</fieldset>
-	<?php
+		<fieldset>
+			<!-- Text Input -->
+			<input type="text" name="loginid_dwp_settings[<?php echo $settings_id ?>]" class="regular-text" value="<?php if ( isset( $settings[$settings_id] ) && ( ! empty($settings[$settings_id]) ) ) echo esc_attr($settings[$settings_id]); ?>"/>
+			<p class="description"><?php _e($description, 'loginid-directweb-plugin'); ?></p>
+		</fieldset>
+		<?php	
 }
  
 /**
