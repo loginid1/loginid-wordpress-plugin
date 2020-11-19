@@ -33,19 +33,20 @@ add_action('wp_enqueue_scripts', 'loginid_dwp_enqueue_css_js');
  */
 function loginid_dwp_registration_form()
 {
+
 ?>
-  <form onsubmit="__loginidOnRegister(event,<?php $_SERVER['REQUEST_URI'] ?>, 'post')">
+  <form id="__loginid_register_form">
     <div>
       <label for="email">Email <strong>*</strong></label>
-      <input id="__loginid_input_email" type="text" name="email" value="<?php (isset($_POST['email']) ? $_POST['email'] : null) ?>">
+      <input id="__loginid_input_email" type="text" name="email" value="<?php echo (isset($_POST['email']) ? $_POST['email'] : null) ?>">
     </div>
     <div>
       <label for="username">Username <strong>*</strong></label>
-      <input id="__loginid_input_username" type="text" name="username" value="<?php (isset($_POST['username']) ? $_POST['username'] : null) ?>">
+      <input id="__loginid_input_username" type="text" name="username" value="<?php echo (isset($_POST['username']) ? $_POST['username'] : null) ?>">
     </div>
     <div>
       <label for="password">Password <strong>*</strong></label>
-      <input id="__loginid_input_password" type="password" name="password" value="<?php (isset($_POST['password']) ? $_POST['password'] : null) ?>">
+      <input id="__loginid_input_password" type="password" name="password" value="<?php echo (isset($_POST['password']) ? $_POST['password'] : null) ?>">
     </div>
     <input type="submit" name="submit" value="Register" />
   </form>
@@ -58,7 +59,7 @@ function loginid_dwp_registration_form()
  * @since 0.1.0
  * @param string $email string representing email
  * @param string $username string representing username
- * @return boolean true if valid, false if invalid
+ * @return boolean true if valid, false if invalid, null if the code went wrong
  */
 function loginid_dwp_email_username_validation($email, $username)
 {
@@ -84,19 +85,7 @@ function loginid_dwp_email_username_validation($email, $username)
     $reg_errors->add('email', 'Email Already in use');
   }
 
-  if (is_wp_error($reg_errors)) {
-
-    foreach ($reg_errors->get_error_messages() as $error) {
-  ?>
-      <div>
-        <strong>ERROR</strong>
-        <?php $error ?><br />
-      </div>
-<?php
-    }
-    return false;
-  }
-  return true;
+  return !loginid_dwp_output_wp_error($reg_errors);
 }
 
 /**
@@ -104,15 +93,45 @@ function loginid_dwp_email_username_validation($email, $username)
  * 
  * @since 0.1.0
  * @param string $password string representing password
- * @return boolean true if valid, false if invalid
+ * @return boolean true if valid, false if invalid, null if something went extremely extremely wrong
  */
 function loginid_dwp_password_validation($password)
 {
+
   $reg_errors = new WP_Error;
   if (5 > strlen($password)) {
     $reg_errors->add('password', 'Password length must be greater than 5');
   }
+
+  return !loginid_dwp_output_wp_error($reg_errors);
 }
+
+
+/**
+ * Outputs WPError Objects
+ * 
+ * @since 0.1.0
+ * @return boolean true if contains error; false if no errors; and null if input is not a wordpress error object
+ */
+function loginid_dwp_output_wp_error($reg_errors)
+{
+  if (is_wp_error($reg_errors)) {
+
+    $contains_error = false;
+    foreach ($reg_errors->get_error_messages() as $error) {
+      $contains_error = true;
+  ?>
+      <div>
+        <strong>ERROR</strong>
+        <?php echo $error ?><br />
+      </div>
+<?php
+    }
+    return $contains_error;
+  }
+  return null;
+}
+
 
 /**
  * interfaces with wordpress to create user object
@@ -143,19 +162,22 @@ function loginid_dwp_complete_registration($email, $username, $password)
  */
 function loginid_dwp_custom_registration()
 {
-  if (isset($_POST['submit'])) {
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $username = $_POST['username'];
     $password = $_POST['password'];
-    if (loginid_dwp_email_username_validation($email, $username) && loginid_dwp_password_validation($password)) {
+
+    if (loginid_dwp_email_username_validation($email, $username)  && loginid_dwp_password_validation($password)) {
+
+
       $email      =   sanitize_email($email);
       $username   =   sanitize_user($username);
       $password   =   esc_attr($password);
 
       loginid_dwp_complete_registration($email, $username, $password);
     }
-    loginid_dwp_registration_form();
   }
+  loginid_dwp_registration_form();
 }
 
 
@@ -181,15 +203,11 @@ add_shortcode('loginid_registration', 'loginid_registration_shortcode');
 function set_redirect()
 {
   global $pagenow;
-  if ('wp-register.php' == $pagenow) {
-    // TODO: uncomment this
-    // wp_redirect('register');
-    exit();
-  }
+  echo  $pagenow;
   if ('wp-login.php' == $pagenow) {
     // TODO: uncomment this
     // wp_redirect('login');
-    exit();
+    // exit();
   }
 }
 add_action('init', 'set_redirect');
