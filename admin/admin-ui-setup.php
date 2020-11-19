@@ -102,9 +102,9 @@ function loginid_dwp_enqueue_css_js( $hook ) {
 	}
 	
 	// Main CSS
-	// wp_enqueue_style( 'loginid_dwp-admin-main-css', LOGINID_DWP_STARTER_PLUGIN_URL . 'admin/css/main.css', '', LOGINID_DWP_VERSION_NUM );
+	// wp_enqueue_style( 'loginid_dwp-admin-main-css', LOGINID_DIRECTWEB_PLUGIN_URL . 'admin/css/main.css', '', LOGINID_DIRECTWEB_PLUGIN_VERSION_NUM );
 	
 	// Main JS
-    // wp_enqueue_script( 'loginid_dwp-admin-main-js', LOGINID_DWP_STARTER_PLUGIN_URL . 'admin/js/main.js', array( 'jquery' ), false, true );
+    // wp_enqueue_script( 'loginid_dwp-admin-main-js', LOGINID_DIRECTWEB_PLUGIN_URL . 'admin/js/main.js', array( 'jquery' ), false, true );
 }
 add_action( 'admin_enqueue_scripts', 'loginid_dwp_enqueue_css_js' );
