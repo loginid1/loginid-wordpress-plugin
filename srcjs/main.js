@@ -15,7 +15,7 @@ async function __loginidIsFido2Supported() {
 async function __loginidOnRegister(url, method) {
   const password = document.getElementById("__loginid_input_password").value;
 
-  if (__loginidIsFido2Supported() || password.length > 0) {
+  if ( await __loginidIsFido2Supported() || password.length > 0) {
     console.log('fido2 supported or ', password, ' > 0')
     const payload = {
       email: {
