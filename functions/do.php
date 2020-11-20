@@ -21,9 +21,30 @@ function loginid_dwp_enqueue_css_js()
   wp_enqueue_style('loginid_dwp-main-css', LOGINID_DIRECTWEB_PLUGIN_URL . 'includes/main.css', '', LOGINID_DIRECTWEB_PLUGIN_VERSION_NUM);
 
   // Main JS
+  // wp_enqueue_script('loginid_dwp-direct-web-js', LOGINID_DIRECTWEB_PLUGIN_URL . 'includes/loginid.direct_web.min.js', array(), false, true);
+  // wp_enqueue_script('loginid_dwp-browser-js', LOGINID_DIRECTWEB_PLUGIN_URL . 'includes/loginid.browser.min.js', array(), false, true);
   wp_enqueue_script('loginid_dwp-main-js', LOGINID_DIRECTWEB_PLUGIN_URL . 'includes/main.js', array(), false, true);
 }
 add_action('wp_enqueue_scripts', 'loginid_dwp_enqueue_css_js');
+
+/**
+ * Adds a handle such that all my own scripts will be using ESmodules
+ * this is done so I don't have to use webpack but sacrifices support for old browsers
+ * TODO: make webpack bable to support old browsers
+ * 
+ * @since 0.1.0
+ */
+function loginid_dwp_script_type_attribute($tag, $handle, $src)
+{
+  $whitelist = array('loginid_dwp-direct-web-js' => true, 'loginid_dwp-browser-js' => true, 'loginid_dwp-main-js' => true);
+  if (isset($whitelist[$handle])) {
+    // change the script tag by adding type="module" and return it.
+    $tag = '<script type="module" src="' . esc_url($src) . '"></script>';
+    return $tag;
+  }
+  return $tag;
+}
+add_filter('script_loader_tag', 'loginid_dwp_script_type_attribute', 10, 3);
 
 /**
  * generates custom registration form
@@ -44,11 +65,13 @@ function loginid_dwp_registration_form()
       <label for="username">Username <strong>*</strong></label>
       <input id="__loginid_input_username" type="text" name="username" value="<?php echo (isset($_POST['username']) ? $_POST['username'] : null) ?>">
     </div>
-    <div>
+    <div id="__loginid_password_div" <?php echo (empty($_POST['password']) ? 'class="__loginid_hide-password"' : null) ?>>
       <label for="password">Password <strong>*</strong></label>
       <input id="__loginid_input_password" type="password" name="password" value="<?php echo (isset($_POST['password']) ? $_POST['password'] : null) ?>">
     </div>
-    <input type="submit" name="submit" value="Register" />
+    <input type="submit" name="submit" value="Next" />
+    <input type="hidden" readonly name="baseurl" id="__loginid_input_baseurl" value="<?php echo loginid_dwp_get_settings()['base_url'] ?>">
+    <input type="hidden" readonly name="apikey" id="__loginid_input_apikey" value="<?php echo loginid_dwp_get_settings()['api_key'] ?>">
   </form>
   <?php
 }
@@ -121,9 +144,8 @@ function loginid_dwp_output_wp_error($reg_errors)
     foreach ($reg_errors->get_error_messages() as $error) {
       $contains_error = true;
   ?>
-      <div>
-        <strong>ERROR</strong>
-        <?php echo $error ?><br />
+      <div class="__loginid-error-style">
+        <?php echo $error ?>
       </div>
 <?php
     }
@@ -139,16 +161,45 @@ function loginid_dwp_output_wp_error($reg_errors)
  * @since 0.1.0
  * @param string $email string representing email
  * @param string $username string representing username
+ * @return Object wordpress user object
+ */
+function loginid_dwp_complete_registration_passwordless($email, $username)
+{
+  return loginid_dwp_complete_registration_array(array(
+    'user_login'    =>   $username,
+    'user_email'    =>   $email,
+    'user_pass'     =>   wp_generate_password($length = 128, $include_standard_special_chars = true) // generates random 128 char password to fill in
+  ));
+}
+
+
+/**
+ * interfaces with wordpress to create user object with password
+ * 
+ * @since 0.1.0
+ * @param string $email string representing email
+ * @param string $username string representing username
  * @param string $password string representing password
  * @return Object wordpress user object
  */
-function loginid_dwp_complete_registration($email, $username, $password)
+function loginid_dwp_complete_registration_with_password($email, $username, $password)
 {
-  $userdata = array(
+  return loginid_dwp_complete_registration_array(array(
     'user_login'    =>   $username,
     'user_email'    =>   $email,
     'user_pass'     =>   $password,
-  );
+  ));
+}
+
+/**
+ * interfaces with wordpress to create user object
+ * 
+ * @since 0.1.0
+ * @param array $userdata array containing userdata that could be processed by wp_insert_user();
+ * @return Object wordpress user object
+ */
+function loginid_dwp_complete_registration_array($userdata)
+{
   $user = wp_insert_user($userdata); // user object
   echo 'Registration complete. Goto <a href="' . get_site_url() . '/wp-login.php">login page</a>.';
   return $user;
@@ -174,7 +225,7 @@ function loginid_dwp_custom_registration()
       $username   =   sanitize_user($username);
       $password   =   esc_attr($password);
 
-      loginid_dwp_complete_registration($email, $username, $password);
+      loginid_dwp_complete_registration_with_password($email, $username, $password);
     }
   }
   loginid_dwp_registration_form();
@@ -203,9 +254,8 @@ add_shortcode('loginid_registration', 'loginid_registration_shortcode');
 function set_redirect()
 {
   global $pagenow;
-  echo  $pagenow;
   if ('wp-login.php' == $pagenow) {
-    // TODO: uncomment this
+    // TODO: uncomment this when login page is stable
     // wp_redirect('login');
     // exit();
   }
