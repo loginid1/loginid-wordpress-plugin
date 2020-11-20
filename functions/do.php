@@ -30,7 +30,7 @@ add_action('wp_enqueue_scripts', 'loginid_dwp_enqueue_css_js');
 /**
  * Adds a handle such that all my own scripts will be using ESmodules
  * this is done so I don't have to use webpack but sacrifices support for old browsers
- * TODO: make webpack bable to support old browsers
+ * This function is unused since it isn't needed anymore, babel transpile ES5 the javascript now.
  * 
  * @since 0.1.0
  */
@@ -44,7 +44,8 @@ function loginid_dwp_script_type_attribute($tag, $handle, $src)
   }
   return $tag;
 }
-add_filter('script_loader_tag', 'loginid_dwp_script_type_attribute', 10, 3);
+// commented out because this function isn't needed anymore
+// add_filter('script_loader_tag', 'loginid_dwp_script_type_attribute', 10, 3);
 
 /**
  * generates custom registration form

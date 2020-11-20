@@ -1,2 +1,3 @@
 /node_modules/
-/includes/
+/includes/*.css.map
+/includes/*.js.map

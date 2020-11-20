@@ -1,5 +1,8 @@
-import DirectWeb from "./loginid.direct_web.min";
-import Browser from "./loginid.browser.min";
+import "core-js/features/promise"; // needed for babel compile
+import "regenerator-runtime/runtime";  // needed for babel compile
+
+import DirectWeb from "./loginid.direct_web.min.js";
+import Browser from './loginid.browser.min.js'
 
 async function __loginidIsFido2Supported() {
   try {
