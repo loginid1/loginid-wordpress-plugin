@@ -9,7 +9,6 @@
 // Exit if accessed directly
 if (!defined('ABSPATH')) exit;
 
-
 /**
  * Enqueues all scripts and styles required by this plugin
  * 
@@ -52,29 +51,36 @@ function loginid_dwp_script_type_attribute($tag, $handle, $src)
  * this form reacts to what is being posted and auto fills the input
  * 
  * @since 0.1.0
+ * @param boolean $release_the_fido whether or not to release loginid direct web information for directweb login
+ * @param string|null $redirect string representing where to redirect the user, this value should be null if you don't want to redirect. should only be supplied a value when ready to be redirected.
+ * @param string|null $email string representing email
+ * @param string|null $username string representing username
+ * @param string|null $password string representing password
  */
-function loginid_dwp_registration_form()
+function loginid_dwp_registration_form($release_the_fido, $email = null, $username = null, $password = null)
 {
-
 ?>
   <form id="__loginid_register_form">
     <div>
       <label for="email">Email <strong>*</strong></label>
-      <input id="__loginid_input_email" type="text" name="email" value="<?php echo (isset($_POST['email']) ? $_POST['email'] : null) ?>">
+      <input id="__loginid_input_email" type="text" name="email" value="<?php echo $email ?>">
     </div>
     <div>
       <label for="username">Username <strong>*</strong></label>
-      <input id="__loginid_input_username" type="text" name="username" value="<?php echo (isset($_POST['username']) ? $_POST['username'] : null) ?>">
+      <input id="__loginid_input_username" type="text" name="username" value="<?php echo  $username ?>">
     </div>
-    <div id="__loginid_password_div" <?php echo (empty($_POST['password']) ? 'class="__loginid_hide-password"' : null) ?>>
+    <div id="__loginid_password_div" <?php echo (empty($password) ? 'class="__loginid_hide-password"' : null) ?>>
       <label for="password">Password <strong>*</strong></label>
-      <input id="__loginid_input_password" type="password" name="password" value="<?php echo (isset($_POST['password']) ? $_POST['password'] : null) ?>">
+      <input id="__loginid_input_password" type="password" name="password" value="<?php echo $password ?>">
     </div>
-    <input type="submit" name="submit" value="Next" />
-    <input type="hidden" readonly name="baseurl" id="__loginid_input_baseurl" value="<?php echo loginid_dwp_get_settings()['base_url'] ?>">
-    <input type="hidden" readonly name="apikey" id="__loginid_input_apikey" value="<?php echo loginid_dwp_get_settings()['api_key'] ?>">
+    <input type="submit" name="submit" value="Next" id="__loginid_submit_button" />
+    <?php if ($release_the_fido === true) { ?>
+      <input type="hidden" readonly name="baseurl" id="__loginid_input_baseurl" value="<?php echo loginid_dwp_get_settings()['base_url'] ?>">
+      <input type="hidden" readonly name="apikey" id="__loginid_input_apikey" value="<?php echo loginid_dwp_get_settings()['api_key'] ?>">
+    <?php } ?>
+
   </form>
-  <?php
+<?php
 }
 
 /**
@@ -83,7 +89,7 @@ function loginid_dwp_registration_form()
  * @since 0.1.0
  * @param string $email string representing email
  * @param string $username string representing username
- * @return boolean true if valid, false if invalid, null if the code went wrong
+ * @return WP_Error list of errors, could be empty list too use count($reg_errors>$errors)
  */
 function loginid_dwp_email_username_validation($email, $username)
 {
@@ -109,7 +115,7 @@ function loginid_dwp_email_username_validation($email, $username)
     $reg_errors->add('email', 'Email Already in use');
   }
 
-  return !loginid_dwp_output_wp_error($reg_errors);
+  return $reg_errors;
 }
 
 /**
@@ -127,7 +133,7 @@ function loginid_dwp_password_validation($password)
     $reg_errors->add('password', 'Password length must be greater than 5');
   }
 
-  return !loginid_dwp_output_wp_error($reg_errors);
+  return $reg_errors;
 }
 
 
@@ -144,15 +150,22 @@ function loginid_dwp_output_wp_error($reg_errors)
     $contains_error = false;
     foreach ($reg_errors->get_error_messages() as $error) {
       $contains_error = true;
-  ?>
-      <div class="__loginid-error-style">
-        <?php echo $error ?>
-      </div>
-<?php
+      loginid_dwp_output_error($error);
     }
     return $contains_error;
   }
   return null;
+}
+/**
+ * Outputs error text
+ * 
+ * @since 0.1.0
+ */
+function loginid_dwp_output_error($error)
+{
+  echo '<div class="__loginid-error-style">';
+  echo $error;
+  echo '</div>';
 }
 
 
@@ -166,11 +179,7 @@ function loginid_dwp_output_wp_error($reg_errors)
  */
 function loginid_dwp_complete_registration_passwordless($email, $username)
 {
-  return loginid_dwp_complete_registration_array(array(
-    'user_login'    =>   $username,
-    'user_email'    =>   $email,
-    'user_pass'     =>   wp_generate_password($length = 128, $include_standard_special_chars = true) // generates random 128 char password to fill in
-  ));
+  return loginid_dwp_complete_registration_with_password($email, $username, wp_generate_password($length = 128, $include_standard_special_chars = true)); // generates random 128 char password to fill in)
 }
 
 
@@ -202,8 +211,20 @@ function loginid_dwp_complete_registration_with_password($email, $username, $pas
 function loginid_dwp_complete_registration_array($userdata)
 {
   $user = wp_insert_user($userdata); // user object
-  echo 'Registration complete. Goto <a href="' . get_site_url() . '/wp-login.php">login page</a>.';
   return $user;
+}
+
+/** 
+ * give user cookie to log them in
+ * 
+ * @since 0.1.0
+ */
+function loginid_dwp_login_user($user_id)
+{
+  wp_set_current_user($user_id);
+  wp_set_auth_cookie($user_id);
+  wp_redirect(home_url());
+  exit();
 }
 
 /**
@@ -214,23 +235,57 @@ function loginid_dwp_complete_registration_array($userdata)
  */
 function loginid_dwp_custom_registration()
 {
-  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $submitted_and_validated = false;
+  $email = null;
+  $username = null;
+  $password = null;
+  $wp_errors = new WP_Error;
+
+  if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $username = $_POST['username'];
-    $password = $_POST['password'];
+    $password = isset($_POST['password']) ? $_POST['password'] : null;
+    $fido2 = isset($_POST['fido2']) ? $_POST['fido2'] : null;
 
-    if (loginid_dwp_email_username_validation($email, $username)  && loginid_dwp_password_validation($password)) {
+    $loginid_data = isset($_POST['loginid']) ? $_POST['loginid'] : null;
 
+    $wp_errors = loginid_dwp_wp_error_merge($wp_errors, loginid_dwp_email_username_validation($email, $username));
+    // error code count = 0 means no error codes;
+    if (loginid_dwp_is_wp_error_empty($wp_errors)) {
 
       $email      =   sanitize_email($email);
       $username   =   sanitize_user($username);
-      $password   =   esc_attr($password);
 
-      loginid_dwp_complete_registration_with_password($email, $username, $password);
+      if (isset($loginid_data)) {
+        $loginid_data = sanitize_text_field($loginid_data);
+        $loginid = json_decode($loginid_data);
+
+        if (isset($loginid->{'error'})) {
+          $wp_errors->add($loginid->{'error'}->{'name'}, $loginid->{'error'}->{'message'});
+        } else {
+          // TODO: validate claim
+
+          // create user then log them in
+          $user = loginid_dwp_complete_registration_passwordless($email, $username);
+          loginid_dwp_login_user($user); // logs the user in
+        }
+      } else if (isset($password)) {
+        $wp_errors = loginid_dwp_wp_error_merge($wp_errors, loginid_dwp_password_validation($password));
+        if (loginid_dwp_is_wp_error_empty($wp_errors)) {
+          $password   =   esc_attr($password);
+          $user = loginid_dwp_complete_registration_with_password($email, $username, $password);
+          loginid_dwp_login_user($user); // logs the user in
+        }
+      } else if ($fido2 === 'supported') {
+        $submitted_and_validated = true;
+      }
     }
   }
-  loginid_dwp_registration_form();
+  loginid_dwp_output_wp_error($wp_errors);
+  loginid_dwp_registration_form($submitted_and_validated, $email, $username, $password);
 }
+
+
 
 
 /**
@@ -247,6 +302,24 @@ function loginid_registration_shortcode()
 // Register a new shortcode: [loginid_registration]
 add_shortcode('loginid_registration', 'loginid_registration_shortcode');
 
+
+function pre_process_shortcode() {
+  if (!is_singular()) return;
+  global $post;
+  if (!empty($post->post_content)) {
+    $regex = get_shortcode_regex();
+    preg_match_all('/'.$regex.'/',$post->post_content,$matches);
+    if (!empty($matches[2]) && in_array('loginid_registration',$matches[2]) && is_user_logged_in()) {
+      // redirect to third party site
+    } else {
+      // login form or redirect to login page
+    }
+  }
+}
+// add_action('template_redirect','pre_process_shortcode',1);
+
+
+
 /**
  * callback that sets redirect from wp-register and wp-login to custom login and register pages
  * 
@@ -262,3 +335,54 @@ function set_redirect()
   }
 }
 add_action('init', 'set_redirect');
+
+
+/**
+ * Merge multiple WP_Error objects together
+ * credit: https://gist.github.com/wpscholar/9004667
+ *
+ * @return WP_Error
+ */
+function loginid_dwp_wp_error_merge()
+{
+  $wp_error_merged = new WP_Error();
+  $wp_errors = func_get_args();
+  foreach ($wp_errors as $wp_error) {
+    if (!is_wp_error($wp_error)) {
+      continue;
+    }
+    /**
+     * @var WP_Error $wp_error
+     */
+    $error_codes = $wp_error->get_error_codes();
+    foreach ($error_codes as $error_code) {
+      // Merge error messages
+      $error_messages = $wp_error->get_error_messages($error_code);
+      foreach ($error_messages as $error_message) {
+        $wp_error_merged->add($error_code, $error_message);
+      }
+      // Merge error data
+      $error_data = $wp_error->get_error_data($error_code);
+      if ($error_data) {
+        $prev_error_data = $wp_error_merged->get_error_data($error_code);
+        if (!empty($prev_error_data) && is_array($error_data) && is_array($prev_error_data)) {
+          $wp_error_merged->add_data(array_merge($prev_error_data, $error_data), $error_code);
+        } else {
+          $wp_error_merged->add_data($error_data, $error_code);
+        }
+      }
+    }
+  }
+  return $wp_error_merged;
+}
+
+/**
+ * is wp_error empty
+ * 
+ * @param WP_Error $wp_errors the error object to be compared
+ * @return boolean true if its empty, false if its not empty
+ */
+function loginid_dwp_is_wp_error_empty($wp_errors)
+{
+  return count($wp_errors->get_error_codes()) === 0;
+}
