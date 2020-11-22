@@ -368,8 +368,8 @@ class LoginID_DirectWeb
    */
   public function on_init()
   {
-    // check for the 2 keys which is unique to this plugin's forms
-    if (isset($_POST['submit']) && isset($_POST['shortcode'])) {
+    // check for the 2 keys which is unique to this plugin's forms (also check to make sure user isn't logged in)
+    if (isset($_POST['submit']) && isset($_POST['shortcode']) && !is_user_logged_in()) {
       // this method gotta be efficient, cuz its loaded on every page, avoid doing unnecessary work
       $submit = sanitize_text_field($_POST['submit']); // immediately sanitized
       $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
@@ -521,12 +521,10 @@ class LoginID_DirectWeb
   }
 
   /**
-   * renders the form depending on the data in the object
-   * 
-   * @since 0.1.0
-   * @param string $type, basically 'login' or 'register'
+   * debug dump
+   * TODO: remove
    */
-  public function render($type = LoginID_Operation::Login)
+  private function debug_dump()
   {
     echo var_dump($this->release_the_fido);
     echo ";<br />";
@@ -544,8 +542,23 @@ class LoginID_DirectWeb
     echo ";<br />";
     echo var_dump($this->user_id);
     echo ";<br />";
-    $this->output_wp_errors();
-    $this->render_form($type);
+  }
+
+  /**
+   * renders the form depending on the data in the object
+   * 
+   * @since 0.1.0
+   * @param string $type, basically 'login' or 'register'
+   */
+  public function render($type = LoginID_Operation::Login)
+  {
+    // don't render if user is logged in
+    if (!is_user_logged_in()) {
+
+      // $this->debug_dump(); // todo: remove
+      $this->output_wp_errors();
+      $this->render_form($type);
+    }
   }
 
   /**
