@@ -38,7 +38,11 @@ abstract class LoginID_Errors
   public const PasswordLength = array(LoginID_Error::Code => "password_length", LoginID_Error::Message => "Password length must be greater than 8");
 
   public const LoginFailed = array(LoginID_Error::Code => "login_failed", LoginID_Error::Message => "Incorrect email/password combination");
+
   public const LoginIDError = array(LoginID_Error::Code => "loginid_error", LoginID_Error::Message => "Unable to verify your identity");
+
+  public const LoginIDCannotVerify = array(LoginID_Error::Code => "loginid_cannot_verify", LoginID_Error::Message => "Your Identity could not be verified");
+  public const LoginIDServerError = array(LoginID_Error::Code => "loginid_server_error", LoginID_Error::Message => "LoginID Server Error, please use password login for now.");
 
   public const Example = array(LoginID_Error::Code => "", LoginID_Error::Message => "");
   // usage add(LoginID_Errors::Example[LoginID_Error::Code], LoginID_Errors::Example[LoginID_Error::Message]);
@@ -219,6 +223,41 @@ class LoginID_DirectWeb
 
     return $reg_errors;
   }
+
+  /**
+   * sends GET request with kid to loginid servers to retrieve public key
+   * this is a pure function
+   * 
+   * @return string|false raw output from loginid server, false if failed
+   */
+  protected function get_jwt_public_key($kid)
+  {
+    $url = "https://jwt.usw1.loginid.io/certs";
+
+    $fields = array(
+      'kid' => $kid,
+    );
+
+    $postvars = '';
+    $sep = '';
+    foreach ($fields as $key => $value) {
+      $postvars .= $sep . urlencode($key) . '=' . urlencode($value);
+      $sep = '&';
+    }
+
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPGET, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, "kid={$kid}");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $result = curl_exec($ch);
+
+    curl_close($ch);
+    return $result;
+  }
+
   /**
    * logs in the user without a password
    * I expect stuff to be sanitized before calling this function
@@ -230,8 +269,38 @@ class LoginID_DirectWeb
    */
   protected function validate_loginid()
   {
-    // TODO: validate claim from loginid api
-    return true;
+    if (isset($this->loginid)) {
+      $jwt = $this->loginid->{'jwt'};
+      if (isset($jwt) && is_string($jwt)) {
+        $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $jwt)[0]))));
+        $jwt_body = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $jwt)[1]))));
+        $jwt_signature = explode('.', $jwt)[2];
+        if (isset($jwt_header->{'kid'})) {
+          $kid = $jwt_header->{'kid'};
+          $public_key = $this->get_jwt_public_key($kid);
+          if ($public_key !== false) {
+            $h = json_encode($jwt_header);
+            $b = json_encode($jwt_body);
+            $result = openssl_verify("{$h}.{$b}", $jwt_signature, $public_key, OPENSSL_ALGO_SHA256);
+
+            if ($result === 1) {
+              return true;
+            } else {
+              // your identity could not be verified
+              $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
+              return false;
+            }
+          }else {
+            // server error
+            $this->wp_errors->add(LoginID_Errors::LoginIDServerError[LoginID_Error::Code], LoginID_Errors::LoginIDServerError[LoginID_Error::Message]);
+
+          }
+        }
+      }
+    }
+    $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
+    // this runs, it means: malformed payload;
+    return false;
   }
 
   /**
@@ -397,12 +466,11 @@ class LoginID_DirectWeb
             // now we need to figure out if we doing loginid login, password login or awaiting loginid direct web.
             if (isset($loginid_data)) {
               // do loginid login
-              $loginid_data = sanitize_text_field($loginid_data);
-              $loginid = json_decode($loginid_data);
+              $loginid = json_decode(stripslashes($loginid_data)); // strip slashes is important :/
               $this->loginid = $loginid;
 
               if (isset($loginid->{'error'})) {
-                $this->wp_errors->add($loginid->{'error'}->{'name'}, $loginid->{'error'}->{'message'});
+                $this->wp_errors->add($loginid->error->{'name'}, $loginid->error->{'message'});
               } else {
                 // create user then log them in
                 $this->authenticate($login_type);
@@ -465,12 +533,10 @@ class LoginID_DirectWeb
         <label for="email">Email <strong>*</strong></label>
         <input id="__loginid_input_email" type="text" name="email" value="<?php echo $this->email ?>">
       </div>
-      <?php if ($type === LoginID_Operation::Register) { ?>
-        <div>
-          <label for="username">Username <strong>*</strong></label>
-          <input id="__loginid_input_username" type="text" name="username" value="<?php echo  $this->username ?>">
-        </div>
-      <?php } ?>
+      <div <?php echo ($type === LoginID_Operation::Login ? 'class="__loginid_hide-username"' : null) ?>>
+        <label for="username">Username <strong>*</strong></label>
+        <input id="__loginid_input_username" type="text" name="username" value="<?php echo  $this->username ?>">
+      </div>
       <div id="__loginid_password_div" <?php echo ((!$this->javascript_unsupported) && empty($this->password) ? 'class="__loginid_hide-password"' : null) ?>>
         <label for="password">Password <strong>*</strong></label>
         <input id="__loginid_input_password" type="password" name="password" value="<?php echo $this->password ?>">
@@ -552,10 +618,10 @@ class LoginID_DirectWeb
    */
   public function render($type = LoginID_Operation::Login)
   {
-    // don't render if user is logged in
-    if (!is_user_logged_in()) {
+    // $this->debug_dump(); // todo: remove
 
-      // $this->debug_dump(); // todo: remove
+    // don't render if user is logged in (except for in previews)
+    if (!is_user_logged_in() || is_preview()) {
       $this->output_wp_errors();
       $this->render_form($type);
     }

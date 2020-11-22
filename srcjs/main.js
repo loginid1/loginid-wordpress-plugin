@@ -11,14 +11,27 @@ async function __loginidIsFido2Supported() {
     return false;
   }
 }
+
+const __loginidAuth = Object.freeze({
+  LOGIN: "login",
+  REGISTER: "register",
+});
+
 /**
  *
  * @param url url in string
  * @param method method in string, POST GET or whatever
+ * @param authType 'login' or 'register' use __loginidAuth.LOGIN or __loginidAuth.REGISTER
  * @param {[k: string]: {value: string, element: string}} additionalPayload additional object, optional.
  */
-async function __loginidOnRegister(url, method, additionalPayload = {}) {
+async function __loginidOnAuthenticate(
+  url,
+  method,
+  authType,
+  additionalPayload = {}
+) {
   const password = document.getElementById("__loginid_input_password").value;
+  const username = document.getElementById("__loginid_input_username").value;
   const isFido2Supported = await __loginidIsFido2Supported();
 
   const payload = {
@@ -26,12 +39,8 @@ async function __loginidOnRegister(url, method, additionalPayload = {}) {
       value: document.getElementById("__loginid_input_email").value,
       element: document.createElement("input"),
     },
-    username: {
-      value: document.getElementById("__loginid_input_username").value,
-      element: document.createElement("input"),
-    },
     submit: {
-      value: "register",
+      value: authType,
       element: document.createElement("input"),
     },
     shortcode: {
@@ -40,6 +49,13 @@ async function __loginidOnRegister(url, method, additionalPayload = {}) {
     },
     ...additionalPayload,
   };
+
+  if (authType === __loginidAuth.REGISTER) {
+    payload['username'] = {
+      value: username,
+      element: document.createElement("input"),
+    };
+  }
 
   if (password.length > 0) {
     payload["password"] = {
@@ -93,7 +109,11 @@ function __loginidIsDefined(domObject) {
   return typeof domObject !== undefined && domObject !== null;
 }
 
-async function __loginidOnRegisterPageLoaded() {
+/**
+ *
+ * @param type 'login' or 'register' use __loginidAuth.LOGIN or __loginidAuth.REGISTER
+ */
+async function __loginidOnPageLoaded(type) {
   // function assumes register from exists
   const email = document.getElementById("__loginid_input_email").value;
   const baseURLInput = document.getElementById("__loginid_input_baseurl");
@@ -106,31 +126,47 @@ async function __loginidOnRegisterPageLoaded() {
     let result;
     try {
       const sdk = new DirectWeb(baseURL, apiKey);
-      result = await sdk.register(email);
+
+      result = await sdk[type](email);
     } catch ({ name, message }) {
       result = { error: { name, message } };
     }
-    console.log("result", result);
-    __loginidOnRegister(
+    // console.log("result", result); // TODO: remove this
+    localStorage.setItem('last_result', JSON.stringify(result))
+    __loginidOnAuthenticate(
       `${window.location.origin}${window.location.pathname}`,
       "POST",
-      { loginid: { value: result, element: document.createElement("input") } }
+      type,
+      {
+        loginid: {
+          value: JSON.stringify(result),
+          element: document.createElement("input"),
+        },
+      }
     );
   }
-  // page not approved for fido2 authentication
+  // otherwise page not approved for fido2 authentication
 }
 
 // self calling function here to trigger onRegisterPageLoaded()
 (function () {
   const registerForm = document.getElementById("__loginid_register_form");
-  if (__loginidIsDefined(registerForm)) {
-    registerForm.addEventListener("submit", (event) => {
+  const loginForm = document.getElementById("__loginid_login_form");
+  let type = __loginidIsDefined(registerForm)
+    ? __loginidAuth.REGISTER
+    : __loginidIsDefined(loginForm)
+    ? __loginidAuth.LOGIN
+    : false;
+
+  if (type) {
+    document.getElementById(`__loginid_${type}_form`).addEventListener("submit", (event) => {
       event.preventDefault();
-      __loginidOnRegister(
+      __loginidOnAuthenticate(
         `${window.location.origin}${window.location.pathname}`,
-        "POST"
+        "POST",
+        type
       );
     });
-    __loginidOnRegisterPageLoaded();
+    __loginidOnPageLoaded(type);
   }
 })();

@@ -2,6 +2,9 @@
   display: none;
 }
 
+.__loginid_hide-username {
+  display: none;
+}
 
 .__loginid_error-style {
   
