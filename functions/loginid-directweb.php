@@ -272,28 +272,33 @@ class LoginID_DirectWeb
     if (isset($this->loginid)) {
       $jwt = $this->loginid->{'jwt'};
       if (isset($jwt) && is_string($jwt)) {
+        // split jwt into header body and signature (decode header and body)
         $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $jwt)[0]))));
         $jwt_body = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $jwt)[1]))));
         $jwt_signature = explode('.', $jwt)[2];
+
         if (isset($jwt_header->{'kid'})) {
+          // get kid
           $kid = $jwt_header->{'kid'};
-          $public_key = $this->get_jwt_public_key($kid);
+          // GET public key from loginid.io servers
+          $public_key = $this->get_jwt_public_key($kid); // returns false if failed, string if successful
           if ($public_key !== false) {
+            // encode previously decoded objects back into strings
             $h = json_encode($jwt_header);
             $b = json_encode($jwt_body);
+            // verify using openssl_verify(original string, signature, public key, algorithm)
             $result = openssl_verify("{$h}.{$b}", $jwt_signature, $public_key, OPENSSL_ALGO_SHA256);
-
             if ($result === 1) {
+              // verification succesful
               return true;
             } else {
               // your identity could not be verified
               $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
               return false;
             }
-          }else {
+          } else {
             // server error
             $this->wp_errors->add(LoginID_Errors::LoginIDServerError[LoginID_Error::Code], LoginID_Errors::LoginIDServerError[LoginID_Error::Message]);
-
           }
         }
       }
