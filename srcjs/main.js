@@ -34,6 +34,10 @@ async function __loginidOnRegister(url, method, additionalPayload = {}) {
       value: "register",
       element: document.createElement("input"),
     },
+    shortcode: {
+      value: document.getElementById("__loginid_input_shortcode").value,
+      element: document.createElement("input"),
+    },
     ...additionalPayload,
   };
 

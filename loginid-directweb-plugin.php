@@ -32,11 +32,6 @@
 /**
  * ~ TODO ~
  *
- * - Update loginid_dwp_settings_link() 		in \admin\basic-setup.php
- * - Update loginid_dwp_footer_text()		in \admin\basic-setup.php
- * - Update loginid_dwp_add_menu_links() 	in \admin\admin-ui-setup.php
- * - Update loginid_dwp_register_settings() 	in \admin\admin-ui-setup.php
- * - Update UI format and settings		in \admin\admin-ui-render.php
  * - Update uninstall.php
  * 
  * - Update LOGINID_DIRECTWEB_PLUGIN_VERSION_NUM 			in loginid-directweb-plugin.php (keep this line for future updates)

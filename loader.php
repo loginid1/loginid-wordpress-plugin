@@ -17,5 +17,9 @@ require_once( LOGINID_DIRECTWEB_PLUGIN_DIR . 'admin/admin-ui-setup.php' );
 // Render Admin UI
 require_once( LOGINID_DIRECTWEB_PLUGIN_DIR . 'admin/admin-ui-render.php' );
 
-// Do plugin operations
+// Perform main plugin function 
+require_once( LOGINID_DIRECTWEB_PLUGIN_DIR . 'functions/loginid-directweb.php' );
+LoginID_DirectWeb::bootstrap();
+
+// Do Other plugin operations
 require_once( LOGINID_DIRECTWEB_PLUGIN_DIR . 'functions/do.php' );
