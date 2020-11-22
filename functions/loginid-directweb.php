@@ -85,7 +85,7 @@ class LoginID_DirectWeb
   {
 
     $self = new self();
-    add_action('wp_loaded', array($self, 'on_loaded'));
+    add_action('init', array($self, 'on_init'));
     add_action('template_redirect', array($self, 'redirect_if_applicable'));
     // add short codes
     add_shortcode(self::ShortCodes[LoginID_Operation::Register], array($self, 'registration_shortcode'));
@@ -366,8 +366,7 @@ class LoginID_DirectWeb
    * 
    * @since 0.1.0
    */
-
-  public function on_loaded()
+  public function on_init()
   {
     // check for the 2 keys which is unique to this plugin's forms
     if (isset($_POST['submit']) && isset($_POST['shortcode'])) {
@@ -385,7 +384,6 @@ class LoginID_DirectWeb
           $this->email = $_POST['email']; // these are okay we gotta remember to sanitize them later, before writing to db
           $this->username = isset($_POST['username']) ? $_POST['username'] : null; // these are okay we gotta remember to sanitize them later
           $this->password = isset($_POST['password']) ? $_POST['password'] : null; // these are okay we gotta remember to sanitize them later
-
 
           $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_email($login_type), $login_type === LoginID_Operation::Register ? $this->validate_username() : null);
           if ($this->contains_no_errors()) {
@@ -419,7 +417,7 @@ class LoginID_DirectWeb
               }
             } else if ($fido2_support === LoginID_FIDO2::Supported) {
               // this point we still awaiting fido2 data from loginid direct web api backend
-              $this->release_the_fido;
+              $this->release_the_fido = true;
             } else {
               // something gone really wrong
               $this->wp_errors->add(LoginID_Errors::CriticalError[LoginID_Error::Code], LoginID_Errors::VersionMismatch[LoginID_Error::Message]);
@@ -447,7 +445,7 @@ class LoginID_DirectWeb
    */
   public function redirect_if_applicable()
   {
-    if(isset($this->user_id)) {
+    if (isset($this->user_id)) {
       $this->login_user($this->user_id); // login and redirects, then exit();
     }
   }
@@ -530,6 +528,22 @@ class LoginID_DirectWeb
    */
   public function render($type = LoginID_Operation::Login)
   {
+    echo var_dump($this->release_the_fido);
+    echo ";<br />";
+    echo var_dump($this->email);
+    echo ";<br />";
+    echo var_dump($this->username);
+    echo ";<br />";
+    echo var_dump($this->password);
+    echo ";<br />";
+    echo var_dump($this->wp_errors);
+    echo ";<br />";
+    echo var_dump($this->javascript_unsupported);
+    echo ";<br />";
+    echo var_dump($this->loginid);
+    echo ";<br />";
+    echo var_dump($this->user_id);
+    echo ";<br />";
     $this->output_wp_errors();
     $this->render_form($type);
   }
