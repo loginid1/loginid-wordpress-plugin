@@ -293,8 +293,9 @@ class LoginID_DirectWeb
               $result = openssl_verify("{$h}.{$b}", $jwt_signature, $public_key, OPENSSL_ALGO_SHA256);
               if ($result === 1) {
                 // verification successful; now we know the jwt is legit at this point
-                // final step is to compare the udata jwt sais vs what we think is logging in. 
-                if ($this->email === $jwt_body->{'udata'}) {
+                // final step is to compare the udata jwt said vs what we think is logging in. 
+                // as well as only accepting a JWT issued in the last 30s
+                if ($this->email === $jwt_body->{'udata'} && time() - intval($jwt_body->{'udata'}) < 30) {
                   // and we done, email matches we done
                   return true;
                 }
