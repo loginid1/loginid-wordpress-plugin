@@ -273,34 +273,37 @@ class LoginID_DirectWeb
       $jwt = $this->loginid->{'jwt'};
       if (isset($jwt) && is_string($jwt)) {
         // split jwt into header body and signature (decode header and body)
-        $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $jwt)[0]))));
-        $jwt_body = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $jwt)[1]))));
-        $jwt_signature = explode('.', $jwt)[2];
+        [$jwt_h, $jwt_b, $jwt_signature] = explode('.', $jwt);
+        $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_h))));
+        $jwt_body = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_b))));
 
-        if (isset($jwt_header->{'kid'})) {
-          // get kid
-          $kid = $jwt_header->{'kid'};
-          // GET public key from loginid.io servers
-          $public_key = $this->get_jwt_public_key($kid); // returns false if failed, string if successful
-          if ($public_key !== false) {
-            // encode previously decoded objects back into strings
-            $h = json_encode($jwt_header);
-            $b = json_encode($jwt_body);
-            // verify using openssl_verify(original string, signature, public key, algorithm)
-            $result = openssl_verify("{$h}.{$b}", $jwt_signature, $public_key, OPENSSL_ALGO_SHA256);
-            if ($result === 1) {
-              // verification succesful
-              return true;
+        // ensure this is a jwt
+        if (is_object($jwt_header) && is_object($jwt_body))
+          // need to then verify that jwt_header is correctly formed
+          if (isset($jwt_header->{'alg'}) && isset($jwt_header->{'typ'}) && $jwt_header->typ === "JWT" && isset($jwt_header->{'kid'})) {
+            // get kid
+            $kid = $jwt_header->{'kid'};
+            // GET public key from loginid.io servers
+            $public_key = $this->get_jwt_public_key($kid); // returns false if failed, string if successful
+            if ($public_key !== false) {
+              // encode previously decoded objects back into strings
+              $h = json_encode($jwt_header);
+              $b = json_encode($jwt_body);
+              // verify using openssl_verify(original string, signature, public key, algorithm)
+              $result = openssl_verify("{$h}.{$b}", $jwt_signature, $public_key, OPENSSL_ALGO_SHA256);
+              if ($result === 1) {
+                // verification successful; now we know the jwt is legit at this point
+                // final step is to compare the udata jwt sais vs what we think is logging in. 
+                if ($this->email === $jwt_body->{'udata'}) {
+                  // and we done, email matches we done
+                  return true;
+                }
+              }
             } else {
-              // your identity could not be verified
-              $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
-              return false;
+              // server error
+              $this->wp_errors->add(LoginID_Errors::LoginIDServerError[LoginID_Error::Code], LoginID_Errors::LoginIDServerError[LoginID_Error::Message]);
             }
-          } else {
-            // server error
-            $this->wp_errors->add(LoginID_Errors::LoginIDServerError[LoginID_Error::Code], LoginID_Errors::LoginIDServerError[LoginID_Error::Message]);
           }
-        }
       }
     }
     $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
