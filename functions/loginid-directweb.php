@@ -1,5 +1,8 @@
 <?php
 // Exit if accessed directly
+
+use function PHPSTORM_META\type;
+
 if (!defined('ABSPATH')) exit;
 
 
@@ -453,14 +456,15 @@ class LoginID_DirectWeb
       $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
       $login_type = $this->validate_loginid_field($shortcode); // validate input
       if ($login_type !== false) {
+        $this->email = $_POST['email']; // these are okay we gotta remember to sanitize them later, before writing to db
+        $this->username = isset($_POST['username']) ? $_POST['username'] : null; // these are okay we gotta remember to sanitize them later
+
         // we have login type as register or login
         if ($submit === $login_type) {
           // the submit should return the correct submission type or else something went wrong on the front end;
           // never trust the front end xd
 
           // from this point on we are good to go
-          $this->email = $_POST['email']; // these are okay we gotta remember to sanitize them later, before writing to db
-          $this->username = isset($_POST['username']) ? $_POST['username'] : null; // these are okay we gotta remember to sanitize them later
           $this->password = isset($_POST['password']) ? $_POST['password'] : null; // these are okay we gotta remember to sanitize them later
 
           $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_email($login_type), $login_type === LoginID_Operation::Register ? $this->validate_username() : null);
@@ -537,7 +541,7 @@ class LoginID_DirectWeb
   protected function render_form($type = LoginID_Operation::Login)
   {
 ?>
-    <form id="<?php echo "__loginid_{$type}_form" ?>">
+    <form id="<?php echo "__loginid_{$type}_form" ?>" method="POST">
       <div>
         <label for="email">Email <strong>*</strong></label>
         <input id="__loginid_input_email" type="text" name="email" value="<?php echo $this->email ?>">
@@ -550,7 +554,7 @@ class LoginID_DirectWeb
         <label for="password">Password <strong>*</strong></label>
         <input id="__loginid_input_password" type="password" name="password" value="<?php echo $this->password ?>">
       </div>
-      <input type="submit" name="submit" value="<?php echo LoginID_Operation::Next ?>" id="__loginid_submit_button" />
+      <input type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
       <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo LoginID_DirectWeb::ShortCodes[$type] ?>">
       <?php if ($this->release_the_fido) {
         $settings = loginid_dwp_get_settings()
