@@ -1,8 +1,9 @@
 var path = require("path");
 var webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: { main: ["./srcjs/main.js", "./srcjs/main.css"] },
@@ -10,7 +11,7 @@ module.exports = {
     path: path.resolve(__dirname, "includes"),
     filename: "[name].js",
   },
-  plugins: [new MiniCssExtractPlugin()],
+  plugins: [new CleanWebpackPlugin(), new MiniCssExtractPlugin()],
   module: {
     rules: [
       {
@@ -28,10 +29,7 @@ module.exports = {
   },
   optimization: {
     minimize: true,
-    minimizer: [
-      new CssMinimizerPlugin(),
-      new TerserPlugin()
-    ],
+    minimizer: [new CssMinimizerPlugin(), new TerserPlugin()],
   },
   stats: {
     colors: true,
