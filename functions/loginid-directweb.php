@@ -697,30 +697,6 @@ class LoginID_DirectWeb
   }
 
   /**
-   * debug dump
-   * TODO: remove
-   */
-  private function debug_dump()
-  {
-    echo var_dump($this->release_the_fido);
-    echo ";<br />";
-    echo var_dump($this->email);
-    echo ";<br />";
-    echo var_dump($this->username);
-    echo ";<br />";
-    echo var_dump($this->password);
-    echo ";<br />";
-    echo var_dump($this->wp_errors);
-    echo ";<br />";
-    echo var_dump($this->javascript_unsupported);
-    echo ";<br />";
-    echo var_dump($this->loginid);
-    echo ";<br />";
-    echo var_dump($this->user_id);
-    echo ";<br />";
-  }
-
-  /**
    * renders the form depending on the data in the object
    * 
    * @since 0.1.0
@@ -728,7 +704,6 @@ class LoginID_DirectWeb
    */
   public function render($type = LoginID_Operation::Login)
   {
-    // $this->debug_dump(); // todo: remove
 
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
@@ -766,7 +741,8 @@ class LoginID_DirectWeb
    * credit: https://gist.github.com/wpscholar/9004667
    * this is a pure function with no side effects
    *
-   * @params add as many WP_Error objects to be merged as you would like
+   * @since 0.1.0 
+   * @param add as many WP_Error objects to be merged as you would like
    * @return WP_Error merged results of the errors
    */
   protected function wp_error_merge()
@@ -805,6 +781,7 @@ class LoginID_DirectWeb
   /**
    * is this->wp_error empty
    * 
+   * @since 0.1.0
    * @return boolean true if its empty, false if its not empty
    */
   function contains_no_errors()
@@ -815,6 +792,7 @@ class LoginID_DirectWeb
   /**
    * is this->wp_error has at least one error in it
    * 
+   * @since 0.1.0
    * @return boolean false if its empty, true if its not empty
    */
   function contains_errors()
