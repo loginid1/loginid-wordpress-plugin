@@ -281,9 +281,9 @@ class LoginID_DirectWeb
    */
   protected function decode_jwt_head($jwt)
   {
-    [$jwt_header, , ] = explode('.', $jwt);
+    [$jwt_header,,] = explode('.', $jwt);
     $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_header))));
-    if ($jwt_header === false ) {
+    if ($jwt_header === false) {
       return false;
     } else {
       return $jwt_header;
@@ -359,10 +359,10 @@ class LoginID_DirectWeb
   protected function verify_claims($type = LoginID_Operation::Login, $user_id = null)
   {
     // get the stuff
-     $jwt_body = $this->validated_jwt_body;
+    $jwt_body = $this->validated_jwt_body;
     // final step is to compare the jwt udata say vs what we think is logging in. 
     // as well as only accepting a JWT issued in the last 30s
-    if ($this->email === $jwt_body->udata && time() - intval($jwt_body->iat) < 30) {
+    if ($jwt_body !== null && $this->email === $jwt_body->udata && time() - intval($jwt_body->iat) < 30) {
 
       if ($type === LoginID_Operation::Register) {
         // register, just return, we good
@@ -394,7 +394,10 @@ class LoginID_DirectWeb
    */
   protected function attach_loginid_to($user_id)
   {
-    return update_user_meta($user_id, LoginID_DB_Fields::id, $this->validated_jwt_body->sub) !== false;
+    if ($this->validated_jwt_body !== null) {
+      return update_user_meta($user_id, LoginID_DB_Fields::id, $this->validated_jwt_body->sub) !== false;
+    }
+    return false;
   }
 
 
