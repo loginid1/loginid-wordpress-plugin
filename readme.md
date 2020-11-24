@@ -91,8 +91,17 @@ cd htdocs/wp-contents/plugins
 ```sh
 git clone https://github.com/loginid1/loginid-directweb-plugin.git
 ```
-3. Open up wordpress and configure the plugin
-
+3. install php dependencies
+```sh
+composer install
+```
+4. Open up wordpress and configure the plugin
+5. (Optional) Editing javascript. Edit stuff in srcjs and don't edit javascript in includes (its minified and generated from files in srcjs anyway). You'll need nodejs to run though. 
+6. (Optional) Build your own javascript files
+```sh
+npm i
+npm run dev
+```
 
 <!-- USAGE EXAMPLES -->
 ## Usage

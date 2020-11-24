@@ -44,8 +44,10 @@ abstract class LoginID_Errors
 
   public const LoginIDError = array(LoginID_Error::Code => "loginid_error", LoginID_Error::Message => "Unable to verify your identity");
 
-  public const LoginIDCannotVerify = array(LoginID_Error::Code => "loginid_cannot_verify", LoginID_Error::Message => "Your Identity could not be verified");
+  public const LoginIDCannotVerify = array(LoginID_Error::Code => "loginid_cannot_verify", LoginID_Error::Message => "Your identity could not be verified");
   public const LoginIDServerError = array(LoginID_Error::Code => "loginid_server_error", LoginID_Error::Message => "LoginID Server Error, please use password login for now.");
+
+  public const DatabaseError = array(LoginID_Error::Code => "database_error", LoginID_Error::Message => "A critical database error has occured.");
 
   public const Example = array(LoginID_Error::Code => "", LoginID_Error::Message => "");
   // usage add(LoginID_Errors::Example[LoginID_Error::Code], LoginID_Errors::Example[LoginID_Error::Message]);
@@ -72,6 +74,18 @@ abstract class LoginID_FIDO2
 {
   public const Supported = 'supported';
 }
+
+abstract class LoginID_DB_Fields
+{
+  public const id = '__loginid_subject_user_id';
+}
+
+abstract class LoginID_Strategy
+{
+  public const Password = "password";
+  public const Passwordless = "passwordless";
+}
+
 
 /**
  * Library class of this plugin
@@ -107,6 +121,7 @@ class LoginID_DirectWeb
   protected $javascript_unsupported;
   protected $loginid;
   protected $user_id;
+  private $validated_jwt_decoded;
 
   /**
    * constructor, basically sets default flags
@@ -125,6 +140,8 @@ class LoginID_DirectWeb
 
     $this->wp_errors = new WP_Error;
     $this->javascript_unsupported = false;
+
+    $this->validated_jwt_decoded = null;
   }
 
   /**
@@ -241,19 +258,13 @@ class LoginID_DirectWeb
       'kid' => $kid,
     );
 
-    $postvars = '';
-    $sep = '';
-    foreach ($fields as $key => $value) {
-      $postvars .= $sep . urlencode($key) . '=' . urlencode($value);
-      $sep = '&';
-    }
+    $data = http_build_query($fields);
 
     $ch = curl_init();
 
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HTTPGET, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, "kid={$kid}");
+    curl_setopt($ch, CURLOPT_URL, $url . "?" . $data);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
 
     $result = curl_exec($ch);
 
@@ -262,10 +273,32 @@ class LoginID_DirectWeb
   }
 
   /**
-   * logs in the user without a password
+   * Expands JWT into an array of [head {Object}, body {Object}, signature {string}]
+   * this is a pure function
+   * 
+   * @since 0.1.0
+   * @param string $jwt token
+   * @return array|false if successfully expanded jwt then [head {Object}, body {Object}, signature {string}], if failed returns false
+   */
+  protected function decode_jwt($jwt)
+  {
+    [$jwt_h, $jwt_b, $jwt_signature] = explode('.', $jwt);
+    $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_h))));
+    $jwt_body = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_b))));
+    if ($jwt_header === false || $jwt_body === false) {
+      return false;
+    } else {
+      return array($jwt_header, $jwt_body, $jwt_signature);
+    }
+  }
+
+  /**
+   * validates jwt contained in $this->loginid against public key obtained from loginid
+   *
    * I expect stuff to be sanitized before calling this function
-   * $this->email
    * $this->loginid to be parsed into an object already
+   * 
+   * if successful this method will set $this->validated_jwt_decoded = array(header, body, signature)
    * 
    * @since 0.1.0
    * @return bool true if valid; false if invalid
@@ -276,44 +309,103 @@ class LoginID_DirectWeb
       $jwt = $this->loginid->{'jwt'};
       if (isset($jwt) && is_string($jwt)) {
         // split jwt into header body and signature (decode header and body)
-        [$jwt_h, $jwt_b, $jwt_signature] = explode('.', $jwt);
-        $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_h))));
-        $jwt_body = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_b))));
+        $decoded_jwt = $this->decode_jwt($jwt);
+        // ensure decode was successful
+        if ($decoded_jwt !== false) {
+          [$jwt_header, $jwt_body, $jwt_signature] = $decoded_jwt;
 
-        // ensure this is a jwt
-        if (is_object($jwt_header) && is_object($jwt_body))
-          // need to then verify that jwt_header is correctly formed
-          if (isset($jwt_header->{'alg'}) && isset($jwt_header->{'typ'}) && $jwt_header->typ === "JWT" && isset($jwt_header->{'kid'})) {
-            // get kid
-            $kid = $jwt_header->{'kid'};
-            // GET public key from loginid.io servers
-            $public_key = $this->get_jwt_public_key($kid); // returns false if failed, string if successful
-            if ($public_key !== false) {
-              // encode previously decoded objects back into strings
-              $h = json_encode($jwt_header);
-              $b = json_encode($jwt_body);
-              // verify using openssl_verify(original string, signature, public key, algorithm)
-              $result = openssl_verify("{$h}.{$b}", $jwt_signature, $public_key, OPENSSL_ALGO_SHA256);
-              if ($result === 1) {
-                // verification successful; now we know the jwt is legit at this point
-                // final step is to compare the udata jwt said vs what we think is logging in. 
-                // as well as only accepting a JWT issued in the last 30s
-                if ($this->email === $jwt_body->{'udata'} && time() - intval($jwt_body->{'udata'}) < 30) {
-                  // and we done, email matches we done
+          // ensure this is a jwt
+          if (is_object($jwt_header) && is_object($jwt_body))
+            // need to then verify that jwt_header is correctly formed
+            if (isset($jwt_header->{'alg'}) && isset($jwt_header->{'typ'}) && $jwt_header->typ === "JWT" && isset($jwt_header->{'kid'})) {
+              // GET public key from loginid.io servers
+              $public_key = $this->get_jwt_public_key($jwt_header->kid); // returns false if failed, string if successful
+              if ($public_key !== false) {
+                // encode previously decoded objects back into strings
+
+                [$h, $b] = explode('.', $jwt);
+                echo var_dump("{$h}.{$b}") .  "<br /><br />\n";
+                echo var_dump($jwt_signature) .  "<br /><br />\n";
+                echo "<pre>" . $public_key .  "</pre><br /><br />\n";
+                // verify using openssl_verify(original string, signature, public key, algorithm)
+                $result = openssl_verify("{$h}.{$b}",  $jwt_signature, openssl_pkey_get_public($public_key), OPENSSL_ALGO_SHA256);
+                echo var_dump($result) .  "<br /><br />\n";
+                while ($msg = openssl_error_string())
+                  echo "OpenSSL error when doing foo:" . $msg . "<br />\n";
+                if ($result === 1) {
+                  // verification successful; now we know the jwt is legit at this point
+                  $this->validated_jwt_decoded = $decoded_jwt;
                   return true;
                 }
+              } else {
+                // server error
+                $this->wp_errors->add(LoginID_Errors::LoginIDServerError[LoginID_Error::Code], LoginID_Errors::LoginIDServerError[LoginID_Error::Message]);
               }
-            } else {
-              // server error
-              $this->wp_errors->add(LoginID_Errors::LoginIDServerError[LoginID_Error::Code], LoginID_Errors::LoginIDServerError[LoginID_Error::Message]);
             }
-          }
+        }
       }
     }
     $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
     // this runs, it means: malformed payload;
     return false;
   }
+
+  /**
+   * Only run this after JWT in $this->loginid has been validated see validate_loginid()
+   * Checks JWT body information against database information, to match identities.
+   *
+   * I expect stuff to be sanitized before calling this function
+   * $this->email
+   * $this->validated_jwt_decoded = array(header, body, signature)
+   * 
+   * for login will also perform additional step of matching sub (subject, basically userid on loginid's side) to data in database;
+   * 
+   * @since 0.1.0
+   * @param string $type "login" or "register"
+   * @param string $user_id wordpress id of user to be verified (only needed if $type is login)
+   * @return bool true if valid; false if invalid
+   */
+  protected function verify_claims($type = LoginID_Operation::Login, $user_id = null)
+  {
+    // get the stuff
+    [, $jwt_body,] = $this->validated_jwt_decoded;
+    // final step is to compare the jwt udata say vs what we think is logging in. 
+    // as well as only accepting a JWT issued in the last 30s
+    if ($this->email === $jwt_body->udata && time() - intval($jwt_body->udata) < 30) {
+
+      if ($type === LoginID_Operation::Register) {
+        // register, just return, we good
+        return true;
+      } else {
+        // login, we need more checks
+        $loginid_id = get_user_meta($user_id, LoginID_DB_Fields::id, true);
+        if (isset($loginid_id) && $loginid_id === $jwt_body->sub)
+          return true;
+      }
+    }
+    $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
+    // this runs, it means verification failed
+    return false;
+  }
+
+  /**
+   * Only run this after JWT in $this->loginid has been validated see validate_loginid()
+   * Attaches loginid userid from jwt->body->sub to wordpress user's metadata
+   * 
+   * Only run this for login
+   * 
+   * I expect stuff to be sanitized before calling this function
+   * $this->validated_jwt_decoded = array(header, body, signature)
+   * 
+   * @since 0.0.1
+   * @param int $user_id, whom to add this metadata to
+   * @return bool true if success, false if failed;
+   */
+  protected function attach_loginid_to($user_id)
+  {
+    return update_user_meta($user_id, LoginID_DB_Fields::id, $this->validated_jwt_decoded[1]->sub) !== false;
+  }
+
 
   /**
    * logs in the user without a password
@@ -326,14 +418,14 @@ class LoginID_DirectWeb
   protected function login_passwordless()
   {
     $user = get_user_by('email', $this->email);
-    if ($user === false || !($this->validate_loginid())) {
-      // either user not found or unable to verify identity
+    if ($user !== false && $this->validate_loginid() && $this->verify_claims(LoginID_Operation::Login, $user->ID)) {
+      // successfully obtained userid and jwt is validated
+      return $user->ID;
+    } else {
+      // either user not found or jwt is invalid
       $error = new WP_Error();
       $error->add(LoginID_Errors::LoginIDError[LoginID_Error::Code], LoginID_Errors::LoginIDError[LoginID_Error::Message]);
       return $error;
-    } else {
-      // successfully obtained userid and loginid information is validated
-      return $user->ID;
     }
   }
 
@@ -348,12 +440,22 @@ class LoginID_DirectWeb
    */
   protected function register_passwordless()
   {
-    if ($this->validate_loginid()) {
-      return $this->register(array(
+    if ($this->validate_loginid() && $this->verify_claims(LoginID_Operation::Register)) {
+      $user_id =  $this->register(array(
         'user_login'    =>   $this->username,
         'user_email'    =>   $this->email,
         'user_pass'     =>    wp_generate_password($length = 128, $include_standard_special_chars = true), // generate 128 character password with special characters
       ));
+      if (!is_wp_error($user_id)) {
+        // we got a properuser_id here so we need to make sure to attach loginid stuff to the user as metadata
+        if (!$this->attach_loginid_to($user_id)) {
+          // if that returns false, somethign is wrong with the database, so return error 
+          $error = new WP_Error();
+          $error->add(LoginID_Errors::DatabaseError[LoginID_Error::Code], LoginID_Errors::DatabaseError[LoginID_Error::Message]);
+          return $error;
+        }
+      }
+      return $user_id;
     } else {
       // this case loginid is unable to verify your identity
       $error = new WP_Error();
@@ -424,11 +526,12 @@ class LoginID_DirectWeb
    * 
    * @since 0.1.0
    * @param string $login_type LoginID_Operation::Login or LoginID_Operation::Register
+   * @param string $strategy LoginID_Strategy::Password or LoginID_Strategy::Passwordless
    * @return int|WP_Error wordpress user id or a WP_Error object on failure
    */
-  protected function authenticate($login_type)
+  protected function authenticate($login_type, $strategy)
   {
-    $result = $this->{"{$login_type}_password"}(); // result could be a userid if successful or a WP_Error if failed
+    $result = $this->{"{$login_type}_{$strategy}"}(); // result could be a userid if successful or a WP_Error if failed
 
     // check if error has happened
     if (is_wp_error($result)) {
@@ -486,7 +589,7 @@ class LoginID_DirectWeb
                 $this->wp_errors->add($loginid->error->{'name'}, $loginid->error->{'message'});
               } else {
                 // create user then log them in
-                $this->authenticate($login_type);
+                $this->authenticate($login_type, LoginID_Strategy::Passwordless);
               }
             } else if (isset($this->password)) {
               // do password login
@@ -494,7 +597,7 @@ class LoginID_DirectWeb
               if ($this->contains_no_errors()) {
                 $this->password = esc_attr($this->password); // sanitize
                 // create user then log them in
-                $this->authenticate($login_type);
+                $this->authenticate($login_type, LoginID_Strategy::Password);
               }
             } else if ($fido2_support === LoginID_FIDO2::Supported) {
               // this point we still awaiting fido2 data from loginid direct web api backend

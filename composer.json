@@ -1,0 +1,8 @@
+{
+    "name": "loginid/loginid-dire",
+    "type": "wordpress-plugin",
+    "require": {
+        "firebase/php-jwt": "^5.2"
+    },
+    "license": "GPL v3"
+}

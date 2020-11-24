@@ -8,6 +8,11 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+// load composer dependancies
+if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
+  require __DIR__ . '/vendor/autoload.php';
+}
+
 // Load basic setup. Plugin list links, text domain, footer links etc. 
 require_once( LOGINID_DIRECTWEB_PLUGIN_DIR . 'admin/basic-setup.php' );
 
