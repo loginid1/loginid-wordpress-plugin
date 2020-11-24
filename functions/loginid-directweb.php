@@ -1,10 +1,9 @@
 <?php
 // Exit if accessed directly
 
-use function PHPSTORM_META\type;
-
 if (!defined('ABSPATH')) exit;
 
+use \Firebase\JWT\JWT;
 
 /**
  * this class serves basically as an enum
@@ -312,10 +311,10 @@ class LoginID_DirectWeb
         $decoded_jwt = $this->decode_jwt($jwt);
         // ensure decode was successful
         if ($decoded_jwt !== false) {
-          [$jwt_header, $jwt_body, $jwt_signature] = $decoded_jwt;
+          [$jwt_header,, $jwt_signature] = $decoded_jwt;
 
           // ensure this is a jwt
-          if (is_object($jwt_header) && is_object($jwt_body))
+          if (is_object($jwt_header))
             // need to then verify that jwt_header is correctly formed
             if (isset($jwt_header->{'alg'}) && isset($jwt_header->{'typ'}) && $jwt_header->typ === "JWT" && isset($jwt_header->{'kid'})) {
               // GET public key from loginid.io servers
@@ -323,19 +322,13 @@ class LoginID_DirectWeb
               if ($public_key !== false) {
                 // encode previously decoded objects back into strings
 
-                [$h, $b] = explode('.', $jwt);
-                echo var_dump("{$h}.{$b}") .  "<br /><br />\n";
-                echo var_dump($jwt_signature) .  "<br /><br />\n";
-                echo "<pre>" . $public_key .  "</pre><br /><br />\n";
                 // verify using openssl_verify(original string, signature, public key, algorithm)
-                $result = openssl_verify("{$h}.{$b}",  $jwt_signature, openssl_pkey_get_public($public_key), OPENSSL_ALGO_SHA256);
-                echo var_dump($result) .  "<br /><br />\n";
-                while ($msg = openssl_error_string())
-                  echo "OpenSSL error when doing foo:" . $msg . "<br />\n";
-                if ($result === 1) {
+                try {
+                  $result = JWT::decode($jwt, $public_key, array($jwt_header->alg));
                   // verification successful; now we know the jwt is legit at this point
-                  $this->validated_jwt_decoded = $decoded_jwt;
+                  $this->validated_jwt_decoded = array($jwt_header, $result, $jwt_signature);
                   return true;
+                } catch (Exception $e) {
                 }
               } else {
                 // server error
@@ -371,7 +364,7 @@ class LoginID_DirectWeb
     [, $jwt_body,] = $this->validated_jwt_decoded;
     // final step is to compare the jwt udata say vs what we think is logging in. 
     // as well as only accepting a JWT issued in the last 30s
-    if ($this->email === $jwt_body->udata && time() - intval($jwt_body->udata) < 30) {
+    if ($this->email === $jwt_body->udata && time() - intval($jwt_body->iat) < 30) {
 
       if ($type === LoginID_Operation::Register) {
         // register, just return, we good
