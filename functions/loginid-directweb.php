@@ -120,7 +120,7 @@ class LoginID_DirectWeb
   protected $javascript_unsupported;
   protected $loginid;
   protected $user_id;
-  private $validated_jwt_decoded;
+  private $validated_jwt_body;
 
   /**
    * constructor, basically sets default flags
@@ -140,7 +140,7 @@ class LoginID_DirectWeb
     $this->wp_errors = new WP_Error;
     $this->javascript_unsupported = false;
 
-    $this->validated_jwt_decoded = null;
+    $this->validated_jwt_body = null;
   }
 
   /**
@@ -272,22 +272,21 @@ class LoginID_DirectWeb
   }
 
   /**
-   * Expands JWT into an array of [head {Object}, body {Object}, signature {string}]
+   * Expands JWT header into an object
    * this is a pure function
    * 
    * @since 0.1.0
    * @param string $jwt token
-   * @return array|false if successfully expanded jwt then [head {Object}, body {Object}, signature {string}], if failed returns false
+   * @return Object|false if successfully returns Object(head), if failed returns false
    */
-  protected function decode_jwt($jwt)
+  protected function decode_jwt_head($jwt)
   {
-    [$jwt_h, $jwt_b, $jwt_signature] = explode('.', $jwt);
-    $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_h))));
-    $jwt_body = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_b))));
-    if ($jwt_header === false || $jwt_body === false) {
+    [$jwt_header, , ] = explode('.', $jwt);
+    $jwt_header = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', $jwt_header))));
+    if ($jwt_header === false ) {
       return false;
     } else {
-      return array($jwt_header, $jwt_body, $jwt_signature);
+      return $jwt_header;
     }
   }
 
@@ -297,7 +296,7 @@ class LoginID_DirectWeb
    * I expect stuff to be sanitized before calling this function
    * $this->loginid to be parsed into an object already
    * 
-   * if successful this method will set $this->validated_jwt_decoded = array(header, body, signature)
+   * if successful this method will set $this->$validated_jwt_body = $jwt_body
    * 
    * @since 0.1.0
    * @return bool true if valid; false if invalid
@@ -307,11 +306,10 @@ class LoginID_DirectWeb
     if (isset($this->loginid)) {
       $jwt = $this->loginid->{'jwt'};
       if (isset($jwt) && is_string($jwt)) {
-        // split jwt into header body and signature (decode header and body)
-        $decoded_jwt = $this->decode_jwt($jwt);
+        // split jwt into header and decode it
+        $jwt_header = $this->decode_jwt_head($jwt);
         // ensure decode was successful
-        if ($decoded_jwt !== false) {
-          [$jwt_header,, $jwt_signature] = $decoded_jwt;
+        if ($jwt_header !== false) {
 
           // ensure this is a jwt
           if (is_object($jwt_header))
@@ -326,7 +324,7 @@ class LoginID_DirectWeb
                 try {
                   $result = JWT::decode($jwt, $public_key, array($jwt_header->alg));
                   // verification successful; now we know the jwt is legit at this point
-                  $this->validated_jwt_decoded = array($jwt_header, $result, $jwt_signature);
+                  $this->validated_jwt_body = $result;
                   return true;
                 } catch (Exception $e) {
                 }
@@ -349,7 +347,7 @@ class LoginID_DirectWeb
    *
    * I expect stuff to be sanitized before calling this function
    * $this->email
-   * $this->validated_jwt_decoded = array(header, body, signature)
+   * $this->validated_jwt_body = Object(jwt_body)
    * 
    * for login will also perform additional step of matching sub (subject, basically userid on loginid's side) to data in database;
    * 
@@ -361,7 +359,7 @@ class LoginID_DirectWeb
   protected function verify_claims($type = LoginID_Operation::Login, $user_id = null)
   {
     // get the stuff
-    [, $jwt_body,] = $this->validated_jwt_decoded;
+     $jwt_body = $this->validated_jwt_body;
     // final step is to compare the jwt udata say vs what we think is logging in. 
     // as well as only accepting a JWT issued in the last 30s
     if ($this->email === $jwt_body->udata && time() - intval($jwt_body->iat) < 30) {
@@ -388,7 +386,7 @@ class LoginID_DirectWeb
    * Only run this for login
    * 
    * I expect stuff to be sanitized before calling this function
-   * $this->validated_jwt_decoded = array(header, body, signature)
+   * $this->validated_jwt_body = Object(body)
    * 
    * @since 0.0.1
    * @param int $user_id, whom to add this metadata to
@@ -396,7 +394,7 @@ class LoginID_DirectWeb
    */
   protected function attach_loginid_to($user_id)
   {
-    return update_user_meta($user_id, LoginID_DB_Fields::id, $this->validated_jwt_decoded[1]->sub) !== false;
+    return update_user_meta($user_id, LoginID_DB_Fields::id, $this->validated_jwt_body->sub) !== false;
   }
 
 
