@@ -23,16 +23,6 @@ if (!defined('ABSPATH')) exit;
  */
 function loginid_dwp_activate_plugin()
 {
-	// // we want to create the login and register pages here
-	// // Create register post object
-	// $register_post = array(
-	// 	'post_title'    => wp_strip_all_tags( 'Register' ),
-	// 	'post_content'  => '[loginid_registration]',
-	// 	'post_status'   => 'publish',
-	// 	'post_type'     => 'page',
-	// );
-	// // Insert the post into the database
-	// wp_insert_post( $register_post );
 }
 
 /**
@@ -123,3 +113,39 @@ function loginid_dwp_footer_version($default)
 	return 'Plugin version ' . LOGINID_DIRECTWEB_PLUGIN_VERSION_NUM;
 }
 add_filter('update_footer', 'loginid_dwp_footer_version', 11);
+
+/**
+ * Hook to process generate login and register pages request
+ */
+function loginid_dwp_generate_page()
+{
+	$which_page = $_POST['submit'];
+	$nonce = $_POST['_wpnonce'];
+	if (isset($nonce) && isset($which_page)) {
+		$which_page = sanitize_text_field($which_page);
+		$nonce = sanitize_text_field($nonce);
+		if (wp_verify_nonce($nonce, 'loginid_dwp_settings_group-options') !== false && ($which_page === 'Generate Register Page' || $which_page === 'Generate Login Page')) {
+			$isRegister = $which_page === 'Generate Register Page';
+			// we want to create the login and register pages here
+			// Create register post object
+			$register_post = array(
+				'post_title'    => wp_strip_all_tags($isRegister ? 'Register' : 'Login'),
+				'post_content'  => '[' . LoginID_DirectWeb::getShortCodes()[$isRegister ? LoginID_Operation::Register : LoginID_Operation::Login] . ']',
+				'post_status'   => 'publish',
+				'post_type'     => 'page',
+			);
+			// Insert the post into the database
+			$result = wp_insert_post($register_post);
+
+			if($result > 0) {
+				exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . ($isRegister?'Register': 'Login') .  ' page created.')));
+
+			}
+			exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . 'Error while creating ' ($isRegister?'Register': 'Login') . ' page.')));
+
+		}
+		exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . 'Error: Token Rejected')));
+	}
+	exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . 'Error: something went very wrong.')));
+}
+add_action('admin_post_loginid_dwp_generate_page', 'loginid_dwp_generate_page');

@@ -95,6 +95,15 @@ class LoginID_DirectWeb
 {
   // strings that contains the shortcode values [loginid_registration] and [loginid_login]
   protected const ShortCodes = array(LoginID_Operation::Register => "loginid_registration", LoginID_Operation::Login => "loginid_login");
+  /**
+   * Getter function of a protected resource short codes, returns a copy of that array
+   * 
+   * @since 0.1.0
+   * @return array of array('register' -> shortcode, 'login' -> shortcode)
+   */
+  public static function getShortCodes() {
+    return self::ShortCodes;
+  }
 
   /**
    * Instantiate this object and object specific hooks into wordpress

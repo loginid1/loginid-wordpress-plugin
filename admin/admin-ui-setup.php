@@ -6,7 +6,7 @@
  * @since 0.1.0
  * @function	loginid_dwp_add_menu_links()		Add admin menu pages
  * @function	loginid_dwp_register_settings	Register Settings
- * @function	loginid_dwp_validater_and_sanitizer()	Validate And Sanitize User Input Before Its Saved To Database
+ * @function	loginid_dwp_validator_and_sanitizer()	Validate And Sanitize User Input Before Its Saved To Database
  * @function	loginid_dwp_get_settings()		Get settings from database
  */
 
@@ -21,7 +21,13 @@ if (!defined('ABSPATH')) exit;
  */
 function loginid_dwp_add_menu_links()
 {
-	add_options_page(__('LoginID DirectWeb Plugin', 'loginid-directweb-plugin'), __('LoginID DirectWeb Plugin', 'loginid-directweb-plugin'), 'update_core', 'loginid-directweb-plugin', 'loginid_dwp_admin_interface_render');
+	add_options_page(
+		__('LoginID DirectWeb Plugin', 'loginid-directweb-plugin'),
+		__('LoginID DirectWeb Plugin', 'loginid-directweb-plugin'),
+		'update_core', // super admin and administrator (single site)
+		'loginid-directweb-plugin',
+		'loginid_dwp_admin_interface_render'
+	);
 }
 add_action('admin_menu', 'loginid_dwp_add_menu_links');
 
@@ -37,7 +43,7 @@ function loginid_dwp_register_settings()
 	register_setting(
 		'loginid_dwp_settings_group', 			// Group name
 		'loginid_dwp_settings', 					// Setting name = html form <input> name on settings form
-		'loginid_dwp_validater_and_sanitizer'	// Input sanitizer
+		'loginid_dwp_validator_and_sanitizer'	// Input sanitizer
 	);
 
 	// Register A New Section
@@ -58,15 +64,15 @@ function loginid_dwp_register_settings()
 		array('base_url', 'example: https://directweb.usw1.loginid.io') //params to pass to callback
 	);
 
-		// BaseURL
-		add_settings_field(
-			'loginid_dwp_api_key_field',							// ID
-			__('API Key', 'loginid-directweb-plugin'),					// Title
-			'loginid_dwp_text_input_field_callback',					// Callback function
-			'loginid-directweb-plugin',											// Page slug
-			'loginid_dwp_minimum_settings_section',							// Settings Section ID
-			array('api_key', 'unique key obtained from <a href="https://usw1.loginid.io/en/integration" target="_blank">LoginID</a> ') //params to pass to callback
-		);
+	// BaseURL
+	add_settings_field(
+		'loginid_dwp_api_key_field',							// ID
+		__('API Key', 'loginid-directweb-plugin'),					// Title
+		'loginid_dwp_text_input_field_callback',					// Callback function
+		'loginid-directweb-plugin',											// Page slug
+		'loginid_dwp_minimum_settings_section',							// Settings Section ID
+		array('api_key', 'unique key obtained from <a href="https://usw1.loginid.io/en/integration" target="_blank">LoginID</a> ') //params to pass to callback
+	);
 }
 add_action('admin_init', 'loginid_dwp_register_settings');
 
@@ -75,7 +81,7 @@ add_action('admin_init', 'loginid_dwp_register_settings');
  *
  * @since 0.1.0
  */
-function loginid_dwp_validater_and_sanitizer($settings)
+function loginid_dwp_validator_and_sanitizer($settings)
 {
 	// list of inputs that requires sanitation
 	$to_be_sanitized = array('base_url', 'api_key');
@@ -99,8 +105,8 @@ function loginid_dwp_get_settings()
 {
 
 	$defaults = array(
-		'setting_one' 	=> '1',
-		'setting_two' 	=> '1',
+		'base_url' 	=> '',
+		'api_key' 	=> '',
 	);
 
 	$settings = get_option('loginid_dwp_settings', $defaults);
@@ -122,7 +128,7 @@ function loginid_dwp_admin_enqueue_css_js($hook)
 	}
 
 	// Main CSS
-	// wp_enqueue_style( 'loginid_dwp-admin-main-css', LOGINID_DIRECTWEB_PLUGIN_URL . 'admin/css/main.css', '', LOGINID_DIRECTWEB_PLUGIN_VERSION_NUM );
+	wp_enqueue_style( 'loginid_dwp-admin-main-css', LOGINID_DIRECTWEB_PLUGIN_URL . 'admin/css/main.css', '', LOGINID_DIRECTWEB_PLUGIN_VERSION_NUM );
 
 	// Main JS
 	// wp_enqueue_script( 'loginid_dwp-admin-main-js', LOGINID_DIRECTWEB_PLUGIN_URL . 'admin/js/main.js', array( 'jquery' ), false, true );
