@@ -128,22 +128,22 @@ async function __loginidOnPageLoaded(type) {
       const sdk = new DirectWeb(baseURL, apiKey);
 
       result = await sdk[type](email);
-    } catch ({ name, message }) {
-      result = { error: { name, message } };
+    } catch ({ name, message, code}) {
+      result = { error: { name, message, code } };
+      console.log("error",{ name, message, code}); // TODO: remove this
     }
-    // console.log("result", result); // TODO: remove this
     localStorage.setItem('last_result', JSON.stringify(result))
-    __loginidOnAuthenticate(
-      `${window.location.origin}${window.location.pathname}`,
-      "POST",
-      type,
-      {
-        loginid: {
-          value: JSON.stringify(result),
-          element: document.createElement("input"),
-        },
-      }
-    );
+    // __loginidOnAuthenticate(
+    //   `${window.location.origin}${window.location.pathname}`,
+    //   "POST",
+    //   type,
+    //   {
+    //     loginid: {
+    //       value: JSON.stringify(result),
+    //       element: document.createElement("input"),
+    //     },
+    //   }
+    // );
   }
   // otherwise page not approved for fido2 authentication
 }

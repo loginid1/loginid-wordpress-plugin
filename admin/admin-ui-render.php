@@ -149,7 +149,9 @@ function loginid_dwp_admin_interface_render()
 				<input type="submit" name="submit" class="button button-secondary" value="Generate Register Page">
 			</form>
 		</p>
-
+		<p class="description">
+			<strong>Or paste the following shortcodes on your designated login or register pages.</strong>
+		</p>
 		<p class="description">
 			<strong>Login Form Shortcode</strong>
 			<code>[<?php echo LoginID_DirectWeb::getShortCodes()[LoginID_Operation::Login] ?>]</code>

@@ -41,7 +41,7 @@ abstract class LoginID_Errors
 
   public const LoginFailed = array(LoginID_Error::Code => "login_failed", LoginID_Error::Message => "Incorrect email/password combination");
 
-  public const LoginIDError = array(LoginID_Error::Code => "loginid_error", LoginID_Error::Message => "Unable to verify your identity");
+  public const PluginError = array(LoginID_Error::Code => "loginid_error", LoginID_Error::Message => "LoginID Directweb Plugin Error");
 
   public const LoginIDCannotVerify = array(LoginID_Error::Code => "loginid_cannot_verify", LoginID_Error::Message => "Your identity could not be verified");
   public const LoginIDServerError = array(LoginID_Error::Code => "loginid_server_error", LoginID_Error::Message => "LoginID Server Error, please use password login for now.");
@@ -101,7 +101,8 @@ class LoginID_DirectWeb
    * @since 0.1.0
    * @return array of array('register' -> shortcode, 'login' -> shortcode)
    */
-  public static function getShortCodes() {
+  public static function getShortCodes()
+  {
     return self::ShortCodes;
   }
 
@@ -427,7 +428,7 @@ class LoginID_DirectWeb
     } else {
       // either user not found or jwt is invalid
       $error = new WP_Error();
-      $error->add(LoginID_Errors::LoginIDError[LoginID_Error::Code], LoginID_Errors::LoginIDError[LoginID_Error::Message]);
+      $error->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
       return $error;
     }
   }
@@ -462,7 +463,7 @@ class LoginID_DirectWeb
     } else {
       // this case loginid is unable to verify your identity
       $error = new WP_Error();
-      $error->add(LoginID_Errors::LoginIDError[LoginID_Error::Code], LoginID_Errors::LoginIDError[LoginID_Error::Message]);
+      $error->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
       return $error;
     }
   }
@@ -589,7 +590,7 @@ class LoginID_DirectWeb
               $this->loginid = $loginid;
 
               if (isset($loginid->{'error'})) {
-                $this->wp_errors->add($loginid->error->{'name'}, $loginid->error->{'message'});
+                $this->handle_loginid_errors($login_type, $loginid->error);
               } else {
                 // create user then log them in
                 $this->authenticate($login_type, LoginID_Strategy::Passwordless);
@@ -621,6 +622,27 @@ class LoginID_DirectWeb
         // front end and backend is out of sync
         $this->wp_errors->add(LoginID_Errors::VersionMismatch[LoginID_Error::Code], LoginID_Errors::VersionMismatch[LoginID_Error::Message]);
       }
+    }
+  }
+
+  /**
+   * this method handles errors and toggles certain flags depending on the error
+   * @since 0.1.0
+   * @param string $login_type LoginID_Operation::Login or LoginID_Operation::Register
+   * @param Object $error, error object from the frontend it should contain the following structure {name: string, code: string|undefined, message: string}
+   */
+  protected function handle_loginid_errors($login_type, $error)
+  {
+    $user_not_found = 'user_not_found';
+    $syntax_error = 'SyntaxError';
+    if ($login_type === LoginID_Operation::Login && $error->code === $user_not_found) {
+      // in the case of login and loginid api returned user not found, it means they didn't register with loginid
+      // setting javascript_unsupported to true will display password field
+      $this->javascript_unsupported = true;
+    } else if ($error->name === $syntax_error) {
+      $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
+    } else {
+      $this->wp_errors->add($error->name, $error->code . '::' . $error->message);
     }
   }
 
