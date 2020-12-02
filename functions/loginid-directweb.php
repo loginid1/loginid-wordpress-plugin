@@ -675,8 +675,9 @@ class LoginID_DirectWeb
    * @return string encoded hashed string 
    */
   protected function generate_hashed_string(string $input) {
-    $encrypted = password_hash ( $input , PASSWORD_BCRYPT);
-    return strrev(urlencode(base64_encode($encrypted)));
+    $salted = password_hash ( $input , PASSWORD_BCRYPT, array('cost' => 4));
+    $substr = substr($salted, 7);
+    return urlencode(base64_encode($substr));
   }
   /**
    * Validates the string created 
@@ -687,8 +688,9 @@ class LoginID_DirectWeb
    * @return bool true if the $encoded_hashed_string is generated using the input, false if it isn't generated using the input. 
    */
   protected function validate_hashed_string(string $input, string $encoded_hashed_string) {
-    $encrypted = password_hash ( $input , PASSWORD_BCRYPT);
-    return strrev(urlencode(base64_encode($encrypted)));
+    $decoded = base64_decode(urldecode($encoded_hashed_string));
+    $fullstr = '$2y$04$' . $decoded;
+    return password_verify($input, $fullstr);
   }
 
   /**
