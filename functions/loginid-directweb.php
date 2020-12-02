@@ -76,7 +76,8 @@ abstract class LoginID_FIDO2
 
 abstract class LoginID_DB_Fields
 {
-  public const id = '__loginid_subject_user_id';
+  public const subject_user_id = '__loginid_subject_user_id';
+  public const udata_user_id = '__loginid_udata_user_id';
 }
 
 abstract class LoginID_Strategy
@@ -374,12 +375,12 @@ class LoginID_DirectWeb
     // as well as only accepting a JWT issued in the last 30s
     if ($jwt_body !== null && $this->email === $jwt_body->udata && time() - intval($jwt_body->iat) < 30) {
 
-      if ($type === LoginID_Operation::Register) {
+      if ($type === LoginID_Operation::Register ) {
         // register, just return, we good
-        return true;
+        return isset($this->email) && $this->validate_hashed_string($this->email, $jwt_body->udata);
       } else {
         // login, we need more checks
-        $loginid_id = get_user_meta($user_id, LoginID_DB_Fields::id, true);
+        $loginid_id = get_user_meta($user_id, LoginID_DB_Fields::subject_user_id, true);
         if (isset($loginid_id) && $loginid_id === $jwt_body->sub)
           return true;
       }
@@ -405,7 +406,7 @@ class LoginID_DirectWeb
   protected function attach_loginid_to($user_id)
   {
     if ($this->validated_jwt_body !== null) {
-      return update_user_meta($user_id, LoginID_DB_Fields::id, $this->validated_jwt_body->sub) !== false;
+      return !!update_user_meta($user_id, LoginID_DB_Fields::subject_user_id, $this->validated_jwt_body->sub) && !!update_user_meta($user_id, LoginID_DB_Fields::udata_user_id, $this->validated_jwt_body->udata);
     }
     return false;
   }
@@ -574,7 +575,9 @@ class LoginID_DirectWeb
           // from this point on we are good to go
           $this->password = isset($_POST['password']) ? $_POST['password'] : null; // these are okay we gotta remember to sanitize them later
 
+          // this generates errors if input is invalid, also merges them into this->wp_error
           $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_email($login_type), $login_type === LoginID_Operation::Register ? $this->validate_username() : null);
+          // check for errors
           if ($this->contains_no_errors()) {
             // this means that username and email validation just passed
             $fido2_support = isset($_POST['fido2']) ? sanitize_text_field($_POST['fido2']) : null;
@@ -610,6 +613,8 @@ class LoginID_DirectWeb
               // something gone really wrong
               $this->wp_errors->add(LoginID_Errors::CriticalError[LoginID_Error::Code], LoginID_Errors::VersionMismatch[LoginID_Error::Message]);
             }
+          } else {
+            // do nothing, display errors during render
           }
         } else if ($submit === LoginID_Operation::Next) {
           // we assume in here that the user doesn't have javascript, because front end js should update this field.
@@ -660,6 +665,33 @@ class LoginID_DirectWeb
   }
 
   /**
+   * Generates the unique id to be sent to loginid direct web in the udata field
+   * Im technically using the password storage method BCRYPT to generate a hashed string that I could validate later internally
+   * but at the same time LoginID could not use it to identify it to a given user
+   * the string is then base64_encoded and then reversed for further obfuscation. making it impossible to get useful information out of this.
+   * 
+   * @since 0.1.0
+   * @param string $input the string input used to generate the udata
+   * @return string encoded hashed string 
+   */
+  protected function generate_hashed_string(string $input) {
+    $encrypted = password_hash ( $input , PASSWORD_BCRYPT);
+    return strrev(urlencode(base64_encode($encrypted)));
+  }
+  /**
+   * Validates the string created 
+   * 
+   * @since 0.1.0
+   * @param string $input the string input used to generate the udata in generate_hashed_string(), same as that
+   * @param string $encoded_hashed_string whatever generate_hashed_string() spitted out as the return value gets put here.
+   * @return bool true if the $encoded_hashed_string is generated using the input, false if it isn't generated using the input. 
+   */
+  protected function validate_hashed_string(string $input, string $encoded_hashed_string) {
+    $encrypted = password_hash ( $input , PASSWORD_BCRYPT);
+    return strrev(urlencode(base64_encode($encrypted)));
+  }
+
+  /**
    * generates custom form
    * this form reacts to what is being posted and auto fills the input
    * 
@@ -684,9 +716,10 @@ class LoginID_DirectWeb
       </div>
       <input type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
       <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo LoginID_DirectWeb::ShortCodes[$type] ?>">
-      <?php if ($this->release_the_fido) {
+      <?php if ($this->release_the_fido && isset($this->email)) {
         $settings = loginid_dwp_get_settings()
       ?>
+        <input type="hidden" readonly name="udata" id="__loginid_input_udata" value="<?php echo $this->generate_hashed_string($this->email) ?>">
         <input type="hidden" readonly name="baseurl" id="__loginid_input_baseurl" value="<?php echo $settings['base_url'] ?>">
         <input type="hidden" readonly name="apikey" id="__loginid_input_apikey" value="<?php echo $settings['api_key'] ?>">
       <?php } ?>

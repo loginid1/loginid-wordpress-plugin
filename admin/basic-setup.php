@@ -116,6 +116,8 @@ add_filter('update_footer', 'loginid_dwp_footer_version', 11);
 
 /**
  * Hook to process generate login and register pages request
+ *
+ * @since 0.1.0
  */
 function loginid_dwp_generate_page()
 {
@@ -137,15 +139,57 @@ function loginid_dwp_generate_page()
 			// Insert the post into the database
 			$result = wp_insert_post($register_post);
 
-			if($result > 0) {
-				exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . ($isRegister?'Register': 'Login') .  ' page created.')));
-
+			if ($result > 0) {
+				exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . ($isRegister ? 'Register' : 'Login') .  ' page created.')));
 			}
-			exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . 'Error while creating ' ($isRegister?'Register': 'Login') . ' page.')));
-
+			exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . 'Error while creating '($isRegister ? 'Register' : 'Login') . ' page.')));
 		}
 		exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . 'Error: Token Rejected')));
 	}
 	exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb-plugin&loginid-admin-msg=' . 'Error: something went very wrong.')));
 }
 add_action('admin_post_loginid_dwp_generate_page', 'loginid_dwp_generate_page');
+
+/**
+ * Hooks to add extra column for user settings
+ * 
+ * @since 0.1.0
+ */
+function loginid_dwp_modify_user_table($columns)
+{
+	$new_columns = array();
+	$is_created = false;
+	foreach ($columns as $name => $label) {
+		$new_columns[$name] = $label;
+		if ($name === 'username') {
+			$new_columns['loginid'] = 'LoginID';
+			$is_created = true;
+		}
+	}
+	if ($is_created === false) {
+		$new_columns['loginid'] = 'LoginID';
+	}
+	return $new_columns;
+}
+add_filter('manage_users_columns', 'loginid_dwp_modify_user_table');
+
+
+/**
+ * fills in the data for each user for the custom LoginID user settings column
+ * 
+ * @since 0.1.0
+ * 
+ * @param string $val, current value of the column
+ * @param string $column_name, current column name
+ * @param string $user_id, current userid of the row
+ */
+function loginid_dwp_modify_user_table_row($val, $column_name, $user_id) {
+	// our specific column
+if($column_name === 'loginid') {
+	return get_the_author_meta( LoginID_DB_Fields::udata_user_id, $user_id );
+} else {
+	// not our column return regular value
+	return $val;
+}
+}
+add_filter( 'manage_users_custom_column', 'loginid_dwp_modify_user_table_row', 10, 3 );

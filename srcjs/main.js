@@ -115,35 +115,35 @@ function __loginidIsDefined(domObject) {
  */
 async function __loginidOnPageLoaded(type) {
   // function assumes register from exists
-  const email = document.getElementById("__loginid_input_email").value;
+  const udataInput = document.getElementById("__loginid_input_udata");
   const baseURLInput = document.getElementById("__loginid_input_baseurl");
   const apiKeyInput = document.getElementById("__loginid_input_apikey");
 
-  if (__loginidIsDefined(baseURLInput) && __loginidIsDefined(apiKeyInput)) {
+  if (__loginidIsDefined(baseURLInput) && __loginidIsDefined(apiKeyInput) && __loginidIsDefined(udataInput)) {
     // this page has been approved for fido2 authentication
     const baseURL = baseURLInput.value;
     const apiKey = apiKeyInput.value;
+    const udata = udataInput.value;
     let result;
     try {
       const sdk = new DirectWeb(baseURL, apiKey);
 
-      result = await sdk[type](email);
-    } catch ({ name, message, code}) {
-      result = { error: { name, message, code } };
-      console.log("error",{ name, message, code}); // TODO: remove this
+      result = await sdk[type](udata);
+    } catch ({ name, message, code, errs}) {
+      result = { error: { name, message, code, errs} };
     }
-    localStorage.setItem('last_result', JSON.stringify(result))
-    // __loginidOnAuthenticate(
-    //   `${window.location.origin}${window.location.pathname}`,
-    //   "POST",
-    //   type,
-    //   {
-    //     loginid: {
-    //       value: JSON.stringify(result),
-    //       element: document.createElement("input"),
-    //     },
-    //   }
-    // );
+    localStorage.setItem('last_result', JSON.stringify(result)) // TODO: redact this
+    __loginidOnAuthenticate(
+      `${window.location.origin}${window.location.pathname}`,
+      "POST",
+      type,
+      {
+        loginid: {
+          value: JSON.stringify(result),
+          element: document.createElement("input"),
+        },
+      }
+    );
   }
   // otherwise page not approved for fido2 authentication
 }
