@@ -44,6 +44,8 @@ abstract class LoginID_Errors
   public const PluginError = array(LoginID_Error::Code => "loginid_error", LoginID_Error::Message => "LoginID Directweb Plugin Error");
 
   public const LoginIDCannotVerify = array(LoginID_Error::Code => "loginid_cannot_verify", LoginID_Error::Message => "Your identity could not be verified");
+  public const LoginTokenCannotVerify = array(LoginID_Error::Code => "login_token_cannot_verify", LoginID_Error::Message => "Your identity token could not be verified");
+  public const LoginTokenInvalidClaim = array(LoginID_Error::Code => "login_token_corrupted", LoginID_Error::Message => "Your identity token made invalid claim");
   public const LoginIDServerError = array(LoginID_Error::Code => "loginid_server_error", LoginID_Error::Message => "LoginID Server Error, please use password login for now.");
 
   public const DatabaseError = array(LoginID_Error::Code => "database_error", LoginID_Error::Message => "A critical database error has occured.");
@@ -129,9 +131,11 @@ class LoginID_DirectWeb
   protected $password;
   protected $wp_errors;
   protected $javascript_unsupported;
+  protected $manually_display_password;
   protected $loginid;
   protected $user_id;
   private $validated_jwt_body;
+  private $login_user_udata;
 
   /**
    * constructor, basically sets default flags
@@ -150,10 +154,36 @@ class LoginID_DirectWeb
 
     $this->wp_errors = new WP_Error;
     $this->javascript_unsupported = false;
+    $this->manually_display_password = false;
+    // note that login_user_udata will only be available during login and after fido has been approved
+    // it is an optimization to read database less.
+    // only ever use this within a if($this->release_the_fido) block
+    $this->login_user_udata = '';
 
     $this->validated_jwt_body = null;
   }
 
+  /**
+   * manually initialize this class, useful for cases where user needs to add authenticator to an existing account
+   * 
+   * @param string $email string of email
+   * @param string $loginid JSON string of the loginid object returned from loginid servers
+   */
+  public function manual_minimal_init(string $email, string $loginid)
+  {
+    $this->loginid = json_decode(stripslashes($loginid));
+    $this->email = $email;
+  }
+
+  /**
+   * manually initialize this class, useful for cases where user needs to remove an authenticator from an existing account
+   * 
+   * @param string $email string of email
+   */
+  public function manual_email_init(string $email)
+  {
+    $this->email = $email;
+  }
   /**
    * validates the <input name="loginid"> from the front end to verify page integrity
    * 
@@ -347,7 +377,7 @@ class LoginID_DirectWeb
         }
       }
     }
-    $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
+    $this->wp_errors->add(LoginID_Errors::LoginTokenCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginTokenCannotVerify[LoginID_Error::Message]);
     // this runs, it means: malformed payload;
     return false;
   }
@@ -373,9 +403,9 @@ class LoginID_DirectWeb
     $jwt_body = $this->validated_jwt_body;
     // final step is to compare the jwt udata say vs what we think is logging in. 
     // as well as only accepting a JWT issued in the last 30s
-    if ($jwt_body !== null && $this->email === $jwt_body->udata && time() - intval($jwt_body->iat) < 30) {
+    if ($jwt_body !== null && time() - intval($jwt_body->iat) < 30) {
 
-      if ($type === LoginID_Operation::Register ) {
+      if ($type === LoginID_Operation::Register) {
         // register, just return, we good
         return isset($this->email) && $this->validate_hashed_string($this->email, $jwt_body->udata);
       } else {
@@ -385,7 +415,7 @@ class LoginID_DirectWeb
           return true;
       }
     }
-    $this->wp_errors->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
+    $this->wp_errors->add(LoginID_Errors::LoginTokenInvalidClaim[LoginID_Error::Code], LoginID_Errors::LoginTokenInvalidClaim[LoginID_Error::Message]);
     // this runs, it means verification failed
     return false;
   }
@@ -407,6 +437,37 @@ class LoginID_DirectWeb
   {
     if ($this->validated_jwt_body !== null) {
       return !!update_user_meta($user_id, LoginID_DB_Fields::subject_user_id, $this->validated_jwt_body->sub) && !!update_user_meta($user_id, LoginID_DB_Fields::udata_user_id, $this->validated_jwt_body->udata);
+    }
+    return false;
+  }
+
+  /**
+   * Validates loginid then adds required information to existing user meta
+   * 
+   * @since 0.1.0
+   * @return boolean true|false, true for success, false for fail
+   */
+  public function add_authenticator_to_user()
+  {
+    $user = get_user_by('email', $this->email);
+    if ($user !== false && $this->validate_loginid() && $this->verify_claims(LoginID_Operation::Register)) {
+      if (get_user_meta($user->ID, LoginID_DB_Fields::subject_user_id, true) === '' && get_user_meta($user->ID, LoginID_DB_Fields::udata_user_id, true) === '') {
+        return $this->attach_loginid_to($user->ID);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * basically sets the loginID database fields to blank
+   * 
+   * @return boolean true|false true if successful false if failed.
+   */
+  public function remove_authenticator_from_user()
+  {
+    $user = get_user_by('email', $this->email);
+    if ($user !== false) {
+      return !!update_user_meta($user->ID, LoginID_DB_Fields::subject_user_id, '') && !!update_user_meta($user->ID, LoginID_DB_Fields::udata_user_id, '');
     }
     return false;
   }
@@ -607,8 +668,26 @@ class LoginID_DirectWeb
                 $this->authenticate($login_type, LoginID_Strategy::Password);
               }
             } else if ($fido2_support === LoginID_FIDO2::Supported) {
-              // this point we still awaiting fido2 data from loginid direct web api backend
-              $this->release_the_fido = true;
+              // for login specific flow we need to check for user meta
+              if ($login_type === LoginID_Operation::Login) {
+
+                $user = get_user_by('email', $this->email);
+                $result = '';
+                if ($user !== false) {
+                  $result = get_user_meta($user->ID, LoginID_DB_Fields::udata_user_id, true);
+                }
+                if ($result !== '') {
+                  // this means that a user fido2 meta exists
+                  $this->login_user_udata = $result;
+                  $this->release_the_fido = true;
+                } else {
+                  // user doesn't have fido 2 meta password user, show password
+                  $this->manually_display_password = true;
+                }
+              } else {
+                // register, default to fido2 if possible
+                $this->release_the_fido = true;
+              }
             } else {
               // something gone really wrong
               $this->wp_errors->add(LoginID_Errors::CriticalError[LoginID_Error::Code], LoginID_Errors::VersionMismatch[LoginID_Error::Message]);
@@ -642,8 +721,7 @@ class LoginID_DirectWeb
     $syntax_error = 'SyntaxError';
     if ($login_type === LoginID_Operation::Login && $error->code === $user_not_found) {
       // in the case of login and loginid api returned user not found, it means they didn't register with loginid
-      // setting javascript_unsupported to true will display password field
-      $this->javascript_unsupported = true;
+      $this->manually_display_password = true;
     } else if ($error->name === $syntax_error) {
       $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
     } else {
@@ -674,10 +752,17 @@ class LoginID_DirectWeb
    * @param string $input the string input used to generate the udata
    * @return string encoded hashed string 
    */
-  protected function generate_hashed_string(string $input) {
-    $salted = password_hash ( $input , PASSWORD_BCRYPT, array('cost' => 4));
-    $substr = substr($salted, 7);
-    return urlencode(base64_encode($substr));
+  public function generate_hashed_string(string $input)
+  {
+    $result = '';
+    do {
+
+      $salted = password_hash($input, PASSWORD_BCRYPT, array('cost' => 4));
+      $substr = substr($salted, 7);
+      $result = str_replace('/', '-', $substr);
+      // keep going until first and last characters are not . or -
+    } while ($result[strlen($result) - 1] === '.' || $result[strlen($result) - 1] === '-' || $result[0] === '.' || $result[0] === '-');
+    return $result;
   }
   /**
    * Validates the string created 
@@ -687,8 +772,9 @@ class LoginID_DirectWeb
    * @param string $encoded_hashed_string whatever generate_hashed_string() spitted out as the return value gets put here.
    * @return bool true if the $encoded_hashed_string is generated using the input, false if it isn't generated using the input. 
    */
-  protected function validate_hashed_string(string $input, string $encoded_hashed_string) {
-    $decoded = base64_decode(urldecode($encoded_hashed_string));
+  protected function validate_hashed_string(string $input, string $encoded_hashed_string)
+  {
+    $decoded = str_replace('-', '/', $encoded_hashed_string);
     $fullstr = '$2y$04$' . $decoded;
     return password_verify($input, $fullstr);
   }
@@ -712,18 +798,21 @@ class LoginID_DirectWeb
         <label for="username">Username <strong>*</strong></label>
         <input id="__loginid_input_username" type="text" name="username" value="<?php echo  $this->username ?>">
       </div>
-      <div id="__loginid_password_div" <?php echo ((!$this->javascript_unsupported) && empty($this->password) ? 'class="__loginid_hide-password"' : null) ?>>
+      <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) ? 'class="__loginid_hide-password"' : null) ?>>
         <label for="password">Password <strong>*</strong></label>
         <input id="__loginid_input_password" type="password" name="password" value="<?php echo $this->password ?>">
       </div>
-      <input type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <input type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
+        <a href="#" style="display: none;" id="__loginid_use_password_instead">use a password instead</a>
+      </div>
       <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo LoginID_DirectWeb::ShortCodes[$type] ?>">
       <?php if ($this->release_the_fido && isset($this->email)) {
-        $settings = loginid_dwp_get_settings()
+        $settings = loginid_dwp_get_settings();
       ?>
-        <input type="hidden" readonly name="udata" id="__loginid_input_udata" value="<?php echo $this->generate_hashed_string($this->email) ?>">
-        <input type="hidden" readonly name="baseurl" id="__loginid_input_baseurl" value="<?php echo $settings['base_url'] ?>">
-        <input type="hidden" readonly name="apikey" id="__loginid_input_apikey" value="<?php echo $settings['api_key'] ?>">
+        <input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo $type === LoginID_Operation::Login ? $this->login_user_udata : $this->generate_hashed_string($this->email) ?>">
+        <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo $settings['base_url'] ?>">
+        <input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo $settings['api_key'] ?>">
       <?php } ?>
     </form>
 <?php
