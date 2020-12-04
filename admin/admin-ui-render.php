@@ -112,7 +112,7 @@ function loginid_dwp_admin_interface_render()
 						<li><strong>Plugin name</strong> <code>loginid-directweb-plugin</code> To make sure that the correct wizard is used. </li>
 					</ol>
 				</p>
-				<form action="http://localhost:8080/wordpress-directweb-plugin" method="get">
+				<form action="https://usw1.loginid.io/wordpress-directweb-plugin" method="get">
 					<?php
 					// Output nonce, action, and option_page fields for a settings page.
 					wp_nonce_field("loginid_dwp_settings_group-options");
