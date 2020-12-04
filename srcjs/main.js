@@ -220,7 +220,7 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
       });
       output.innerText = await response.text();
     } catch (error) {
-      console.log('error', error)
+      console.log("error", error);
       output.innerText = "Failed to make wordpress request";
     }
   }
@@ -267,8 +267,12 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
     "__loginid_use_an_authenticator_on_this_device"
   );
   if (__loginidIsDefined(useAnAuthenticatorOnThisDevice)) {
-    document.getElementById("__loginid_set_authenticator").style.display =
-      "table-row";
+    try {
+      document.getElementById("__loginid_set_authenticator").style.display =
+        "table-row";
+    } catch (error) {
+      console.log("non-fatal-error", error);
+    }
     useAnAuthenticatorOnThisDevice.addEventListener("click", (event) => {
       event.preventDefault();
       __loginidOnProfilePageAddAuthenticator();
@@ -279,8 +283,13 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
     "__loginid_remove_authenticator_button"
   );
   if (__loginidIsDefined(removeAuthenticator)) {
-    document.getElementById("__loginid_remove_authenticator").style.display =
-      "table-row";
+    try {
+      document.getElementById("__loginid_remove_authenticator").style.display =
+        "table-row";
+    } catch (error) {
+      console.log("non-fatal-error", error);
+    }
+
     removeAuthenticator.addEventListener("click", (event) => {
       event.preventDefault();
       __loginidOnProfilePageRemoveAuthenticator();

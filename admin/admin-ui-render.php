@@ -203,14 +203,14 @@ function loginid_dwp_attach_to_profile($user)
 					</div>
 				</td>
 			</tr>
-		<?php } ?>
-		<?php if ($isEnabled && wp_get_current_user()->ID === $user->ID) { ?>
+		<?php }
+		else if ($isEnabled && (in_array('administrator', (array) wp_get_current_user()->roles) || wp_get_current_user()->ID === $user->ID)) { ?>
 			<tr style="display: none" id="__loginid_remove_authenticator">
 				<th><label>Remove Authenticator</label></th>
 				<td>
 					<button type="button" class="button" style="color:red; border-color: red;" id="__loginid_remove_authenticator_button">Remove authenticator from this account</button>
 					<div id="__loginid_remove_authenticator_response">
-						This action is not reversible. Your LoginID credentials will be permanently deleted.
+						This action is not reversible. Your LoginID credentials will be permanently deleted. You will need another method of authentication to access this account. (like a password).
 					</div>
 					<div>
 						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dwp_remove_from_profile_nonce"); ?>">

@@ -127,7 +127,7 @@ function loginid_dwp_admin_enqueue_css_js($hook)
 		// Main CSS
 		wp_enqueue_style('loginid_dwp-admin-main-css', LOGINID_DIRECTWEB_PLUGIN_URL . 'admin/css/main.css', '', LOGINID_DIRECTWEB_PLUGIN_VERSION_NUM);
 	}
-	if ($hook === "profile.php") {
+	if ($hook === "profile.php" || $hook === "user-edit.php") {
 		// main js processes loginid direct web api stuff
 		wp_enqueue_script('loginid_dwp-admin-main-js', LOGINID_DIRECTWEB_PLUGIN_URL . 'includes/main.js', array(), false, true);
 	}
