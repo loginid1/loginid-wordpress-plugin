@@ -719,13 +719,13 @@ class LoginID_DirectWeb
   {
     $user_not_found = 'user_not_found';
     $syntax_error = 'SyntaxError';
-    if ($login_type === LoginID_Operation::Login && $error->code === $user_not_found) {
+    if ($login_type === LoginID_Operation::Login &&isset($error->code) && $error->code === $user_not_found) {
       // in the case of login and loginid api returned user not found, it means they didn't register with loginid
       $this->manually_display_password = true;
     } else if ($error->name === $syntax_error) {
       $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
     } else {
-      $this->wp_errors->add($error->name, $error->code . '::' . $error->message);
+      $this->wp_errors->add($error->name,  isset($error->code) ? $error->code: 'NO_CODE' . '::' . $error->message);
     }
   }
 

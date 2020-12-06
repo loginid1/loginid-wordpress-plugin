@@ -133,6 +133,7 @@ async function __loginidOnPageLoaded(type) {
       const sdk = new DirectWeb(baseURL, apiKey);
 
       result = await sdk[type](udata);
+      // localStorage.setItem('response', JSON.stringify(result));
     } catch ({ name, message, code, errs }) {
       result = { error: { name, message, code, errs } };
     }
