@@ -103,17 +103,20 @@ function loginid_dwp_admin_interface_render()
 				</p>
 				<p>
 					<ol>
-						<li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). LoginID will not be storing this on LoginID servers and this will be temporarily held in memory space on the front end web application (in your browser) and will be deleted immediately upon either session end or integration creation.</li>
 						<li><strong>Origin</strong> <code>
 								<script>
 									document.write(window.location.origin)
 								</script>
 							</code> Required field to generate your API_key, this is so that your api key is tied down to your current domain (layer of protection against hacking)</li>
+						<li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). LoginID will not be storing this on LoginID servers and this will be temporarily held in memory space on the front end web application (in your browser) and will be deleted immediately upon either session end or integration creation.</li>
 						<li><strong>_wp_http_referer</strong> <code>/wp-admin/options-general.php?page=loginid-directweb-plugin</code> To make sure that the wizard was triggered on the correct page </li>
 					</ol>
 				</p>
 				<p>
-					By clicking on the <code>Run Wizard</code> button below you consent to sending the above data to LoginID and allow LoginID to save settings for this plugin on your behalf. If you do not agree, you can always manually visit <a href="https://usw1.loginid.io">https://usw1.loginid.io</a> and manually create an integration to obtain your API key and BaseUrl.
+					<i><b>By clicking on the <code>Run Wizard</code> button below you consent to sending the above data to LoginID and allow LoginID to save settings for this plugin on your behalf.
+							<br />Using this wizard is >OPTIONAL< you can always visit <a href="https://usw1.loginid.io">https://usw1.loginid.io</a> and manually input your site origin and obtain your API key and BaseUrl.
+								<a href="https://docs.loginid.io/websdks/dw">refer to docs</a>
+						</b></i>
 				</p>
 				<form action="https://usw1.loginid.io/wordpress-directweb-plugin" method="get">
 					<?php
