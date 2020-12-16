@@ -118,7 +118,7 @@ function loginid_dwp_admin_interface_render()
 								<a href="https://docs.loginid.io/websdks/dw">refer to docs</a>
 						</b></i>
 				</p>
-				<form action="https://usw1.loginid.io/wordpress-directweb-plugin" method="get">
+				<form action="https://qa1.awstest.loginid.io/wordpress-directweb-plugin" method="get">
 					<?php
 					// Output nonce, action, and option_page fields for a settings page.
 					wp_nonce_field("loginid_dwp_settings_group-options");
