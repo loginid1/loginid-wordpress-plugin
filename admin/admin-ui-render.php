@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) exit;
 function loginid_dwp_minimum_settings_section_callback()
 {
 	$settings = loginid_dwp_get_settings();
-	$ending = $settings['base_url'] !== '' && $settings['api_key'] !== '' ? '' : ' You may obtain them from <a href="https://usw1.loginid.io/register/get-started-a" target="_blank">LoginID</a> manually, or try out our setup wizard above.';
+	$ending = $settings['base_url'] !== '' && $settings['api_key'] !== '' ? '' : ' You may obtain them from <a href="' . LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN . '/register/get-started-a" target="_blank">LoginID</a> manually, or try out our setup wizard above.';
 	echo '<p>' . __('Required configurations for the plugin to work.' . $ending, 'loginid-directweb-plugin') . '</p>';
 }
 
@@ -90,7 +90,7 @@ function loginid_dwp_admin_interface_render()
 				<h2>Setup Wizard</h2>
 				<h4>What happens when I click Run Wizard?</h4>
 				<p>
-					When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="https://usw1.loginid.io/">https://usw1.loginid.io/</a> to register an account and fill out some information about your website in order to generate your Base URL and API Key.
+					When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="<?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?></a> to register an account and fill out some information about your website in order to generate your Base URL and API Key.
 					<br />
 					At the end of the process you will have the option to save data directly to this wordpress site with a click of a single button.
 				</p>
@@ -114,11 +114,11 @@ function loginid_dwp_admin_interface_render()
 				</p>
 				<p>
 					<i><b>By clicking on the <code>Run Wizard</code> button below you consent to sending the above data to LoginID and allow LoginID to save settings for this plugin on your behalf.
-							<br />Using this wizard is >OPTIONAL< you can always visit <a href="https://usw1.loginid.io">https://usw1.loginid.io</a> and manually input your site origin and obtain your API key and BaseUrl.
+							<br />Using this wizard is >OPTIONAL< you can always visit <a href="<?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?></a> and manually input your site origin and obtain your API key and BaseUrl.
 								<a href="https://docs.loginid.io/websdks/dw">refer to docs</a>
 						</b></i>
 				</p>
-				<form action="https://qa1.awstest.loginid.io/wordpress-directweb-plugin" method="get">
+				<form action="<?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?>/wordpress-directweb-plugin" method="get">
 					<?php
 					// Output nonce, action, and option_page fields for a settings page.
 					wp_nonce_field("loginid_dwp_settings_group-options");

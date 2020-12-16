@@ -71,7 +71,7 @@ function loginid_dwp_register_settings()
 		'loginid_dwp_text_input_field_callback',					// Callback function
 		'loginid-directweb-plugin',											// Page slug
 		'loginid_dwp_minimum_settings_section',							// Settings Section ID
-		array('api_key', 'unique key obtained from <a href="https://usw1.loginid.io/en/integration" target="_blank">LoginID</a> ') //params to pass to callback
+		array('api_key', 'unique key obtained from <a href="' . LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN . '/en/integration" target="_blank">LoginID</a> ') //params to pass to callback
 	);
 }
 add_action('admin_init', 'loginid_dwp_register_settings');
