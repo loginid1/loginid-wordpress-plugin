@@ -50,8 +50,8 @@ if (!defined('LOGINID_DIRECTWEB_PLUGIN_VERSION_NUM'))     define('LOGINID_DIRECT
 if (!defined('LOGINID_DIRECTWEB_PLUGIN'))    define('LOGINID_DIRECTWEB_PLUGIN', trim(dirname(plugin_basename(__FILE__)), '/')); // Name of the plugin folder eg - 'loginid-directweb-plugin'
 if (!defined('LOGINID_DIRECTWEB_PLUGIN_DIR'))  define('LOGINID_DIRECTWEB_PLUGIN_DIR', plugin_dir_path(__FILE__)); // Plugin directory absolute path with the trailing slash. Useful for using with includes eg - /var/www/html/wp-content/plugins/loginid-directweb-plugin/
 if (!defined('LOGINID_DIRECTWEB_PLUGIN_URL'))  define('LOGINID_DIRECTWEB_PLUGIN_URL', plugin_dir_url(__FILE__)); // URL to the plugin folder with the trailing slash. Useful for referencing src eg - http://localhost/wp/wp-content/plugins/loginid-directweb-plugin/
-if (!defined('LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN'))     define('LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN', 'https://qa1.awstest.loginid.io'); // Plugin version constant
-if (!defined('LOGINID_DIRECTWEB_PLUGIN_LOGINID_JWT_ORIGIN'))     define('LOGINID_DIRECTWEB_PLUGIN_LOGINID_JWT_ORIGIN', 'https://directweb.qa1.awstest.loginid.io/certs'); // Plugin version constant
+if (!defined('LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN'))     define('LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN', 'https://usw1.loginid.io'); // Plugin version constant
+if (!defined('LOGINID_DIRECTWEB_PLUGIN_LOGINID_JWT_ORIGIN'))     define('LOGINID_DIRECTWEB_PLUGIN_LOGINID_JWT_ORIGIN', 'https://directweb.usw1.loginid.io/certs'); // Plugin version constant
 
 /**
  * Add plugin version to database

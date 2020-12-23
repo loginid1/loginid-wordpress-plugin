@@ -1,20 +1,4 @@
-<!--
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** twitter_handle
--->
-
-
-
-
-
 <!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -25,16 +9,14 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/loginid1/loginid-directweb-plugin">
-    TODO:<img src="images/logo.png" alt="Logo" width="80" height="80">
+  <a href="https://loginid.io">
+    <img src="img/logo.png" alt="Logo" width="auto" height="80">
   </a>
 
   <h3 align="center">LoginID DirectWeb Plugin</h3>
 
   <p align="center">
     For Wordpress
-    <br />
-    <a href="https://github.com/loginid1/loginid-directweb-plugin"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/loginid1/loginid-directweb-plugin/issues">Report Bug</a>
@@ -52,10 +34,9 @@
 - [About The Project](#about-the-project)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
+  - [Wordpress Setup Guide](#wordpress-setup-guide)
+  - [Building From Source](#building-from-source)
 - [Roadmap](#roadmap)
-- [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
@@ -65,25 +46,45 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-***TODO:***
-[![Product Screen Shot][product-screenshot]](https://example.com)
+Wordpress Plugin to enable a passwordless login experience using LoginID's Direct Web API.
 
-Wordpress Plugin to create a passwordless login experience using LoginID's Direct Web API
+This plugin will add two custom short codes `[loginid_login]` and `[loginid_registration]`. These two short codes will generate a login form and a register form that will use LoginID's DirectWeb API to authenticate the user without a password.
 
+The user must have a FIDO2 compatible device, otherwise this form will default back to using a password authentication instead.
 
+This plugin is compatible with Wordpress' default password login, so this should be compatible with existing authentication plugins. 
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To get a local copy up and running follow these simple steps.
-
 ### Prerequisites
 
-As this is a wordpress plugin this project requires wordpress to run
+As this is a wordpress plugin this project requires wordpress to run. 
 
-### Installation
+(OPTIONAL) If you wish to modify the Javascript source files and/or PHP dependancies within this project, then you would also need to nave Node, NPM, and Composer installed. 
 
-1. 
+### Wordpress Setup Guide
+
+1. Install the plugin (through the zip file or through the wordpress plugin store)
+2. Configure the plugin under Settings > LoginID DirectWeb Plugin (as shown in the image below)
+   
+   ![Settings](img/settings.png)
+3. Choose one of the following methods of obtaining your Base URL and API Key from LoginID. You can either 
+   
+   - Run the setup Wizard by clicking on the `Run Setup Wizard` button. An expanded menu will be displayed to disclose exactly what this wizard does. It sends some of your site information directly to LoginID so the create integration form will be pre-populated with data, and presents you with the option to directly save the BaseURL and API Key directly to your wordpress site. (You can always perform this action manually).
+  
+  ![Setup Wizard](img/setup-wizard.png)
+
+   - Or Visit [LoginID Dashboard](https://usw1.loginid.io/integrations) on the integrations page, and manually input required site data. This method will collect less data, but requires you to manually copy and paste over the BaseURL and API Key from LoginID.(shown in the following two screenshots).
+  
+  Copy from the LoginID dashboard
+  ![LoginID Dashboard](img/loginid-dashboard.png)
+  To the plugin dashboard
+  ![Plugin Dashboard](img/plugin-dashboard.png)
+  
+### Building From Source
+
+1. Go to your wordpress plugin folder
 ```sh
 cd htdocs/wp-contents/plugins
 ```
@@ -91,11 +92,11 @@ cd htdocs/wp-contents/plugins
 ```sh
 git clone https://github.com/loginid1/loginid-directweb-plugin.git
 ```
-3. install php dependencies
+3. Install php dependencies
 ```sh
 composer install
 ```
-4. Open up wordpress and configure the plugin
+4. Open up wordpress and configure the plugin (refer to above)
 5. (Optional) Editing javascript. Edit stuff in srcjs and don't edit javascript in includes (its minified and generated from files in srcjs anyway). You'll need nodejs to run though. 
 6. (Optional) Build your own javascript files
 ```sh
@@ -103,23 +104,11 @@ npm i
 npm run dev
 ```
 
-<!-- USAGE EXAMPLES -->
-## Usage
-
-This plugin will disable wp-login and wp-register and replace them with custom login and register pages that is compatible with LoginID Direct Web login process.
-
-
 
 <!-- ROADMAP -->
 ## Roadmap
 
 See the [open issues](https://github.com/loginid1/loginid-directweb-plugin/issues) for a list of proposed features (and known issues).
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-***TODO:*** Contribution policy
 
 <!-- LICENSE -->
 ## License
@@ -132,7 +121,8 @@ Distributed under the GPLv3 License. See `LICENSE` for more information.
 ## Contact
 
 LoginID - dev@loginid.io
-<!-- - [@twitter_handle](https://twitter.com/twitter_handle) -->
+
+If you need plugin help feel free to contact jimmy@loginid.io (usually reply within 48 hours).
 
 Project Link: [https://github.com/loginid1/loginid-directweb-plugin](https://github.com/loginid1/loginid-directweb-plugin)
 

@@ -79,7 +79,8 @@ async function __loginidOnAuthenticate(
     passwordDiv.classList = passwordDiv.classList.remove(
       "__loginid_hide-password"
     );
-    document.getElementById("__loginid_submit_button").value = "Register";
+    document.getElementById("__loginid_submit_button").value =
+      String(authType).charAt(0).toUpperCase() + String(authType).slice(1);
     return;
   }
 
