@@ -802,9 +802,9 @@ class LoginID_DirectWeb
         <label for="password">Password <strong>*</strong></label>
         <input id="__loginid_input_password" type="password" name="password" value="<?php echo $this->password ?>">
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
         <input type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
-        <a href="#" style="display: none;" id="__loginid_use_password_instead">use a password instead</a>
+        <a href="#" style="display: none;white-space: nowrap;" id="__loginid_use_password_instead">use a password instead</a>
       </div>
       <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo LoginID_DirectWeb::ShortCodes[$type] ?>">
       <?php if ($this->release_the_fido && isset($this->email)) {
