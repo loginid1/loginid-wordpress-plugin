@@ -78,9 +78,13 @@ As this is a wordpress plugin this project requires wordpress to run.
    - Or Visit [LoginID Dashboard](https://usw1.loginid.io/integrations) on the integrations page, and manually input required site data. This method will collect less data, but requires you to manually copy and paste over the BaseURL and API Key from LoginID.(shown in the following two screenshots).
   
   Copy from the LoginID dashboard
+
   ![LoginID Dashboard](img/loginid-dashboard.png)
+
   To the plugin dashboard
+
   ![Plugin Dashboard](img/plugin-dashboard.png)
+  
 4. Add `[loginid_login]` and `[loginid_registration]` to your login and register pages for the form to be displayed. (Note that the forms will not be shown when the user is logged in.)
 
 ### Building From Source
