@@ -108,7 +108,7 @@ function loginid_dwp_admin_interface_render()
 									document.write(window.location.origin)
 								</script>
 							</code> Required field to generate your API_key, this is so that your api key is tied down to your current domain (layer of protection against hacking)</li>
-						<li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). LoginID will not be storing this on LoginID servers and this will be temporarily held in memory space on the front end web application (in your browser) and will be deleted immediately upon either session end or integration creation. This hash lives a maximum of 24 hours and can only be used to change BaseURL and APIKey settings for this plugin.</li>
+						<li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). <b>LoginID will be using wp nonce transiently during credentials creation process and will not store it on loginID system.</b> This hash lives a maximum of 24 hours and can only be used to change BaseURL and APIKey settings for this plugin.</li>
 						<li><strong>_wp_http_referer</strong> <code>/wp-admin/options-general.php?page=loginid-directweb-plugin</code> To make sure that the wizard was triggered on the correct page </li>
 					</ol>
 				</p>
