@@ -61,7 +61,7 @@ function loginid_dw_register_settings()
 		'loginid_dw_text_input_field_callback',					// Callback function
 		'loginid-directweb',											// Page slug
 		'loginid_dw_minimum_settings_section',							// Settings Section ID
-		array('base_url', 'example: https://directweb.usw1.loginid.io') //params to pass to callback
+		array('base_url', 'example: https://directweb.sandbox-usw1.api.loginid.io') //params to pass to callback
 	);
 
 	// BaseURL
