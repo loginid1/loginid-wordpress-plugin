@@ -41,7 +41,7 @@ abstract class LoginID_Errors
 
   public const LoginFailed = array(LoginID_Error::Code => "login_failed", LoginID_Error::Message => "Incorrect email/password combination");
 
-  public const PluginError = array(LoginID_Error::Code => "loginid_error", LoginID_Error::Message => "LoginID Directweb Plugin Error");
+  public const PluginError = array(LoginID_Error::Code => "loginid_error", LoginID_Error::Message => "LoginID Directweb Error");
 
   public const LoginIDCannotVerify = array(LoginID_Error::Code => "loginid_cannot_verify", LoginID_Error::Message => "Your identity could not be verified");
   public const LoginTokenCannotVerify = array(LoginID_Error::Code => "login_token_cannot_verify", LoginID_Error::Message => "Your identity token could not be verified");
@@ -292,7 +292,7 @@ class LoginID_DirectWeb
    */
   protected function get_jwt_public_key($kid)
   {
-    $url = LOGINID_DIRECTWEB_PLUGIN_LOGINID_JWT_ORIGIN;
+    $url = LOGINID_DIRECTWEB_LOGINID_JWT_ORIGIN;
 
     $fields = array(
       'kid' => $kid,
@@ -300,15 +300,9 @@ class LoginID_DirectWeb
 
     $data = http_build_query($fields);
 
-    $ch = curl_init();
 
-    curl_setopt($ch, CURLOPT_URL, $url . "?" . $data);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-
-    $result = curl_exec($ch);
-
-    curl_close($ch);
+    $response = wp_remote_get($url . "?" . $data);
+    $result = wp_remote_retrieve_body($response);
     return $result;
   }
 
@@ -625,8 +619,8 @@ class LoginID_DirectWeb
       $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
       $login_type = $this->validate_loginid_field($shortcode); // validate input
       if ($login_type !== false) {
-        $this->email = $_POST['email']; // these are okay we gotta remember to sanitize them later, before writing to db
-        $this->username = isset($_POST['username']) ? $_POST['username'] : null; // these are okay we gotta remember to sanitize them later
+        $this->email = sanitize_email($_POST['email']);
+        $this->username = sanitize_email($_POST['username']);
 
         // we have login type as register or login
         if ($submit === $login_type) {
@@ -643,9 +637,6 @@ class LoginID_DirectWeb
             // this means that username and email validation just passed
             $fido2_support = isset($_POST['fido2']) ? sanitize_text_field($_POST['fido2']) : null;
             $loginid_data = isset($_POST['loginid']) ? sanitize_text_field($_POST['loginid']) : null;
-            // this is a good place to sanitize email and username
-            $this->email = sanitize_email($this->email);
-            $this->username = sanitize_user($this->username);
 
             // now we need to figure out if we doing loginid login, password login or awaiting loginid direct web.
             if (isset($loginid_data)) {
@@ -719,13 +710,13 @@ class LoginID_DirectWeb
   {
     $user_not_found = 'user_not_found';
     $syntax_error = 'SyntaxError';
-    if ($login_type === LoginID_Operation::Login &&isset($error->code) && $error->code === $user_not_found) {
+    if ($login_type === LoginID_Operation::Login && isset($error->code) && $error->code === $user_not_found) {
       // in the case of login and loginid api returned user not found, it means they didn't register with loginid
       $this->manually_display_password = true;
     } else if ($error->name === $syntax_error) {
       $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
     } else {
-      $this->wp_errors->add($error->name,  isset($error->code) ? $error->code: 'NO_CODE' . '::' . $error->message);
+      $this->wp_errors->add($error->name,  isset($error->code) ? $error->code : 'NO_CODE' . '::' . $error->message);
     }
   }
 
@@ -808,7 +799,7 @@ class LoginID_DirectWeb
       </div>
       <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo LoginID_DirectWeb::ShortCodes[$type] ?>">
       <?php if ($this->release_the_fido && isset($this->email)) {
-        $settings = loginid_dwp_get_settings();
+        $settings = loginid_dw_get_settings();
       ?>
         <input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo $type === LoginID_Operation::Login ? $this->login_user_udata : $this->generate_hashed_string($this->email) ?>">
         <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo $settings['base_url'] ?>">

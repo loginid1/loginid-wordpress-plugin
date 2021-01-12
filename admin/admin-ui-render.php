@@ -4,9 +4,9 @@
  * Admin UI setup and render
  *
  * @since 0.1.0
- * @function	loginid_dwp_minimum_settings_section_callback()	Callback function for General Settings section
- * @function	loginid_dwp_general_settings_field_callback()	Callback function for General Settings field
- * @function	loginid_dwp_admin_interface_render()				Admin interface renderer
+ * @function	loginid_dw_minimum_settings_section_callback()	Callback function for General Settings section
+ * @function	loginid_dw_general_settings_field_callback()	Callback function for General Settings field
+ * @function	loginid_dw_admin_interface_render()				Admin interface renderer
  */
 
 // Exit if accessed directly
@@ -17,11 +17,11 @@ if (!defined('ABSPATH')) exit;
  *
  * @since 0.1.0
  */
-function loginid_dwp_minimum_settings_section_callback()
+function loginid_dw_minimum_settings_section_callback()
 {
-	$settings = loginid_dwp_get_settings();
-	$ending = $settings['base_url'] !== '' && $settings['api_key'] !== '' ? '' : ' You may obtain them from <a href="' . LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN . '/register/get-started-a" target="_blank">LoginID</a> manually, or try out our setup wizard above.';
-	echo '<p>' . __('Required configurations for the plugin to work.' . $ending, 'loginid-directweb-plugin') . '</p>';
+	$settings = loginid_dw_get_settings();
+	$ending = $settings['base_url'] !== '' && $settings['api_key'] !== '' ? '' : ' You may obtain them from <a href="' . LOGINID_DIRECTWEB_LOGINID_ORIGIN . '/register/get-started-a" target="_blank">LoginID</a> manually, or try out our setup wizard above.';
+	echo '<p>' . __('Required configurations for the plugin to work.' . $ending, 'loginid-directweb') . '</p>';
 }
 
 /**
@@ -30,18 +30,18 @@ function loginid_dwp_minimum_settings_section_callback()
  * @since 0.1.0
  * @param Array $args contains a list of settings in the following order [$settings_id, $description]
  */
-function loginid_dwp_text_input_field_callback($args)
+function loginid_dw_text_input_field_callback($args)
 {
 	// destructure args
 	[$settings_id, $description] = $args;
 
 	// Get Settings
-	$settings = loginid_dwp_get_settings(); ?>
+	$settings = loginid_dw_get_settings(); ?>
 
 	<fieldset>
 		<!-- Text Input -->
-		<input type="text" name="loginid_dwp_settings[<?php echo $settings_id ?>]" class="regular-text" value="<?php if (isset($settings[$settings_id]) && (!empty($settings[$settings_id]))) echo esc_attr($settings[$settings_id]); ?>" />
-		<p class="description"><?php _e($description, 'loginid-directweb-plugin'); ?></p>
+		<input type="text" name="loginid_dw_settings[<?php echo $settings_id ?>]" class="regular-text" value="<?php if (isset($settings[$settings_id]) && (!empty($settings[$settings_id]))) echo esc_attr($settings[$settings_id]); ?>" />
+		<p class="description"><?php _e($description, 'loginid-directweb'); ?></p>
 	</fieldset>
 <?php
 }
@@ -51,7 +51,7 @@ function loginid_dwp_text_input_field_callback($args)
  *
  * @since 0.1.0
  */
-function loginid_dwp_admin_interface_render()
+function loginid_dw_admin_interface_render()
 {
 
 	if (!current_user_can('manage_options')) {
@@ -65,23 +65,23 @@ function loginid_dwp_admin_interface_render()
 	 *
 		if ( isset( $_GET['settings-updated'] ) ) {
 			// Add settings saved message with the class of "updated"
-			add_settings_error( 'loginid_dwp_settings_saved_message', 'loginid_dwp_settings_saved_message', __( 'Settings are Saved', 'loginid-directweb-plugin' ), 'updated' );
+			add_settings_error( 'loginid_dw_settings_saved_message', 'loginid_dw_settings_saved_message', __( 'Settings are Saved', 'loginid-directweb' ), 'updated' );
 		}
 	
 		// Show Settings Saved Message
-		settings_errors( 'loginid_dwp_settings_saved_message' ); 
+		settings_errors( 'loginid_dw_settings_saved_message' ); 
 	 */
 
 	if (isset($_GET['loginid-admin-msg'])) {
 		// some other loginid hood redirected here with an admin message
-		add_settings_error('loginid_dwp_settings_admin_msg', 'loginid_dwp_settings_admin_msg', sanitize_text_field($_GET['loginid-admin-msg']), 'info');
+		add_settings_error('loginid_dw_settings_admin_msg', 'loginid_dw_settings_admin_msg', sanitize_text_field($_GET['loginid-admin-msg']), 'info');
 		// then show the message
-		settings_errors('loginid_dwp_settings_admin_msg');
+		settings_errors('loginid_dw_settings_admin_msg');
 	}
 ?>
 
 	<div class="wrap">
-		<h1>LoginID DirectWeb Plugin</h1>
+		<h1>LoginID DirectWeb</h1>
 
 		<div style="margin-top: 1em;">
 			<input class="__loginid_setup-wizard-checkbox" type="checkbox" id="__loginid_setup-wizard-checkbox" />
@@ -90,7 +90,7 @@ function loginid_dwp_admin_interface_render()
 				<h2>Setup Wizard</h2>
 				<h4>What happens when I click Run Wizard?</h4>
 				<p>
-					When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="<?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?></a> to register an account and fill out some information about your website in order to generate your Base URL and API Key.
+					When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?></a> to register an account and fill out some information about your website in order to generate your Base URL and API Key.
 					<br />
 					At the end of the process you will have the option to save data directly to this wordpress site with a click of a single button.
 				</p>
@@ -109,19 +109,19 @@ function loginid_dwp_admin_interface_render()
 								</script>
 							</code> Required field to generate your API_key, this is so that your api key is tied down to your current domain (layer of protection against hacking)</li>
 						<li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). <b>LoginID will be using wp nonce transiently during credentials creation process and will not store it on loginID system.</b> This hash lives a maximum of 24 hours and can only be used to change BaseURL and APIKey settings for this plugin.</li>
-						<li><strong>_wp_http_referer</strong> <code>/wp-admin/options-general.php?page=loginid-directweb-plugin</code> To make sure that the wizard was triggered on the correct page </li>
+						<li><strong>_wp_http_referer</strong> <code>/wp-admin/options-general.php?page=loginid-directweb</code> To make sure that the wizard was triggered on the correct page </li>
 					</ol>
 				</p>
 				<p>
 					<i><b>By clicking on the <code>Run Wizard</code> button below you consent to sending the above data to LoginID and allow LoginID to save settings for this plugin on your behalf.
-							<br />Using this wizard is >OPTIONAL< you can always visit <a href="<?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?></a> and manually input your site origin and obtain your API key and BaseUrl.
+							<br />Using this wizard is >OPTIONAL< you can always visit <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?></a> and manually input your site origin and obtain your API key and BaseUrl.
 								<a href="https://docs.loginid.io/websdks/dw">refer to docs</a>
 						</b></i>
 				</p>
-				<form action="<?php echo LOGINID_DIRECTWEB_PLUGIN_LOGINID_ORIGIN ?>/wordpress-directweb-plugin" method="get">
+				<form action="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>/wordpress-directweb-plugin" method="get">
 					<?php
 					// Output nonce, action, and option_page fields for a settings page.
-					wp_nonce_field("loginid_dwp_settings_group-options");
+					wp_nonce_field("loginid_dw_settings_group-options");
 					?>
 					<input type="hidden" name="origin" id="__loginid_form_origin" />
 					<script>
@@ -135,22 +135,22 @@ function loginid_dwp_admin_interface_render()
 		<form action="options.php" method="post">
 			<?php
 			// Output nonce, action, and option_page fields for a settings page.
-			settings_fields('loginid_dwp_settings_group');
+			settings_fields('loginid_dw_settings_group');
 
 			// Prints out all settings sections added to a particular settings page. 
-			do_settings_sections('loginid-directweb-plugin');	// Page slug
+			do_settings_sections('loginid-directweb');	// Page slug
 
 			// Output save settings button
-			submit_button(__('Save Settings', 'loginid-directweb-plugin'));
+			submit_button(__('Save Settings', 'loginid-directweb'));
 			?>
 		</form>
 
 		<p>
 			<form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
 				<?php
-				wp_nonce_field("loginid_dwp_settings_group-options");
+				wp_nonce_field("loginid_dw_settings_group-options");
 				?>
-				<input type="hidden" name="action" value="loginid_dwp_generate_page">
+				<input type="hidden" name="action" value="loginid_dw_generate_page">
 				<input type="submit" name="submit" class="button button-secondary" value="Generate Login Page">
 				<input type="submit" name="submit" class="button button-secondary" value="Generate Register Page">
 			</form>
@@ -175,9 +175,9 @@ function loginid_dwp_admin_interface_render()
  * 
  * @since 0.1.0
  */
-function loginid_dwp_attach_to_profile($user)
+function loginid_dw_attach_to_profile($user)
 {
-	$settings = loginid_dwp_get_settings();
+	$settings = loginid_dw_get_settings();
 	$udata = get_user_meta($user->ID, LoginID_DB_Fields::udata_user_id, true);
 	$sub = get_user_meta($user->ID, LoginID_DB_Fields::subject_user_id, true);
 	$isEnabled = $udata !== '' && $sub !== '';
@@ -202,7 +202,7 @@ function loginid_dwp_attach_to_profile($user)
 					<button type="button" class="button" id="__loginid_use_an_authenticator_on_this_device">Use an authenticator on this device</button>
 					<div id="__loginid_use_an_authenticator_on_this_device_response"></div>
 					<div>
-						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dwp_save_to_profile_nonce"); ?>">
+						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dw_save_to_profile_nonce"); ?>">
 						<input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo $udata ?>">
 						<input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo $settings['base_url'] ?>">
 						<input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo $settings['api_key'] ?>">
@@ -218,7 +218,7 @@ function loginid_dwp_attach_to_profile($user)
 						This action is not reversible. Your LoginID credentials will be permanently deleted. You will need another method of authentication to access this account. (like a password).
 					</div>
 					<div>
-						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dwp_remove_from_profile_nonce"); ?>">
+						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dw_remove_from_profile_nonce"); ?>">
 					</div>
 				</td>
 			</tr>
@@ -226,5 +226,5 @@ function loginid_dwp_attach_to_profile($user)
 	</table>
 <?php }
 
-add_action('show_user_profile', 'loginid_dwp_attach_to_profile');
-add_action('edit_user_profile', 'loginid_dwp_attach_to_profile');
+add_action('show_user_profile', 'loginid_dw_attach_to_profile');
+add_action('edit_user_profile', 'loginid_dw_attach_to_profile');

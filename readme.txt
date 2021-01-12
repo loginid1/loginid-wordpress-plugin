@@ -1,10 +1,10 @@
-=== loginid-directweb-plugin ===
+=== loginid-directweb ===
 Contributors: loginidauth
 Donate link: https://loginid.io
 Tags: Authentication, Security, Oauth-2.0, Identity, Biometrics, Touch-id, Webauthn, Passwordless, Fido2, Fido, Passwordless login, Fido certified, Uaf
-Requires at least: 4.7
-Tested up to: 5.4
-Stable tag: 4.3
+Requires at least: 5.4
+Tested up to: 5.6
+Stable tag: 1.0
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -30,7 +30,7 @@ For more information on how the DirectWeb plugin works, please view our [documen
 
 1. Upload to the `/wp-content/plugins/` directory
 1. Activate the plugin
-1. Visit Settings > LoginID DirectWeb Plugin to configure this plugin.
+1. Visit Settings > LoginID DirectWeb to configure this plugin.
 
 == Frequently Asked Questions ==
 
@@ -70,7 +70,7 @@ Yes, you can customize the registration page in line with your website’s look 
 Yes. Our solution augments your existing authentication flows. You may choose to replace or add LoginID authentication based on your specific needs. 
 
 = Can I integrate this plugin with my other installed plugins such as my eCommerce plugin? =
-We can assist you with integrating the LoginID DirectWeb plugin with your other installed plugins. Please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
+We can assist you with integrating the LoginID DirectWeb with your other installed plugins. Please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
 
 = I need to customize the plugin or I need support and help? =
 Please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 

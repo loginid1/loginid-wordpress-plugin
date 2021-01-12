@@ -17,5 +17,5 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) die;
  *
  * @since 0.1.0
  */ 
-delete_option( 'loginid_dwp_settings' );
-delete_option( 'abl_loginid_dwp_version' );
+delete_option( 'loginid_dw_settings' );
+delete_option( 'abl_loginid_dw_version' );
