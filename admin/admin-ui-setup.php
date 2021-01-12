@@ -22,10 +22,10 @@ if (!defined('ABSPATH')) exit;
 function loginid_dw_add_menu_links()
 {
 	add_options_page(
-		__('LoginID DirectWeb', 'loginid-directweb'),
-		__('LoginID DirectWeb', 'loginid-directweb'),
+		__('LoginID DirectWeb Plugin', 'loginid-directweb'),
+		__('LoginID DirectWeb Plugin', 'loginid-directweb'),
 		'update_core', // super admin and administrator (single site)
-		'loginid-directweb',
+		'loginid-directweb-plugin',
 		'loginid_dw_admin_interface_render'
 	);
 }
