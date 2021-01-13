@@ -46,22 +46,3 @@ add_action('wp_enqueue_scripts', 'loginid_dw_enqueue_css_js');
 // commented out because this function isn't needed anymore
 // add_filter('script_loader_tag', 'loginid_dw_script_type_attribute', 10, 3);
 
-
-/**
- * callback that sets redirect from wp-register and wp-login to custom login and register pages
- * 
- * @since 0.1.0
- */
-function set_redirect()
-{
-  global $pagenow;
-  if ('wp-login.php' == $pagenow) {
-    // TODO: uncomment this when login page is stable
-    // wp_redirect('login');
-    // exit();
-  }
-}
-// enable this if you want to disable entire wp-login page
-// add_action('init', 'set_redirect');
-
-
