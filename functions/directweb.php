@@ -628,7 +628,7 @@ class LoginID_DirectWeb
           // never trust the front end xd
 
           // from this point on we are good to go
-          $this->password = isset($_POST['password']) ? esc_attr($_POST['password']) : null; 
+          $this->password = isset($_POST['password']) ? esc_attr(sanitize_text_field($_POST['password'])) : null; 
 
           // this generates errors if input is invalid, also merges them into this->wp_error
           $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_email($login_type), $login_type === LoginID_Operation::Register ? $this->validate_username() : null);
