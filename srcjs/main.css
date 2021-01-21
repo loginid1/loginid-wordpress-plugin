@@ -1,11 +1,17 @@
 .__loginid_hide-password {
-  display: none;
+  display: none !important;
 }
 
 .__loginid_hide-username {
-  display: none;
+  display: none !important;
 }
 
 .__loginid_error-style {
-  
+}
+
+.loginid-submit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }

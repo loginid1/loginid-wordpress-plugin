@@ -779,22 +779,22 @@ class LoginID_DirectWeb
   protected function render_form($type = LoginID_Operation::Login)
   {
 ?>
-    <form id="<?php echo "__loginid_{$type}_form" ?>" method="POST">
-      <div>
-        <label for="email">Email <strong>*</strong></label>
-        <input id="__loginid_input_email" type="text" name="email" value="<?php echo $this->email ?>">
+    <form id="<?php echo "__loginid_{$type}_form" ?>" method="POST" class="loginid-auth-form">
+      <div class="loginid-auth-form-row">
+        <label class="loginid-auth-form-label" for="email">Email <strong>*</strong></label>
+        <input class="loginid-auth-form-input" id="__loginid_input_email" type="text" name="email" value="<?php echo $this->email ?>">
       </div>
-      <div <?php echo ($type === LoginID_Operation::Login ? 'class="__loginid_hide-username"' : null) ?>>
-        <label for="username">Username <strong>*</strong></label>
-        <input id="__loginid_input_username" type="text" name="username" value="<?php echo  $this->username ?>">
+      <div <?php echo ($type === LoginID_Operation::Login ? 'class="__loginid_hide-username loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
+        <label class="loginid-auth-form-label" for="username">Username <strong>*</strong></label>
+        <input class="loginid-auth-form-input" id="__loginid_input_username" type="text" name="username" value="<?php echo  $this->username ?>">
       </div>
-      <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) ? 'class="__loginid_hide-password"' : null) ?>>
-        <label for="password">Password <strong>*</strong></label>
-        <input id="__loginid_input_password" type="password" name="password" value="<?php echo $this->password ?>">
+      <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) ? 'class="__loginid_hide-password loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
+        <label class="loginid-auth-form-label" for="password">Password <strong>*</strong></label>
+        <input class="loginid-auth-form-input" id="__loginid_input_password" type="password" name="password" value="<?php echo $this->password ?>">
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-        <input type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
-        <a href="#" style="display: none;white-space: nowrap;" id="__loginid_use_password_instead">use a password instead</a>
+      <div class="loginid-submit-row">
+        <input class="loginid-auth-form-submit" type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
+        <a class="loginid-auth-form-link" href="#" style="display: none;white-space: nowrap;" id="__loginid_use_password_instead">use a password instead</a>
       </div>
       <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo LoginID_DirectWeb::ShortCodes[$type] ?>">
       <?php if ($this->release_the_fido && isset($this->email)) {
