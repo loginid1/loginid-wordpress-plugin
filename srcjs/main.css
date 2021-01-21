@@ -15,3 +15,7 @@
   align-items: center;
   flex-wrap: wrap;
 }
+
+.loginid-auth-form-input {
+  width: 100%;
+}
