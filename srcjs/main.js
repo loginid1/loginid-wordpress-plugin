@@ -239,6 +239,9 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
     : false;
 
   if (type) {
+    document.getElementById("__loginid_submit_button").value =
+      String(type).charAt(0).toUpperCase() + String(type).slice(1) + ' with FIDO';
+
     document
       .getElementById(`__loginid_${type}_form`)
       .addEventListener("submit", (event) => {
@@ -261,6 +264,7 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
 
         const passwordDiv = document.getElementById("__loginid_password_div");
         passwordDiv.style.display = "block";
+        passwordDiv.className = passwordDiv.className.replace(/\b__loginid_hide-password\b/g, "")
       });
     }
   }
