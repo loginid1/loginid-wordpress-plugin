@@ -621,7 +621,7 @@ class LoginID_DirectWeb
       $login_type = $this->validate_loginid_field($shortcode); // validate input
       if ($login_type !== false) {
         $this->email = sanitize_email($_POST['email']);
-        $this->username = sanitize_text_field($_POST['username']);
+        $this->username = sanitize_text_field(isset($_POST['username']) ? $_POST['username'] : '');
 
         // we have login type as register or login
         if ($submit === $login_type) {
