@@ -51,7 +51,6 @@ if (!defined('LOGINID_DIRECTWEB'))    define('LOGINID_DIRECTWEB', trim(dirname(p
 if (!defined('LOGINID_DIRECTWEB_DIR'))  define('LOGINID_DIRECTWEB_DIR', plugin_dir_path(__FILE__)); // Plugin directory absolute path with the trailing slash. Useful for using with includes eg - /var/www/html/wp-content/plugins/loginid-directweb/
 if (!defined('LOGINID_DIRECTWEB_URL'))  define('LOGINID_DIRECTWEB_URL', plugin_dir_url(__FILE__)); // URL to the plugin folder with the trailing slash. Useful for referencing src eg - http://localhost/wp/wp-content/plugins/loginid-directweb/
 if (!defined('LOGINID_DIRECTWEB_LOGINID_ORIGIN'))     define('LOGINID_DIRECTWEB_LOGINID_ORIGIN', 'https://sandbox-usw1.api.loginid.io'); // Plugin version constant
-if (!defined('LOGINID_DIRECTWEB_LOGINID_JWT_ORIGIN'))     define('LOGINID_DIRECTWEB_LOGINID_JWT_ORIGIN', 'https://directweb.sandbox-usw1.api.loginid.io/certs'); // Plugin version constant
 
 /**
  * Add plugin version to database

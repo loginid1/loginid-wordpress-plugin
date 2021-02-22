@@ -292,7 +292,8 @@ class LoginID_DirectWeb
    */
   protected function get_jwt_public_key($kid)
   {
-    $url = LOGINID_DIRECTWEB_LOGINID_JWT_ORIGIN;
+    $settings = loginid_dw_get_settings();
+    $url = $settings['base_url'] . '/certs';
 
     $fields = array(
       'kid' => $kid,
