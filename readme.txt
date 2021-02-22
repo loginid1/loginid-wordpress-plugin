@@ -4,7 +4,7 @@ Donate link: https://loginid.io
 Tags: Authentication, Security, Oauth-2.0, Identity, Biometrics, Touch-id, Webauthn, Passwordless, Fido2, Fido, Passwordless login, Fido certified, Uaf
 Requires at least: 5.4
 Tested up to: 5.6
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -86,6 +86,9 @@ For any other queries or if you need additional support, please email us at [ema
 Coming soon.
 
 == Changelog ==
+
+= 1.0.4 =
+Minor Style changes and also bump version in plugin directory to display properly
 
 = 1.0.3 =
 remove an unused function that might result in naming conflicts with wordpress naming conventions
