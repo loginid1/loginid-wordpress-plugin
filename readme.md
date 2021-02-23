@@ -10,7 +10,7 @@
 <br />
 <p align="center">
   <a href="https://loginid.io">
-    <img src="img/logo.png" alt="Logo" width="auto" height="80">
+    <img src="img/logo2.png" alt="Logo" width="auto" height="300">
   </a>
 
   <h3 align="center">LoginID DirectWeb</h3>
