@@ -186,7 +186,7 @@ function loginid_dw_attach_to_profile($user)
 	}
 
 ?>
-	<h3 id="loginid-profile-information"><?php echo "LoginID profile information" ?></h3>
+	<h3 id="loginid-profile-information"><?php echo "FIDO login information powered by LoginID" ?></h3>
 
 	<table class="form-table">
 		<tr>
