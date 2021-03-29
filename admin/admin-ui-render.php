@@ -83,6 +83,10 @@ function loginid_dw_admin_interface_render()
 	<div class="wrap">
 		<h1>LoginID DirectWeb</h1>
 
+		<div class="__loginid_tls_warning_banner" id="__loginid_tls_warning_banner">
+			A TLS connection with a certificate signed by a trusted Certificate Authority is required for this plugin to work on production site. Check your URL and it should start with HTTPS
+		</div>
+
 		<div style="margin-top: 1em;">
 			<input class="__loginid_setup-wizard-checkbox" type="checkbox" id="__loginid_setup-wizard-checkbox" />
 			<label class="button button-secondary __loginid_setup-wizard-label" for="__loginid_setup-wizard-checkbox">Run Setup Wizard</label>
@@ -102,15 +106,15 @@ function loginid_dw_admin_interface_render()
 					Here is a complete list of what this plugin will send to LoginID and why:
 				</p>
 				<p>
-					<ol>
-						<li><strong>Origin</strong> <code>
-								<script>
-									document.write(window.location.origin)
-								</script>
-							</code> Required field to generate your API_key, this is so that your api key is tied down to your current domain (layer of protection against hacking)</li>
-						<li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). <b>LoginID will be using wp nonce transiently during credentials creation process and will not store it on loginID system.</b> This hash lives a maximum of 24 hours and can only be used to change BaseURL and APIKey settings for this plugin.</li>
-						<li><strong>_wp_http_referer</strong> <code>/wp-admin/options-general.php?page=loginid-directweb</code> To make sure that the wizard was triggered on the correct page </li>
-					</ol>
+				<ol>
+					<li><strong>Origin</strong> <code>
+							<script>
+								document.write(window.location.origin)
+							</script>
+						</code> Required field to generate your API_key, this is so that your api key is tied down to your current domain (layer of protection against hacking)</li>
+					<li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). <b>LoginID will be using wp nonce transiently during credentials creation process and will not store it on loginID system.</b> This hash lives a maximum of 24 hours and can only be used to change BaseURL and APIKey settings for this plugin.</li>
+					<li><strong>_wp_http_referer</strong> <code>/wp-admin/options-general.php?page=loginid-directweb</code> To make sure that the wizard was triggered on the correct page </li>
+				</ol>
 				</p>
 				<p>
 					<i><b>By clicking on the <code>Run Wizard</code> button below you consent to sending the above data to LoginID and allow LoginID to save settings for this plugin on your behalf.
@@ -146,14 +150,14 @@ function loginid_dw_admin_interface_render()
 		</form>
 
 		<p>
-			<form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
-				<?php
-				wp_nonce_field("loginid_dw_settings_group-options");
-				?>
-				<input type="hidden" name="action" value="loginid_dw_generate_page">
-				<input type="submit" name="submit" class="button button-secondary" value="Generate Login Page">
-				<input type="submit" name="submit" class="button button-secondary" value="Generate Register Page">
-			</form>
+		<form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+			<?php
+			wp_nonce_field("loginid_dw_settings_group-options");
+			?>
+			<input type="hidden" name="action" value="loginid_dw_generate_page">
+			<input type="submit" name="submit" class="button button-secondary" value="Generate Login Page">
+			<input type="submit" name="submit" class="button button-secondary" value="Generate Register Page">
+		</form>
 		</p>
 		<p class="description">
 			<strong>Or paste the following shortcodes on your designated login or register pages.</strong>
@@ -165,6 +169,9 @@ function loginid_dw_admin_interface_render()
 		<p class="description">
 			<strong>Register Form Shortcode</strong>
 			<code>[<?php echo LoginID_DirectWeb::getShortCodes()[LoginID_Operation::Register] ?>]</code>
+		</p>
+		<p class="description">
+			<strong style="color: red">Note: If your site is not running on localhost, make sure to have TLS enabled.</strong>
 		</p>
 	</div>
 <?php

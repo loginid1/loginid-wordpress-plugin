@@ -124,6 +124,8 @@ function loginid_dw_admin_enqueue_css_js($hook)
 
 	if ($hook == "settings_page_loginid-directweb") {
 		// Load only on plugin options page
+		// main JS for settings page detection
+		wp_enqueue_script('loginid_dw-admin-settings-js', LOGINID_DIRECTWEB_URL . 'admin/css/main.js', '', LOGINID_DIRECTWEB_VERSION_NUM);
 		// Main CSS
 		wp_enqueue_style('loginid_dw-admin-main-css', LOGINID_DIRECTWEB_URL . 'admin/css/main.css', '', LOGINID_DIRECTWEB_VERSION_NUM);
 	}
