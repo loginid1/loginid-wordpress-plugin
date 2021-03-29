@@ -89,7 +89,7 @@ function loginid_dw_footer_text($default)
 
 	$loginid_dw_footer_text = sprintf(
 		__('If you like this plugin, please leave a <a href="%s" target="_blank">&#9733;&#9733;&#9733;&#9733;&#9733;</a> rating to support continued development. Thanks a bunch!', 'loginid-directweb'),
-		'https://wordpress.org/support/plugin/loginid-directweb/reviews/?rate=5#new-post',
+		'https://wordpress.org/support/plugin/loginid-directweb/reviews/?rate=5#new-post'
 	);
 
 	return $loginid_dw_footer_text;
