@@ -199,7 +199,7 @@ function loginid_dw_attach_to_profile($user)
 		<tr>
 			<th><label>Status</label></th>
 			<td>
-				<?php echo $isEnabled  ? 'Enabled' : 'Disabled' ?>
+				<?php echo $isEnabled  ? 'Active' : 'Inactive: use the button below to add an authenticator.' ?>
 			</td>
 		</tr>
 		<?php if (!$isEnabled && wp_get_current_user()->ID === $user->ID) { ?>
