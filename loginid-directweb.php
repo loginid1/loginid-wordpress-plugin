@@ -65,3 +65,38 @@ require_once(LOGINID_DIRECTWEB_DIR . 'loader.php');
 
 // Register activation hook (this has to be in the main plugin file or refer bit.ly/2qMbn2O)
 register_activation_hook(__FILE__, 'loginid_dw_activate_plugin');
+
+
+/**
+ * Settings link on plugin page
+ * 
+ * @since 0.1.0
+ */
+function loginid_dw_plugin_page_settings_link($links)
+{
+  // Build and escape the URL.
+  $url =  admin_url('options-general.php?page=loginid-directweb');
+  // Create the link.
+  $settings_link = "<a href='$url'>" . __('Settings') . '</a>';
+  // Adds the link to the end of the array.
+  array_push(
+    $links,
+    $settings_link
+  );
+  return $links;
+}
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'loginid_dw_plugin_page_settings_link');
+
+function loginid_dw_plugin_support_faq_links($links_array, $plugin_file_name, $plugin_data, $status)
+{
+
+  if (strpos($plugin_file_name, basename(__FILE__))) {
+    // you can still use array_unshift() to add links at the beginning
+    $links_array[] = '<a target="_blank" href="https://docs.loginid.io">Docs</a>';
+    $links_array[] = '<a target="_blank" href="https://loginid.io/support">Support</a>';
+  }
+
+  return $links_array;
+}
+
+add_filter('plugin_row_meta', 'loginid_dw_plugin_support_faq_links', 10, 4);

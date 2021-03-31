@@ -113,23 +113,3 @@ function loginid_dw_footer_version($default)
 	return 'Plugin version ' . LOGINID_DIRECTWEB_VERSION_NUM;
 }
 add_filter('update_footer', 'loginid_dw_footer_version', 11);
-
-/**
- * Settings link on plugin page
- * 
- * @since 0.1.0
- */
-function loginid_dw_plugin_page_settings_link($links)
-{
-	// Build and escape the URL.
-	$url =  admin_url('options-general.php?page=loginid-directweb');
-	// Create the link.
-	$settings_link = "<a href='$url'>" . __('Settings') . '</a>';
-	// Adds the link to the end of the array.
-	array_push(
-		$links,
-		$settings_link
-	);
-	return $links;
-}
-add_filter('plugin_action_links_loginid-directweb/loginid-directweb.php', 'loginid_dw_plugin_page_settings_link');
