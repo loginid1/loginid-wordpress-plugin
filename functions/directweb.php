@@ -717,7 +717,7 @@ class LoginID_DirectWeb
     } else if ($error->name === $syntax_error) {
       $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
     } else {
-      $this->wp_errors->add($error->name,  isset($error->code) ? $error->code : 'NO_CODE' . '::' . $error->message);
+      $this->wp_errors->add($error->name,  isset($error->code) ? 'LOGINID_ERROR::' . $error->code : 'NO_CODE' . '::' . $error->message);
     }
   }
 
@@ -854,7 +854,14 @@ class LoginID_DirectWeb
 
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
-      $this->output_wp_errors();
+      // make sure to only output error in the correct section, in case both login and register is in the same page
+      $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
+      $login_type = $this->validate_loginid_field($shortcode); // validate input
+      if ($login_type !== false && $type === $login_type) {
+        $this->output_wp_errors();
+      }
+
+      // make sure to only output error in the correct section, in case both login and register is in the same page
       $this->render_form($type);
     }
   }
