@@ -171,6 +171,10 @@ function loginid_dw_admin_interface_render()
 			<code>[<?php echo LoginID_DirectWeb::getShortCodes()[LoginID_Operation::Register] ?>]</code>
 		</p>
 		<p class="description">
+			<strong>End User Settings Shortcode</strong>
+			<code>[<?php echo LoginID_DirectWeb::getShortCodes()['settings'] ?>]</code>
+		</p>
+		<p class="description">
 			<strong style="color: red">Note: If your site is not running on localhost, make sure to have TLS enabled.</strong>
 		</p>
 	</div>
@@ -220,9 +224,9 @@ function loginid_dw_attach_to_profile($user)
 			<tr style="display: none" id="__loginid_remove_authenticator">
 				<th><label>Remove Authenticator</label></th>
 				<td>
-					<button type="button" class="button" style="color:red; border-color: red;" id="__loginid_remove_authenticator_button">Remove authenticator from this account</button>
+					<button type="button" class="button" id="__loginid_remove_authenticator_button">Remove authenticator from this account</button>
 					<div id="__loginid_remove_authenticator_response">
-						This action is not reversible. Your LoginID credentials will be permanently deleted. You will need another method of authentication to access this account. (like a password).
+						This action is not reversible.<br /> You will need another method of authentication to access this account. (like a password).
 					</div>
 					<div>
 						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dw_remove_from_profile_nonce"); ?>">

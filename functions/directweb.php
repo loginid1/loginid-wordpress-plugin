@@ -97,7 +97,7 @@ abstract class LoginID_Strategy
 class LoginID_DirectWeb
 {
   // strings that contains the shortcode values [loginid_registration] and [loginid_login]
-  protected const ShortCodes = array(LoginID_Operation::Register => "loginid_registration", LoginID_Operation::Login => "loginid_login");
+  protected const ShortCodes = array(LoginID_Operation::Register => "loginid_registration", LoginID_Operation::Login => "loginid_login", "settings" => "loginid_settings");
   /**
    * Getter function of a protected resource short codes, returns a copy of that array
    * 
@@ -123,6 +123,7 @@ class LoginID_DirectWeb
     // add short codes
     add_shortcode(self::ShortCodes[LoginID_Operation::Register], array($self, 'registration_shortcode'));
     add_shortcode(self::ShortCodes[LoginID_Operation::Login], array($self, 'login_shortcode'));
+    add_shortcode(self::ShortCodes['settings'], array($self, 'settings_shortcode'));
   }
 
   protected $release_the_fido; //whether or not to release loginid direct web information for directweb login
@@ -879,6 +880,21 @@ class LoginID_DirectWeb
   {
     ob_start();
     $this->render(LoginID_Operation::Login); // defaults to login, but we set this for consistency
+    return ob_get_clean();
+  }
+
+  /**
+   * The callback function that will replace [shortcode] for settings
+   * 
+   */
+  public function settings_shortcode()
+  {
+    ob_start();
+    if (is_user_logged_in() || is_preview()) {
+      $user = wp_get_current_user();
+      loginid_dw_attach_to_profile($user);
+    }
+
     return ob_get_clean();
   }
 
