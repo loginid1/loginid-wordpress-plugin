@@ -855,10 +855,12 @@ class LoginID_DirectWeb
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
       // make sure to only output error in the correct section, in case both login and register is in the same page
-      $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
-      $login_type = $this->validate_loginid_field($shortcode); // validate input
-      if ($login_type !== false && $type === $login_type) {
-        $this->output_wp_errors();
+      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
+        $login_type = $this->validate_loginid_field($shortcode); // validate input
+        if ($login_type !== false && $type === $login_type) {
+          $this->output_wp_errors();
+        }
       }
 
       // make sure to only output error in the correct section, in case both login and register is in the same page
