@@ -97,7 +97,7 @@ abstract class LoginID_Strategy
 class LoginID_DirectWeb
 {
   // strings that contains the shortcode values [loginid_registration] and [loginid_login]
-  protected const ShortCodes = array(LoginID_Operation::Register => "loginid_registration", LoginID_Operation::Login => "loginid_login");
+  protected const ShortCodes = array(LoginID_Operation::Register => "loginid_registration", LoginID_Operation::Login => "loginid_login", "settings" => "loginid_settings");
   /**
    * Getter function of a protected resource short codes, returns a copy of that array
    * 
@@ -123,6 +123,7 @@ class LoginID_DirectWeb
     // add short codes
     add_shortcode(self::ShortCodes[LoginID_Operation::Register], array($self, 'registration_shortcode'));
     add_shortcode(self::ShortCodes[LoginID_Operation::Login], array($self, 'login_shortcode'));
+    add_shortcode(self::ShortCodes['settings'], array($self, 'settings_shortcode'));
   }
 
   protected $release_the_fido; //whether or not to release loginid direct web information for directweb login
@@ -629,7 +630,7 @@ class LoginID_DirectWeb
           // never trust the front end xd
 
           // from this point on we are good to go
-          $this->password = isset($_POST['password']) ? esc_attr(sanitize_text_field($_POST['password'])) : null; 
+          $this->password = isset($_POST['password']) ? esc_attr(sanitize_text_field($_POST['password'])) : null;
 
           // this generates errors if input is invalid, also merges them into this->wp_error
           $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_email($login_type), $login_type === LoginID_Operation::Register ? $this->validate_username() : null);
@@ -716,7 +717,7 @@ class LoginID_DirectWeb
     } else if ($error->name === $syntax_error) {
       $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
     } else {
-      $this->wp_errors->add($error->name,  isset($error->code) ? $error->code : 'NO_CODE' . '::' . $error->message);
+      $this->wp_errors->add($error->name,  isset($error->code) ? 'LOGINID_SERVER_ERROR::' . $error->code : 'NO_CODE' . '::' . $error->message);
     }
   }
 
@@ -853,7 +854,16 @@ class LoginID_DirectWeb
 
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
-      $this->output_wp_errors();
+      // make sure to only output error in the correct section, in case both login and register is in the same page
+      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
+        $login_type = $this->validate_loginid_field($shortcode); // validate input
+        if ($login_type !== false && $type === $login_type) {
+          $this->output_wp_errors();
+        }
+      }
+
+      // make sure to only output error in the correct section, in case both login and register is in the same page
       $this->render_form($type);
     }
   }
@@ -879,6 +889,21 @@ class LoginID_DirectWeb
   {
     ob_start();
     $this->render(LoginID_Operation::Login); // defaults to login, but we set this for consistency
+    return ob_get_clean();
+  }
+
+  /**
+   * The callback function that will replace [shortcode] for settings
+   * 
+   */
+  public function settings_shortcode()
+  {
+    ob_start();
+    if (is_user_logged_in() || is_preview()) {
+      $user = wp_get_current_user();
+      loginid_dw_attach_to_profile($user);
+    }
+
     return ob_get_clean();
   }
 

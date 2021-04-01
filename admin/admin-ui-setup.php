@@ -61,7 +61,7 @@ function loginid_dw_register_settings()
 		'loginid_dw_text_input_field_callback',					// Callback function
 		'loginid-directweb',											// Page slug
 		'loginid_dw_minimum_settings_section',							// Settings Section ID
-		array('base_url', 'example: https://directweb.sandbox-usw1.api.loginid.io') //params to pass to callback
+		array('base_url', 'This plugin will use the server at this URL to authenticate users. Obtain from LoginID Dashboard') //params to pass to callback
 	);
 
 	// BaseURL
@@ -124,6 +124,8 @@ function loginid_dw_admin_enqueue_css_js($hook)
 
 	if ($hook == "settings_page_loginid-directweb") {
 		// Load only on plugin options page
+		// main JS for settings page detection
+		wp_enqueue_script('loginid_dw-admin-settings-js', LOGINID_DIRECTWEB_URL . 'admin/css/main.js', '', LOGINID_DIRECTWEB_VERSION_NUM);
 		// Main CSS
 		wp_enqueue_style('loginid_dw-admin-main-css', LOGINID_DIRECTWEB_URL . 'admin/css/main.css', '', LOGINID_DIRECTWEB_VERSION_NUM);
 	}

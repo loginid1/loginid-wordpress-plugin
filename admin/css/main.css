@@ -24,3 +24,11 @@ input[type="checkbox"].__loginid_setup-wizard-checkbox:checked
 input[type="checkbox"].__loginid_setup-wizard-checkbox {
   display: none;
 }
+
+.__loginid_tls_warning_banner {
+  background-color: #8b0000;
+  color: white;
+  font-weight: bold;
+  padding: 20px;
+  display: none;
+}

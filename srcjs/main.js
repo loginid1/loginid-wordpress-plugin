@@ -188,14 +188,17 @@ async function __loginidOnProfilePageAddAuthenticator() {
       // thing is, if your browser supports fido2 it probably also supports fetch()
       // because fido2 is newer than ES6 anyway.
       try {
-        const response = await fetch("admin-ajax.php", {
-          method: "POST",
-          mode: "same-origin",
-          headers: { "Content-type": "application/x-www-form-urlencoded" },
-          body: `action=loginid_save_to_profile&nonce=${nonce}&loginid=${JSON.stringify(
-            result
-          )}`,
-        });
+        const response = await fetch(
+          `${window.origin}/wp-admin/admin-ajax.php`,
+          {
+            method: "POST",
+            mode: "same-origin",
+            headers: { "Content-type": "application/x-www-form-urlencoded" },
+            body: `action=loginid_save_to_profile&nonce=${nonce}&loginid=${JSON.stringify(
+              result
+            )}`,
+          }
+        );
         output.innerText = await response.text();
       } catch (error) {
         output.innerText = "Failed to make wordpress request";
@@ -214,7 +217,7 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
   if (__loginidIsDefined(nonceInput)) {
     const nonce = nonceInput.value;
     try {
-      const response = await fetch("admin-ajax.php", {
+      const response = await fetch(`${window.origin}/wp-admin/admin-ajax.php`, {
         method: "POST",
         mode: "same-origin",
         headers: { "Content-type": "application/x-www-form-urlencoded" },
@@ -240,7 +243,9 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
 
   if (type) {
     document.getElementById("__loginid_submit_button").value =
-      String(type).charAt(0).toUpperCase() + String(type).slice(1) + ' with FIDO';
+      String(type).charAt(0).toUpperCase() +
+      String(type).slice(1) +
+      " with FIDO";
 
     document
       .getElementById(`__loginid_${type}_form`)
@@ -264,7 +269,10 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
 
         const passwordDiv = document.getElementById("__loginid_password_div");
         passwordDiv.style.display = "block";
-        passwordDiv.className = passwordDiv.className.replace(/\b__loginid_hide-password\b/g, "")
+        passwordDiv.className = passwordDiv.className.replace(
+          /\b__loginid_hide-password\b/g,
+          ""
+        );
       });
     }
   }
