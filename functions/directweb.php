@@ -717,7 +717,7 @@ class LoginID_DirectWeb
     } else if ($error->name === $syntax_error) {
       $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
     } else {
-      $this->wp_errors->add($error->name,  isset($error->code) ? 'LOGINID_ERROR::' . $error->code : 'NO_CODE' . '::' . $error->message);
+      $this->wp_errors->add($error->name,  isset($error->code) ? 'LOGINID_SERVER_ERROR::' . $error->code : 'NO_CODE' . '::' . $error->message);
     }
   }
 

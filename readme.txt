@@ -4,7 +4,7 @@ Donate link: https://loginid.io
 Tags: Authentication, Security, Oauth-2.0, Identity, Biometrics, Touch-id, Webauthn, Passwordless, Fido2, Fido, Passwordless login, Fido certified, Uaf
 Requires at least: 5.4
 Tested up to: 5.6
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -28,8 +28,8 @@ For more information on how the DirectWeb plugin works, please view our [documen
 
 == Installation ==
 
-1. Upload to the `/wp-content/plugins/` directory
-1. Activate the plugin
+1. Upload to the `/wp-content/plugins/` directory.
+1. Activate the plugin.
 1. Visit Settings > LoginID DirectWeb to configure this plugin.
 
 == Frequently Asked Questions ==
@@ -78,14 +78,24 @@ Please email us at [email] or contact us via the Live Chat option on [loginid.io
 = Where can I report bugs or leave feedback? =
 Please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
 
-= I have other queries or need additional support.  =
+= I have other queries or need additional support. =
 For any other queries or if you need additional support, please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
+
+= Error: Your identity token could not be verified =
+This error means that the plugin is unable to verify the validity of the login or register claim. This can often be resulted from a bad baseURL and api key combination. Please double check your Base URL and API Key parameters in the plugin settings against your credentials on the LoginID dashboard.
 
 == Screenshots ==
 
 Coming soon.
 
 == Changelog ==
+
+= 1.0.8 =
+Add TLS warning on production sites. This plugin only works on HTTPS enabled sites
+Added plugin Action links to settings as well as external link to docs and support
+Support login and register forms on the same page
+Added loginid_settings so the site could display passwordless configurations on custom settings pages
+Cleaned up a few bugs, and dependency vulnerabilities
 
 = 1.0.7 =
 Changed some wording options.
