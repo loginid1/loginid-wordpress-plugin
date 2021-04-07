@@ -262,3 +262,93 @@ function loginid_dw_remove_from_profile()
 }
 
 add_action('wp_ajax_loginid_remove_from_profile', 'loginid_dw_remove_from_profile');
+
+/**
+ * Saves the data obtained from loginID dashboard setup wizard
+ *  
+ * @since 1.0.9
+ */
+function loginid_dw_wizard_callback()
+{
+	// 
+	if (wp_verify_nonce($_REQUEST['nonce'], 'loginid_dw_nonce_wizard')) {
+
+		exit("
+<html>
+<body>
+<noscript>Javascript is required for this to work</noscript>
+<pre id=\"output\"></pre>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const hash = window.location.hash;
+const output = `Wizard Redirecting ...`;
+document.getElementById(\"output\").innerHTML = output;
+
+const fields = [
+	{ name: '_wpnonce', value: `" . wp_create_nonce("loginid_dw_settings_group-options") . "` },
+	{ name: '_wp_http_referer', value: '/wp-admin/options-general.php?page=loginid-directweb' },
+	{ name: 'option_page', value: 'loginid_dw_settings_group' },
+	{ name: 'submit', value: 'Save Settings' },
+	{ name: 'action', value: 'update' },
+]
+
+const hiddenForm = document.createElement('form');
+hiddenForm.setAttribute('action', window.location.origin+`/wp-admin/options.php`);
+hiddenForm.setAttribute('method', 'post');
+// hiddenForm.style.display = 'none';
+for (const { name, value } of fields) {
+		const element = document.createElement('input');
+		element.setAttribute('type', 'hidden');
+		element.setAttribute('name', name);
+		element.setAttribute('value', value);
+		hiddenForm.appendChild(element);
+}
+let element = document.createElement('input');
+element.setAttribute('type', 'hidden');
+element.setAttribute('name', 'loginid_dw_settings[base_url]');
+element.setAttribute('value', urlParams.get(\"base_url\"));
+hiddenForm.appendChild(element);
+
+element = document.createElement('input');
+element.setAttribute('type', 'hidden');
+element.setAttribute('name', 'loginid_dw_settings[api_key]');
+element.setAttribute('value', hash.substring(1));
+hiddenForm.appendChild(element);
+
+document.body.appendChild(hiddenForm);
+document.createElement('form').submit.call(hiddenForm);
+hiddenForm.remove();
+</script>
+</body>
+</html>
+");
+	}
+	exit("
+<html>
+<body>
+<p id=\"output\">Something went wrong, please try again later</p>
+<a href=\"/wp-admin/options-general.php?page=loginid-directweb\">Take me back</a>
+<body>
+</html>
+");
+}
+add_action('wp_ajax_loginid_wizard_callback', 'loginid_dw_wizard_callback');
+
+/**
+ * NO Priv display
+ *  
+ * @since 1.0.9
+ */
+function loginid_dw_nopriv_wizard_callback()
+{
+
+	exit("
+<html>
+<body>
+<p id=\"output\">You must be authenticated to perform this action</p>
+<a href=\"/\">Go Home</a>
+<body>
+</html>
+");
+}
+add_action('wp_ajax_nopriv_loginid_wizard_callback', 'loginid_dw_nopriv_wizard_callback');

@@ -113,7 +113,6 @@ function loginid_dw_admin_interface_render()
 							</script>
 						</code> Required field to generate your API_key, this is so that your api key is tied down to your current domain (layer of protection against hacking)</li>
 					<li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). <b>LoginID will be using wp nonce transiently during credentials creation process and will not store it on loginID system.</b> This hash lives a maximum of 24 hours and can only be used to change BaseURL and APIKey settings for this plugin.</li>
-					<li><strong>_wp_http_referer</strong> <code>/wp-admin/options-general.php?page=loginid-directweb</code> To make sure that the wizard was triggered on the correct page </li>
 				</ol>
 				</p>
 				<p>
@@ -122,17 +121,18 @@ function loginid_dw_admin_interface_render()
 								<a href="https://docs.loginid.io/websdks/dw">refer to docs</a>
 						</b></i>
 				</p>
-				<form action="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>/wordpress-directweb-plugin" method="get">
-					<?php
-					// Output nonce, action, and option_page fields for a settings page.
-					wp_nonce_field("loginid_dw_settings_group-options");
-					?>
-					<input type="hidden" name="origin" id="__loginid_form_origin" />
-					<script>
-						document.getElementById('__loginid_form_origin').value = window.location.origin;
-					</script>
-					<input type="submit" name="submit" class="button button-primary" value="Run Wizard">
-				</form>
+				<button class="button button-primary" id="__loginid_run_setup_wizard_button"> Run Wizard </button>
+				<noscript><b>Setup Wizard requires javascript to function.</b></noscript>
+				<script>
+					(function() {
+						const setupWizardButton = document.getElementById("__loginid_run_setup_wizard_button");
+						setupWizardButton.addEventListener('click', () => {
+							const nonce = "<?php echo wp_create_nonce('loginid_dw_nonce_wizard') ?>"
+							const remoteLocation = "<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>/wordpress-directweb-plugin?origin=" + window.location.origin + "#" + nonce;
+							window.location = remoteLocation;
+						})
+					})();
+				</script>
 			</div>
 		</div>
 
