@@ -160,7 +160,7 @@ function loginid_dw_admin_interface_render()
 		</form>
 		</p>
 		<p class="description">
-			<strong>Or paste the following shortcodes on your designated login or register pages.</strong>
+			<strong>Or paste the following shortcodes on your designated login or register pages. Please avoid putting this form in modals.</strong>
 		</p>
 		<p class="description">
 			<strong>Login Form Shortcode</strong>
