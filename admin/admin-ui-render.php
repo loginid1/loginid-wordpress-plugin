@@ -88,8 +88,55 @@ function loginid_dw_admin_interface_render()
 		</div>
 
 		<div style="margin-top: 1em;">
-			<input class="__loginid_setup-wizard-checkbox" type="checkbox" id="__loginid_setup-wizard-checkbox" />
-			<label class="button button-secondary __loginid_setup-wizard-label" for="__loginid_setup-wizard-checkbox">Run Setup Wizard</label>
+			<input class="__loginid_dropdown-checkbox" type="checkbox" id="__loginid_help-checkbox" />
+			<label class="button button-secondary __loginid_setup-wizard-label" for="__loginid_help-checkbox">Setup Step by Step Guide</label>
+			<div class="__loginid_setup-wizard-dropdown">
+				<h2>Setup Step by Step guide</h2>
+				<p>
+					In order for the LoginID to manage authentication on your behalf, it needs to be configured with your credentials, which you can obtain from LoginID’s dashboard by following the below steps:
+				<ol>
+					<li>
+						Register on our dashboard using the above link <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>/en/integration" target="_blank">LoginID’s dashboard </a>
+					</li>
+					<li>
+						Make sure you are on the integration page, if not use the navigation bar to select “Integration".
+					</li>
+					<li>
+						Agree to our license on Step of the integration
+					</li>
+					<li>
+						Choose DirectWeb Integration:
+					</li>
+					<li>
+						In the resulting form, you must enter the following information. Alternatively, you may use the Setup Wizard to automatically export this information to loginID.
+						<ol type="a">
+							<li>
+								App Name
+							</li>
+							<li>
+								Website URL
+							</li>
+						</ol>
+					</li>
+					<li>
+						Once you create a new integration you will be provided with the following on our dashboard which you can copy and paste into the below fields.
+						<ol type="a">
+							<li>
+								The API key is used to configure LoginID’s JavaScript SDK from your web application
+							</li>
+							<li>
+								Base URL which provides our SDK which LoginID environment the integration will be using
+							</li>
+						</ol>
+					</li>
+				</ol>
+				</p>
+			</div>
+		</div>
+
+		<div style="margin-top: 1em;">
+			<input class="__loginid_dropdown-checkbox" type="checkbox" id="__loginid_wizard-checkbox" />
+			<label class="button button-secondary __loginid_setup-wizard-label" for="__loginid_wizard-checkbox">Run Setup Wizard</label>
 			<div class="__loginid_setup-wizard-dropdown">
 				<h2>Setup Wizard</h2>
 				<h4>What happens when I click Run Wizard?</h4>
