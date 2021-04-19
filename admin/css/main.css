@@ -1,9 +1,9 @@
-input[type="checkbox"].__loginid_setup-wizard-checkbox
+input[type="checkbox"].__loginid_dropdown-checkbox
   ~ .__loginid_setup-wizard-dropdown {
   display: none;
 }
 
-input[type="checkbox"].__loginid_setup-wizard-checkbox:checked
+input[type="checkbox"].__loginid_dropdown-checkbox:checked
   ~ .__loginid_setup-wizard-dropdown {
   display: block;
   padding: 0.8rem 0px;
@@ -11,17 +11,17 @@ input[type="checkbox"].__loginid_setup-wizard-checkbox:checked
   border-bottom: 1px solid #007bff;
 }
 
-input[type="checkbox"].__loginid_setup-wizard-checkbox
+input[type="checkbox"].__loginid_dropdown-checkbox
   ~ .__loginid_setup-wizard-label {
   display: static;
 }
 
-input[type="checkbox"].__loginid_setup-wizard-checkbox:checked
+input[type="checkbox"].__loginid_dropdown-checkbox:checked
   ~ .__loginid_setup-wizard-label {
   display: none;
 }
 
-input[type="checkbox"].__loginid_setup-wizard-checkbox {
+input[type="checkbox"].__loginid_dropdown-checkbox {
   display: none;
 }
 

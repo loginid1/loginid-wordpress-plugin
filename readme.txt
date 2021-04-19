@@ -4,7 +4,7 @@ Donate link: https://loginid.io
 Tags: Authentication, Security, Oauth-2.0, Identity, Biometrics, Touch-id, Webauthn, Passwordless, Fido2, Fido, Passwordless login, Fido certified, Uaf
 Requires at least: 5.4
 Tested up to: 5.7
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -89,6 +89,10 @@ This error means that the plugin is unable to verify the validity of the login o
 Coming soon.
 
 == Changelog ==
+
+= 1.0.10 =
+Added a self help section within the plugin, to make setup more clear.
+The readme.md file still exists if the user wants to read that instead.
 
 = 1.0.9 =
 Changed how the setup wizard works under the hood.
