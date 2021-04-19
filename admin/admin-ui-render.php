@@ -108,7 +108,7 @@ function loginid_dw_admin_interface_render()
 						Choose DirectWeb Integration:
 					</li>
 					<li>
-						In the resulting form, you must enter the following information. Alternatively, you may use the Setup Wizard to automatically export this information to loginID.
+						In the resulting form, you must enter the following information. <b>Alternatively, you may use the Setup Wizard to automatically export this information to loginID.</b>
 						<ol type="a">
 							<li>
 								App Name
