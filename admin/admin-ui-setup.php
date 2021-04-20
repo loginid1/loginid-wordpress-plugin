@@ -49,7 +49,7 @@ function loginid_dw_register_settings()
 	// Register A New Section
 	add_settings_section(
 		'loginid_dw_minimum_settings_section',							// ID
-		__('Minimum Settings', 'loginid-directweb'),		// Title
+		__('Configure the Plugin', 'loginid-directweb'),		// Title
 		'loginid_dw_minimum_settings_section_callback',					// Callback Function
 		'loginid-directweb'											// Page slug
 	);
