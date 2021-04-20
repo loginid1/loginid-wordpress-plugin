@@ -21,7 +21,7 @@ function loginid_dw_minimum_settings_section_callback()
 {
 	$settings = loginid_dw_get_settings();
 	$ending = $settings['base_url'] !== '' && $settings['api_key'] !== '' ? '' : ' You may obtain them from <a href="' . LOGINID_DIRECTWEB_LOGINID_ORIGIN . '/register/get-started-a" target="_blank">LoginID</a> manually, or try out our setup wizard above.';
-	echo '<p>' . __('Required configurations for the plugin to work.' . $ending, 'loginid-directweb') . '</p>';
+	echo '<p>' . __('You will be able to obtain these two fields from either the setup wizard or manual setup process. The setup wizard will auto populate these two fields.' . $ending, 'loginid-directweb') . '</p>';
 }
 
 /**
@@ -83,62 +83,18 @@ function loginid_dw_admin_interface_render()
 	<div class="wrap">
 		<h1>LoginID DirectWeb</h1>
 
+		<h4>Please select one of the following methods to complete setup.</h4>
+
 		<div class="__loginid_tls_warning_banner" id="__loginid_tls_warning_banner">
 			A TLS connection with a certificate signed by a trusted Certificate Authority is required for this plugin to work on production site. Check your URL and it should start with HTTPS
 		</div>
 
 		<div style="margin-top: 1em;">
-			<input class="__loginid_dropdown-checkbox" type="checkbox" id="__loginid_help-checkbox" />
-			<label class="button button-secondary __loginid_setup-wizard-label" for="__loginid_help-checkbox">Setup Step by Step Guide</label>
-			<div class="__loginid_setup-wizard-dropdown">
-				<h2>Setup Step by Step guide</h2>
-				<p>
-					In order for the LoginID to manage authentication on your behalf, it needs to be configured with your credentials, which you can obtain from LoginID’s dashboard by following the below steps:
-				<ol>
-					<li>
-						Register on our dashboard using the above link <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>/en/integration" target="_blank">LoginID’s dashboard </a>
-					</li>
-					<li>
-						Make sure you are on the integration page, if not use the navigation bar to select “Integration".
-					</li>
-					<li>
-						Agree to our license on Step of the integration
-					</li>
-					<li>
-						Choose DirectWeb Integration:
-					</li>
-					<li>
-						In the resulting form, you must enter the following information. <b>Alternatively, you may use the Setup Wizard to automatically export this information to loginID.</b>
-						<ol type="a">
-							<li>
-								App Name
-							</li>
-							<li>
-								Website URL
-							</li>
-						</ol>
-					</li>
-					<li>
-						Once you create a new integration you will be provided with the following on our dashboard which you can copy and paste into the below fields.
-						<ol type="a">
-							<li>
-								The API key is used to configure LoginID’s JavaScript SDK from your web application
-							</li>
-							<li>
-								Base URL which provides our SDK which LoginID environment the integration will be using
-							</li>
-						</ol>
-					</li>
-				</ol>
-				</p>
-			</div>
-		</div>
-
-		<div style="margin-top: 1em;">
 			<input class="__loginid_dropdown-checkbox" type="checkbox" id="__loginid_wizard-checkbox" />
-			<label class="button button-secondary __loginid_setup-wizard-label" for="__loginid_wizard-checkbox">Run Setup Wizard</label>
+			<label class="button button-secondary __loginid_setup-wizard-label" for="__loginid_wizard-checkbox">Run Express Setup Wizard</label>
 			<div class="__loginid_setup-wizard-dropdown">
 				<h2>Setup Wizard</h2>
+				<h4>This method will take less than 2 minutes to complete</h4>
 				<h4>What happens when I click Run Wizard?</h4>
 				<p>
 					When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?></a> to register an account and fill out some information about your website in order to generate your Base URL and API Key.
@@ -183,6 +139,53 @@ function loginid_dw_admin_interface_render()
 			</div>
 		</div>
 
+		<div style="margin-top: 1em;">
+			<input class="__loginid_dropdown-checkbox" type="checkbox" id="__loginid_help-checkbox" />
+			<label class="button button-secondary __loginid_setup-wizard-label" for="__loginid_help-checkbox">Manual Step by Step Setup</label>
+			<div class="__loginid_setup-wizard-dropdown">
+				<h2>Setup Step by Step guide</h2>
+				<p>
+					In order for the LoginID to manage authentication on your behalf, it needs to be configured with your credentials, which you can obtain from LoginID’s dashboard by following the below steps:
+				<ol>
+					<li>
+						Register on our dashboard using the above link <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>/en/integration" target="_blank">LoginID’s dashboard </a>
+					</li>
+					<li>
+						Make sure you are on the integration page, if not use the navigation bar to select “Integration".
+					</li>
+					<li>
+						Agree to our license on Step of the integration
+					</li>
+					<li>
+						Choose DirectWeb Integration:
+					</li>
+					<li>
+						In the resulting form, you must enter the following information. <b>Alternatively, you may use the Setup Wizard to automatically export this information to loginID.</b>
+						<ol type="a">
+							<li>
+								App Name
+							</li>
+							<li>
+								Website URL
+							</li>
+						</ol>
+					</li>
+					<li>
+						Once you create a new integration you will be provided with the following on our dashboard which you can copy and paste into the below fields.
+						<ol type="a">
+							<li>
+								The API key is used to configure LoginID’s JavaScript SDK from your web application
+							</li>
+							<li>
+								Base URL which provides our SDK which LoginID environment the integration will be using
+							</li>
+						</ol>
+					</li>
+				</ol>
+				</p>
+			</div>
+		</div>
+
 		<form action="options.php" method="post">
 			<?php
 			// Output nonce, action, and option_page fields for a settings page.
@@ -196,6 +199,9 @@ function loginid_dw_admin_interface_render()
 			?>
 		</form>
 
+		<h3>Using the Plugin</h3>
+		<h4 class="description">There are 2 was to use the plugins: </h4>
+		<p class="description"><strong>1. Generate Login or Registration pages.</strong></p>
 		<p>
 		<form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
 			<?php
@@ -207,7 +213,9 @@ function loginid_dw_admin_interface_render()
 		</form>
 		</p>
 		<p class="description">
-			<strong>Or paste the following shortcodes on your designated login or register pages. Please avoid putting this form in modals.</strong>
+			<strong>
+				2. Apply shortcodes to your existing Login & Registration pages. Please avoid putting this form in modals.
+			</strong>
 		</p>
 		<p class="description">
 			<strong>Login Form Shortcode</strong>
