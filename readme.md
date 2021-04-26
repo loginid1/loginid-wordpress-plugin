@@ -76,7 +76,7 @@ As this is a wordpress plugin this project requires wordpress to run.
 
 ![Setup Wizard](img/setup-wizard.png)
 
-- Or Visit [LoginID Dashboard](https://sandbox-usw1.api.loginid.io/integrations) on the integrations page, and manually input required site data. This method will collect less data, but requires you to manually copy and paste over the BaseURL and API Key from LoginID.(shown in the following two screenshots).
+- Or Visit [LoginID Dashboard](https://usw1.loginid.io/integrations) on the integrations page, and manually input required site data. This method will collect less data, but requires you to manually copy and paste over the BaseURL and API Key from LoginID.(shown in the following two screenshots).
 
 Copy from the LoginID dashboard
 

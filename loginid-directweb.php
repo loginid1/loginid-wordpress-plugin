@@ -100,3 +100,14 @@ function loginid_dw_plugin_support_faq_links($links_array, $plugin_file_name, $p
 }
 
 add_filter('plugin_row_meta', 'loginid_dw_plugin_support_faq_links', 10, 4);
+
+function loginid_dw_plugin_showUpgradeNotification($currentPluginMetadata, $newPluginMetadata)
+{
+  // check "upgrade_notice"
+  if (isset($newPluginMetadata->upgrade_notice) && strlen(trim($newPluginMetadata->upgrade_notice)) > 0) {
+    echo '<p style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px">';
+    echo esc_html($newPluginMetadata->upgrade_notice), '</p>';
+  }
+}
+// add plugin upgrade notification
+add_action('in_plugin_update_message-' . plugin_basename(__FILE__), 'loginid_dw_plugin_showUpgradeNotification', 10, 2);

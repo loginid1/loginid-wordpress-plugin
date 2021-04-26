@@ -13,7 +13,11 @@ FIDO-certified strong authentication in 5 clicks.  Go passwordless and eliminate
 
 == Description ==
 
-LoginID’s DirectWeb Plugin enables your WordPress application’s end users to register and authenticate through highly secure public key cryptography instead of a password. 
+Getting started with LoginID’s innovative and highly secure FIDO <link or bubble popup to blog> based authentication technology is easy! You and your users will benefit immensely from this as they won’t have any passwords to remember and you won’t have to worry about storing them either!
+
+Even if you still wish to keep passwords and captcha methods active, LoginID makes a fantastic addition by providing one extra layer as part of a holistic Multi-factor authentication process.   
+
+*Did you know:* FIDO does not send login information through the internet which helps prevent many vulnerabilities such as credential phishing and “Man in The Middle” attacks.  Nor does your biometric leave your device and become stored in the cloud somewhere. Your biometric information is safe - it is not stored on any servers or in the cloud, thereby making it secure.
 
 Benefits:
 - Convenience: 
@@ -28,9 +32,68 @@ For more information on how the DirectWeb plugin works, please view our [documen
 
 == Installation ==
 
-1. Upload to the `/wp-content/plugins/` directory.
-1. Activate the plugin.
-1. Visit Settings > LoginID DirectWeb to configure this plugin.
+LoginID has taken the complexity out of the FIDO integration process and we can have you up and running in under 5 minutes with our easy to follow steps below.
+
+Let’s get started!
+
+### Step 1: Prerequisites
+
+While logged into your WordPress (/wp-admin) account, browse to your dashboard and scroll down to the bottom right to ensure that your wordpress version is version 5.4 or later.
+
+*Tip: We always recommend that you run the latest versions of WordPress and our LoginID plugin as part of a good security posture.*
+
+### Step 2: Plugin Installation
+
+We currently support installing the plugin through the WordPress Marketplace or manually uploading it if this is not available to you or you prefer to inspect the package first.
+
+#### Marketplace Installation Method
+
+Navigate to the Plug-in Marketplace on your Wordpress Admin Site
+
+Search for our plugin named loginid-directweb 
+
+*Security Tip: Please be careful when installing plugins from the marketplace. Always verify the name thoroughly to make sure you are indeed installing the correct plugin! Our plugin is spelled EXACTLY loginid-directweb*
+
+Click Install and you are ready for configuration in Step 3! 
+
+*Note: We want to make this as easy and seamless for you as possible so we have embedded the instructions in Step 3 and Step 4 below on the plugin settings page as well. You can continue to follow along here or you can move to the plugin settings page to complete the remainder of your setup. *
+
+#### Manual Installation Method 
+
+Download the plugin here: [https://github.com/loginid1/loginid-directweb](https://github.com/loginid1/loginid-directweb)
+
+Navigate to the Plugins Page on your Wordpress admin site
+
+Click the "Add New" button at the top left of the page, and then click Upload Plugin. You can upload the zip file containing the appropriate plugin.
+
+### Step 3: LoginID Account Registration
+
+In order for us to handle / broker the FIDO authentication for you we need you (the developer / integrator) to have an account on our system so that we have a secure means to receive the requests.
+
+#### Setup Wizard Method
+
+Navigate to the settings page of the plugin in the settings menu (/wp-admin/options-general.php?page=loginid-directweb) and perform the following 5 steps: 
+
+1. Click "Run Express Setup Wizard" button and click the "Run wizard" button inside the dropdown. This will redirect you to loginID's dashboard and pre populate your information.
+2. Create a LoginID account or login
+3. You will land on the integrations page. Accept our Customer License Agreement, and scroll down to validate that your site information is correct.
+4. Click the "Create" button. This will present you with a BaseURL and an API key that is unique to your integration.
+5. Click the "Export to my Wordpress site: https://yoursite.com" button. Make sure that the URL matches to your website completely.
+
+You will now be able to use the login or register form shortcodes on your wordpress site. 
+
+#### Do It Yourself Method
+
+This method will collect less data, but requires you to manually copy and paste over the BaseURL and API Key from LoginID.
+
+1. Configure the plugin under Settings > LoginID DirectWeb 
+2. Visit [LoginID Dashboard](https://usw1.loginid.io/integrations) on the integrations Page, and click "Add Integration"
+3. Accept our Customer License Agreement.
+4. Select DirectWeb on step 2 of the Integration creation process. 
+5. Input the correct information about your website. Ensure that you check the box with the label "This integration is for LoginID Directweb Wordpress plugin"
+6. Copy and Paste the BaseURL and API key from the loginID dashboard to the plugin.
+
+You will now be able to use the login or register form shortcodes on your wordpress site. 
 
 == Frequently Asked Questions ==
 
@@ -136,4 +199,6 @@ Features:
 - Add biometrics to existing user accounts
 
 == Upgrade Notice == 
-Not applicable at the moment
+We recommend all users upgrading from version 1.0.9 and earlier to rerun the setup wizard.
+Version 1.0.10 and later swapped to production environment for better stability.
+Users may need to re-create their admin panel accounts again on production environment.
