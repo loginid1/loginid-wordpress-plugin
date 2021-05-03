@@ -31,7 +31,6 @@ async function __loginidOnAuthenticate(
   additionalPayload = {}
 ) {
   const password = document.getElementById("__loginid_input_password").value;
-  const username = document.getElementById("__loginid_input_username").value;
   const isFido2Supported = await __loginidIsFido2Supported();
 
   const payload = {
@@ -51,8 +50,16 @@ async function __loginidOnAuthenticate(
   };
 
   if (authType === __loginidAuth.REGISTER) {
+    const username = document.getElementById("__loginid_input_username").value;
     payload["username"] = {
       value: username,
+      element: document.createElement("input"),
+    };
+    const optIn = document.getElementById(
+      "__loginid_register-passwordless-opt-in"
+    ).checked;
+    payload["opt-in"] = {
+      value: optIn,
       element: document.createElement("input"),
     };
   }
@@ -242,10 +249,13 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
     : false;
 
   if (type) {
-    document.getElementById("__loginid_submit_button").value =
-      String(type).charAt(0).toUpperCase() +
-      String(type).slice(1) +
-      " with FIDO";
+    document.getElementById("__loginid_submit_button").value = ((type) => {
+      if (type === __loginidAuth.REGISTER) {
+        return "Register";
+      } else {
+        return "Login";
+      }
+    })(type);
 
     document
       .getElementById(`__loginid_${type}_form`)
