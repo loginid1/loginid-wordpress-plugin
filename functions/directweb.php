@@ -120,6 +120,7 @@ class LoginID_DirectWeb
     $self = new self();
     add_action('init', array($self, 'on_init'));
     add_action('template_redirect', array($self, 'redirect_if_applicable'));
+    add_action("wp_body_open", array($self, 'render_banner'));
     // add short codes
     add_shortcode(self::ShortCodes[LoginID_Operation::Register], array($self, 'registration_shortcode'));
     add_shortcode(self::ShortCodes[LoginID_Operation::Login], array($self, 'login_shortcode'));
@@ -149,6 +150,8 @@ class LoginID_DirectWeb
     $this->email = null;
     $this->username = null;
     $this->password = null;
+    $this->optin = null;
+    $this->redirect_message = '';
 
     $this->loginid = null;
     $this->user_id = null;
@@ -496,34 +499,35 @@ class LoginID_DirectWeb
    * I expect stuff to be sanitized before calling this function
    * $this->email
    * $this->username
+   * $this->password, i know this is ironic, but we need this for now
    * 
    * @since 0.1.0
    * @return int|WP_Error wordpress user id or a WP_Error object on failure
    */
   protected function register_passwordless()
   {
-    if ($this->validate_loginid() && $this->verify_claims(LoginID_Operation::Register)) {
-      $user_id =  $this->register(array(
-        'user_login'    =>   $this->username,
-        'user_email'    =>   $this->email,
-        'user_pass'     =>    wp_generate_password($length = 128, $include_standard_special_chars = true), // generate 128 character password with special characters
-      ));
-      if (!is_wp_error($user_id)) {
-        // we got a properuser_id here so we need to make sure to attach loginid stuff to the user as metadata
-        if (!$this->attach_loginid_to($user_id)) {
-          // if that returns false, somethign is wrong with the database, so return error 
-          $error = new WP_Error();
-          $error->add(LoginID_Errors::DatabaseError[LoginID_Error::Code], LoginID_Errors::DatabaseError[LoginID_Error::Message]);
-          return $error;
-        }
+    // immediately register the user
+    $user_id = $this->register_password();
+
+    if (!is_wp_error($user_id)) {
+
+      if (isset($this->loginid) && isset($this->loginid->{'error'})) {
+        $this->redirect_message = 'failure';
       }
-      return $user_id;
-    } else {
-      // this case loginid is unable to verify your identity
-      $error = new WP_Error();
-      $error->add(LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Code], LoginID_Errors::LoginIDCannotVerify[LoginID_Error::Message]);
-      return $error;
+      if ($this->validate_loginid() && $this->verify_claims(LoginID_Operation::Register)) {
+        if (!is_wp_error($user_id)) {
+          // we got a proper user_id here so we need to make sure to attach loginid stuff to the user as metadata
+          if (!$this->attach_loginid_to($user_id)) {
+            $this->redirect_message = 'failure';
+          }
+        }
+        // $this->redirect_message = 'success';
+      } else {
+        $this->redirect_message = 'failure';
+      }
     }
+
+    return $user_id;
   }
 
   /**
@@ -593,6 +597,7 @@ class LoginID_DirectWeb
    */
   protected function authenticate($login_type, $strategy)
   {
+
     $result = $this->{"{$login_type}_{$strategy}"}(); // result could be a userid if successful or a WP_Error if failed
 
     // check if error has happened
@@ -623,6 +628,7 @@ class LoginID_DirectWeb
       if ($login_type !== false) {
         $this->email = sanitize_email($_POST['email']);
         $this->username = sanitize_text_field(isset($_POST['username']) ? $_POST['username'] : '');
+        $this->optin = sanitize_text_field(isset($_POST['opt-in']) ? $_POST['opt-in'] : '');
 
         // we have login type as register or login
         if ($submit === $login_type) {
@@ -635,6 +641,12 @@ class LoginID_DirectWeb
           // this generates errors if input is invalid, also merges them into this->wp_error
           $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_email($login_type), $login_type === LoginID_Operation::Register ? $this->validate_username() : null);
           // check for errors
+
+          if ($login_type === LoginID_Operation::Register) {
+            // validate password too for registration now, because it is now required for registration purposes
+            $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_password($this->password));
+          }
+
           if ($this->contains_no_errors()) {
             // this means that username and email validation just passed
             $fido2_support = isset($_POST['fido2']) ? sanitize_text_field($_POST['fido2']) : null;
@@ -646,13 +658,13 @@ class LoginID_DirectWeb
               $loginid = json_decode(stripslashes($loginid_data)); // strip slashes is important :/
               $this->loginid = $loginid;
 
-              if (isset($loginid->{'error'})) {
+              if (isset($loginid->{'error'}) && $login_type === LoginID_Operation::Login) {
                 $this->handle_loginid_errors($login_type, $loginid->error);
               } else {
                 // create user then log them in
                 $this->authenticate($login_type, LoginID_Strategy::Passwordless);
               }
-            } else if (isset($this->password)) {
+            } else if (isset($this->password) && $this->optin !== 'true') {
               // do password login
               $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_password($login_type));
               if ($this->contains_no_errors()) {
@@ -677,9 +689,16 @@ class LoginID_DirectWeb
                   $this->manually_display_password = true;
                 }
               } else {
-                // register, default to fido2 if possible
-                $this->release_the_fido = true;
+                // register, default to fido2 if user opted in
+                if ($this->optin === 'true') {
+                  $this->release_the_fido = true;
+                }
               }
+            }
+            // fido 2 is not supported in this case but they have opt in.
+            else if ($login_type === LoginID_Operation::Register && $this->optin === 'true') {
+              $this->authenticate(LoginID_Operation::Register, LoginID_Strategy::Password);
+              $this->redirect_message = 'unsupported';
             } else {
               // something gone really wrong
               $this->wp_errors->add(LoginID_Errors::CriticalError[LoginID_Error::Code], LoginID_Errors::VersionMismatch[LoginID_Error::Message]);
@@ -717,7 +736,7 @@ class LoginID_DirectWeb
     } else if ($error->name === $syntax_error) {
       $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
     } else {
-      $this->wp_errors->add($error->name,  isset($error->code) ? 'LOGINID_SERVER_ERROR::' . $error->code : 'NO_CODE' . '::' . $error->message);
+      $this->wp_errors->add($error->name,  isset($error->code) ? 'LOGINID_SERVER_ERROR::' . $error->code : $error->message . '; Please try biometrics authentication again; Or use a password instead');
     }
   }
 
@@ -786,17 +805,39 @@ class LoginID_DirectWeb
         <label class="loginid-auth-form-label" for="email">Email <strong>*</strong></label>
         <input class="loginid-auth-form-input" id="__loginid_input_email" type="text" name="email" value="<?php echo $this->email ?>">
       </div>
-      <div <?php echo ($type === LoginID_Operation::Login ? 'class="__loginid_hide-username loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
-        <label class="loginid-auth-form-label" for="username">Username <strong>*</strong></label>
-        <input class="loginid-auth-form-input" id="__loginid_input_username" type="text" name="username" value="<?php echo  $this->username ?>">
-      </div>
-      <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) ? 'class="__loginid_hide-password loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
+      <?php
+      if ($type === LoginID_Operation::Register) {
+      ?>
+        <div class="loginid-auth-form-row">
+          <label class="loginid-auth-form-label" for="username">Username <strong>*</strong></label>
+          <input class="loginid-auth-form-input" id="__loginid_input_username" type="text" name="username" value="<?php echo  $this->username ?>">
+        </div>
+      <?php
+      }
+      ?>
+      <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) && ($type === LoginID_Operation::Login) ? 'class="__loginid_hide-password loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
         <label class="loginid-auth-form-label" for="password">Password <strong>*</strong></label>
         <input class="loginid-auth-form-input" id="__loginid_input_password" type="password" name="password" value="<?php echo $this->password ?>">
       </div>
+      <?php
+      if ($type === LoginID_Operation::Register) {
+      ?>
+        <div id="__loginid_register-passwordless-opt-in-div" class="__loginid_register-passwordless-opt-in-div">
+          <input name="optin" type="checkbox" id="__loginid_register-passwordless-opt-in" checked="<?php echo $this->optin ?>">
+          <label for="__loginid_register-passwordless-opt-in">Opt in for passwordless authentication</label>
+        </div>
+      <?php
+      }
+      ?>
       <div class="loginid-submit-row">
         <input class="loginid-auth-form-submit" type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
-        <a class="loginid-auth-form-link" href="#" style="display: none;white-space: nowrap;" id="__loginid_use_password_instead">use a password instead</a>
+        <?php
+        if ($type === LoginID_Operation::Login) {
+        ?>
+          <a class="loginid-auth-form-link" href="#" style="display: none;white-space: nowrap;" id="__loginid_use_password_instead">use a password instead</a>
+        <?php
+        }
+        ?>
       </div>
       <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo LoginID_DirectWeb::ShortCodes[$type] ?>">
       <?php if ($this->release_the_fido && isset($this->email)) {
@@ -807,7 +848,7 @@ class LoginID_DirectWeb
         <input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo $settings['api_key'] ?>">
       <?php } ?>
     </form>
-<?php
+    <?php
   }
 
   /**
@@ -843,6 +884,48 @@ class LoginID_DirectWeb
     echo '</div>';
   }
 
+
+  /**
+   * renders the status banner if required
+   * 
+   * @since 1.0.12
+   */
+  public function render_banner()
+  {
+    $bannerStatus = sanitize_text_field(isset($_REQUEST['__loginid_status']) ? $_REQUEST['__loginid_status'] : '');
+    $definitions = array(
+      'success' => array(
+        'msg' => 'Successfully created account with biometrics enabled',
+        'color' => '#155724', 'bgc' => '#d4edda'
+      ),
+      'failure' => array(
+        'msg' => 'Successfully created account, however, biometrics verification failed. Biometrics will not be enabled. You can trying again using your user profile settings.',
+        'color' => '#721c24', 'bgc' => '#f8d7da'
+      ),
+      'unsupported' => array(
+        'msg' => 'Successfully created account, however, your browser or device does not support FIDO2 authentication. You can try again using the user profile settings on another device. Or check out a list of supported devices here.',
+        'color' => '#721c24', 'bgc' => '#f8d7da'
+      )
+    );
+
+    if (array_key_exists($bannerStatus, $definitions)) {
+    ?>
+      <div id="__loginid_notification_header" <?php echo 'style="position: absolute; top: 0; left: 0; right: 0; padding: 20px; z-index: 99999; display: flex; align-items: center; gap: 20px; background-color: ' . $definitions[$bannerStatus]['bgc'] . '; color: ' . $definitions[$bannerStatus]['color'] . ';"' ?>>
+        <div style="flex-grow: 1">
+          <?php echo $definitions[$bannerStatus]['msg'] ?>
+        </div>
+        <button id="__loginid_notification_close" style="flex-shrink: 0;">close</button>
+        <script>
+          document.getElementById("__loginid_notification_close").addEventListener('click', () => {
+            document.getElementById("__loginid_notification_header").style.display = 'None'
+          })
+        </script>
+      </div>
+<?php
+    }
+  }
+
+
   /**
    * renders the form depending on the data in the object
    * 
@@ -851,7 +934,6 @@ class LoginID_DirectWeb
    */
   public function render($type = LoginID_Operation::Login)
   {
-
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
       // make sure to only output error in the correct section, in case both login and register is in the same page
@@ -981,7 +1063,7 @@ class LoginID_DirectWeb
   {
     wp_set_current_user($user_id);
     wp_set_auth_cookie($user_id);
-    wp_redirect(home_url());
+    wp_redirect(home_url() . '?__loginid_status=' . (string)($this->redirect_message));
     exit();
   }
 }
