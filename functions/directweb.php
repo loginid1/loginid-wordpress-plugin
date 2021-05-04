@@ -736,7 +736,7 @@ class LoginID_DirectWeb
     } else if ($error->name === $syntax_error) {
       $this->wp_errors->add(LoginID_Errors::PluginError[LoginID_Error::Code], LoginID_Errors::PluginError[LoginID_Error::Message]);
     } else {
-      $this->wp_errors->add($error->name,  isset($error->code) ? 'LOGINID_SERVER_ERROR::' . $error->code : $error->message . '; Please try biometrics authentication again; Or use a password instead');
+      $this->wp_errors->add($error->name,  isset($error->code) ? 'LOGINID_SERVER_ERROR::' . $error->code : $error->message . '; Please try biometrics authentication again Or use a password instead');
     }
   }
 
@@ -822,9 +822,31 @@ class LoginID_DirectWeb
       <?php
       if ($type === LoginID_Operation::Register) {
       ?>
-        <div id="__loginid_register-passwordless-opt-in-div" class="__loginid_register-passwordless-opt-in-div">
+        <div id="__loginid_register-passwordless-opt-in-div" class="__loginid_register-passwordless-opt-in-div" style="display: flex; align-items: center;">
           <input name="optin" type="checkbox" id="__loginid_register-passwordless-opt-in" checked="<?php echo $this->optin ?>">
-          <label for="__loginid_register-passwordless-opt-in">Opt in for passwordless authentication</label>
+          <label for="__loginid_register-passwordless-opt-in" style=" display: flex; align-items: center; gap:5px; margin: 5px;">
+            <div style="width: 30px; height: 38px; display: inline-block;">
+              <svg width="100%" height="100%" viewBox="0 0 99 125" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="
+          fill-rule: evenodd;
+          clip-rule: evenodd;
+          stroke-linejoin: round;
+          stroke-miterlimit: 2;
+        ">
+                <path d="M32.196,32.615c-4.531,4.716 -7.12,10.866 -7.259,17.338c0,0.648 0.232,1.295 0.694,1.804c0.462,0.462 1.063,0.739 1.711,0.739c1.387,0 2.496,-1.109 2.543,-2.45c0.231,-10.727 9.062,-19.835 19.326,-19.835c7.166,0 13.963,4.439 17.292,11.328c0.277,0.601 0.786,1.017 1.387,1.248c0.647,0.231 1.294,0.185 1.895,-0.139c1.249,-0.601 1.757,-2.08 1.156,-3.329c-4.161,-8.553 -12.714,-14.101 -21.73,-14.101c-6.381,-0 -12.391,2.635 -17.015,7.397Z" style="fill: currentColor; fill-rule: nonzero" />
+                <path d="M68.549,52.667l0,22.296c0,3.643 -1.02,7.237 -2.914,10.346l-0.097,0.097c-3.546,5.683 -9.666,9.083 -16.321,9.083c-10.686,0 -19.332,-8.792 -19.332,-19.526l-0,-12.387c-0,-1.36 -1.117,-2.477 -2.477,-2.477c-1.36,0 -2.478,1.117 -2.478,2.477l0,12.387c0,13.503 10.881,24.529 24.287,24.529c8.403,0 16.078,-4.323 20.595,-11.512c2.429,-3.886 3.692,-8.403 3.692,-13.017l-0,-22.296c-0,-1.408 -1.117,-2.525 -2.478,-2.525c-1.36,-0 -2.477,1.117 -2.477,2.525Z" style="fill: currentColor; fill-rule: nonzero" />
+                <path d="M13.959,43.321c-0.543,0.408 -0.951,1.019 -1.019,1.63c-0.339,1.969 -0.475,4.006 -0.475,5.975l0,24.036c0,20.438 16.5,37.141 36.733,37.141c12.426,-0 23.969,-6.315 30.759,-16.771c0.746,-1.155 0.407,-2.716 -0.679,-3.463c-0.544,-0.408 -1.223,-0.543 -1.902,-0.408c-0.611,0.136 -1.154,0.544 -1.561,1.087c-5.907,9.098 -15.821,14.53 -26.617,14.53c-17.517,0 -31.776,-14.462 -31.776,-32.116l-0,-24.036c-0,-1.698 0.136,-3.463 0.407,-5.16c0.204,-1.358 -0.747,-2.648 -2.105,-2.852c-0.068,-0.068 -0.203,-0.068 -0.339,-0.068c-0.543,-0 -1.019,0.204 -1.426,0.475Z" style="fill: currentColor; fill-rule: nonzero" />
+                <path d="M18.701,29.857c-0.744,1.151 -0.406,2.707 0.745,3.452c0.541,0.406 1.15,0.473 1.827,0.338c0.677,-0.135 1.218,-0.474 1.557,-1.083c6.023,-9.339 15.903,-14.956 26.393,-14.956c17.258,0.068 31.808,15.295 31.808,33.297l0,24.025c0,1.488 -0.135,3.045 -0.271,4.466c-0.203,1.421 0.745,2.64 2.098,2.843c1.286,0.203 2.572,-0.812 2.775,-2.098c0.203,-1.692 0.338,-3.452 0.338,-5.211l0,-24.025c0,-9.814 -3.925,-19.559 -10.692,-26.733c-6.971,-7.444 -16.243,-11.505 -25.988,-11.572c-12.249,-0 -23.619,6.429 -30.59,17.257Z" style="fill: currentColor; fill-rule: nonzero" />
+                <path d="M14.417,15.398c-9.219,9.709 -14.417,22.753 -14.417,35.896l0,15.986c0,1.373 1.079,2.55 2.452,2.55c1.373,-0 2.452,-1.177 2.452,-2.55l-0,-15.986c-0,-25.01 20.301,-46.292 44.33,-46.292l0.098,-0c21.773,0.098 40.996,17.948 43.84,40.701c0.098,0.687 0.392,1.275 0.883,1.668c0.588,0.392 1.176,0.588 1.863,0.49c1.373,-0.196 2.354,-1.373 2.158,-2.746c-1.472,-12.064 -7.258,-23.342 -16.085,-31.777c-9.121,-8.532 -20.694,-13.338 -32.659,-13.338c-13.142,0 -25.598,5.492 -34.915,15.398Z" style="fill: currentColor; fill-rule: nonzero" />
+                <path d="M93.53,57.965l-0,16.986c-0,24.646 -19.933,44.775 -44.284,44.775c-22.78,-0.098 -41.73,-17.281 -44.087,-40.061c-0.098,-0.688 -0.393,-1.277 -0.884,-1.768c-0.491,-0.294 -0.982,-0.491 -1.571,-0.491l-0.196,0c-0.687,0.098 -1.277,0.393 -1.669,0.884c-0.491,0.491 -0.688,1.178 -0.589,1.865c1.276,12.176 6.873,23.37 15.906,31.618c9.034,8.346 20.816,12.862 32.992,12.862c27.198,0 49.291,-22.289 49.291,-49.684l0,-16.986c0,-1.375 -1.08,-2.455 -2.455,-2.455c-1.374,-0 -2.454,1.08 -2.454,2.455Z" style="fill: currentColor; fill-rule: nonzero" />
+                <path d="M53.346,64.354l-0.1,0.1c0,-0 -0.621,0.48 -0.627,1.345c-0.003,0.865 0.011,6.252 0.011,6.252l-7.265,-0c-0,-0 0.008,-5.387 0.003,-6.252c-0.003,-0.865 -0.627,-1.345 -0.627,-1.345l-0.097,-0.1c-1.448,-1.312 -2.249,-3.121 -2.249,-5.019c0,-3.674 2.959,-6.663 6.6,-6.669c3.641,0.006 6.599,2.995 6.599,6.669c0,1.898 -0.801,3.707 -2.248,5.019m-4.346,-16.495l-0.011,0c-6.254,0.009 -11.337,5.155 -11.337,11.476c0,2.793 1.008,5.486 2.837,7.591l0.152,0.174l0,7.354c0,1.326 1.066,2.403 2.376,2.403l11.956,0c1.309,0 2.373,-1.077 2.373,-2.403l-0,-7.354l0.152,-0.174c1.831,-2.105 2.84,-4.798 2.84,-7.591c-0,-6.321 -5.086,-11.467 -11.338,-11.476" style="fill: currentColor; fill-rule: nonzero" />
+              </svg>
+            </div>
+            <div>
+              Opt in for passwordless authentication. <br />
+              When enabled, you can login using TouchID or FaceID instead of password.
+            </div>
+
+          </label>
         </div>
       <?php
       }
