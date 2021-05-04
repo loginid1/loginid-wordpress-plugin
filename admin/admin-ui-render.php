@@ -228,6 +228,7 @@ function loginid_dw_admin_interface_render()
 		<p class="description">
 			<strong>End User Settings Shortcode</strong>
 			<code>[<?php echo LoginID_DirectWeb::getShortCodes()['settings'] ?>]</code>
+			For bests user experience for your end users. It is recommended to only use this short code on your user settings page.
 		</p>
 		<p class="description">
 			<strong style="color: red">Note: If your site is not running on localhost, make sure to have TLS enabled.</strong>
@@ -252,20 +253,20 @@ function loginid_dw_attach_to_profile($user)
 	}
 
 ?>
-	<h3 id="loginid-profile-information"><?php echo "FIDO login information powered by LoginID" ?></h3>
+	<h3 id="loginid-profile-information"><?php echo "Biometrics Login Setting" ?></h3>
 
 	<table class="form-table">
 		<tr>
 			<th><label>Status</label></th>
 			<td>
-				<?php echo $isEnabled  ? 'Active' : 'Inactive: Please add an authenticator.' ?>
+				<?php echo $isEnabled  ? 'Active' : 'No device added. Please add using below button' ?>
 			</td>
 		</tr>
 		<?php if (!$isEnabled && wp_get_current_user()->ID === $user->ID) { ?>
 			<tr style="display: none" id="__loginid_set_authenticator">
 				<th><label>Setup Authenticator</label></th>
 				<td>
-					<button type="button" class="button" id="__loginid_use_an_authenticator_on_this_device">Use an authenticator on this device</button>
+					<button type="button" class="button" id="__loginid_use_an_authenticator_on_this_device">Add new device</button>
 					<div id="__loginid_use_an_authenticator_on_this_device_response"></div>
 					<div>
 						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dw_save_to_profile_nonce"); ?>">
@@ -279,7 +280,7 @@ function loginid_dw_attach_to_profile($user)
 			<tr style="display: none" id="__loginid_remove_authenticator">
 				<th><label>Remove Authenticator</label></th>
 				<td>
-					<button type="button" class="button" id="__loginid_remove_authenticator_button">Remove authenticator from this account</button>
+					<button type="button" class="button" id="__loginid_remove_authenticator_button">Remove device</button>
 					<div id="__loginid_remove_authenticator_response">
 						This action is not reversible.<br /> You will need another method of authentication to access this account. (like a password).
 					</div>
