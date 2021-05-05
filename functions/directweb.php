@@ -843,7 +843,7 @@ class LoginID_DirectWeb
             </div>
             <div>
               Opt in for passwordless authentication. <br />
-              When enabled, you can login using TouchID or FaceID instead of password.
+              When enabled, you can login using your biometrics instead of password.
             </div>
 
           </label>
