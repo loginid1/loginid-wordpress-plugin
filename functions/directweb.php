@@ -823,15 +823,14 @@ class LoginID_DirectWeb
       if ($type === LoginID_Operation::Register) {
       ?>
         <div id="__loginid_register-passwordless-opt-in-div" class="__loginid_register-passwordless-opt-in-div" style="display: flex; align-items: center;">
-          <input name="optin" type="checkbox" id="__loginid_register-passwordless-opt-in" checked="<?php echo $this->optin ?>">
-          <label for="__loginid_register-passwordless-opt-in" style=" display: flex; align-items: center; gap:5px; margin: 5px;">
-            <div style="width: 30px; height: 38px; display: inline-block;">
+          <label for="__loginid_register-passwordless-opt-in" style=" display: flex; align-items: center; gap:5px; margin: 5px; cursor: pointer;">
+            <div style="width: 30px; height: 38px; display: inline-block; margin-right: 10px;">
               <svg width="100%" height="100%" viewBox="0 0 99 125" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="
-          fill-rule: evenodd;
-          clip-rule: evenodd;
-          stroke-linejoin: round;
-          stroke-miterlimit: 2;
-        ">
+                  fill-rule: evenodd;
+                  clip-rule: evenodd;
+                  stroke-linejoin: round;
+                  stroke-miterlimit: 2;
+                ">
                 <path d="M32.196,32.615c-4.531,4.716 -7.12,10.866 -7.259,17.338c0,0.648 0.232,1.295 0.694,1.804c0.462,0.462 1.063,0.739 1.711,0.739c1.387,0 2.496,-1.109 2.543,-2.45c0.231,-10.727 9.062,-19.835 19.326,-19.835c7.166,0 13.963,4.439 17.292,11.328c0.277,0.601 0.786,1.017 1.387,1.248c0.647,0.231 1.294,0.185 1.895,-0.139c1.249,-0.601 1.757,-2.08 1.156,-3.329c-4.161,-8.553 -12.714,-14.101 -21.73,-14.101c-6.381,-0 -12.391,2.635 -17.015,7.397Z" style="fill: currentColor; fill-rule: nonzero" />
                 <path d="M68.549,52.667l0,22.296c0,3.643 -1.02,7.237 -2.914,10.346l-0.097,0.097c-3.546,5.683 -9.666,9.083 -16.321,9.083c-10.686,0 -19.332,-8.792 -19.332,-19.526l-0,-12.387c-0,-1.36 -1.117,-2.477 -2.477,-2.477c-1.36,0 -2.478,1.117 -2.478,2.477l0,12.387c0,13.503 10.881,24.529 24.287,24.529c8.403,0 16.078,-4.323 20.595,-11.512c2.429,-3.886 3.692,-8.403 3.692,-13.017l-0,-22.296c-0,-1.408 -1.117,-2.525 -2.478,-2.525c-1.36,-0 -2.477,1.117 -2.477,2.525Z" style="fill: currentColor; fill-rule: nonzero" />
                 <path d="M13.959,43.321c-0.543,0.408 -0.951,1.019 -1.019,1.63c-0.339,1.969 -0.475,4.006 -0.475,5.975l0,24.036c0,20.438 16.5,37.141 36.733,37.141c12.426,-0 23.969,-6.315 30.759,-16.771c0.746,-1.155 0.407,-2.716 -0.679,-3.463c-0.544,-0.408 -1.223,-0.543 -1.902,-0.408c-0.611,0.136 -1.154,0.544 -1.561,1.087c-5.907,9.098 -15.821,14.53 -26.617,14.53c-17.517,0 -31.776,-14.462 -31.776,-32.116l-0,-24.036c-0,-1.698 0.136,-3.463 0.407,-5.16c0.204,-1.358 -0.747,-2.648 -2.105,-2.852c-0.068,-0.068 -0.203,-0.068 -0.339,-0.068c-0.543,-0 -1.019,0.204 -1.426,0.475Z" style="fill: currentColor; fill-rule: nonzero" />
@@ -845,7 +844,8 @@ class LoginID_DirectWeb
               Opt in for passwordless authentication. <br />
               When enabled, you can login using your biometrics instead of password.
             </div>
-
+            <input class="toggle-checkbox" name="optin" type="checkbox" style="display: none;" id="__loginid_register-passwordless-opt-in" checked="<?php echo $this->optin ?>">
+            <div class="toggle-switch" style="flex-shrink: 0;"></div>
           </label>
         </div>
       <?php
