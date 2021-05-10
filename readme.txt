@@ -1,4 +1,4 @@
-=== loginid-directweb ===
+=== Passwordless, regulatory compliant biometric login ===
 Contributors: loginidauth
 Donate link: https://loginid.io
 Tags: Authentication, Security, Oauth-2.0, Identity, Biometrics, Touch-id, Webauthn, Passwordless, Fido2, Fido, Passwordless login, Fido certified, Uaf
@@ -13,9 +13,9 @@ FIDO-certified strong authentication in 5 clicks.  Go passwordless and eliminate
 
 == Description ==
 
-LoginID’s DirectWeb Plugin enables your WordPress application’s end users to register and authenticate through highly secure public key cryptography instead of a password. 
+LoginID’s DirectWeb Plugin enables your WordPress application’s end users to register and authenticate through highly secure **FIDO-certified** public key cryptography instead of a password.
 
-Benefits:
+**Benefits:**
 - Convenience: 
   - Eliminate the need for your users to enter a password when they log in to your website.
   - Reduce your user abandonment rates by making transactions as seamless as possible.
@@ -24,7 +24,7 @@ Benefits:
 - Security:
   - Boost your website’s security through the use of multifactor authentication by replacing vulnerable static username/password credentials with strong public/private key credentials.  
 
-For more information on how the DirectWeb plugin works, please view our [documentation](https://docs.loginid.io/websdks/dw).
+For more information on how the DirectWeb plugin works, please view our [documentation](https://docs.loginid.io).
 
 == Installation ==
 
@@ -89,6 +89,10 @@ This error means that the plugin is unable to verify the validity of the login o
 Coming soon.
 
 == Changelog ==
+
+= 1.0.13 =
+Update node dependencies for security. 
+Update plugin description.
 
 = 1.0.12 =
 Enforce password selection during registration process to make sure a user has multiple ways of logging in.
