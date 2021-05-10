@@ -71,16 +71,16 @@ Yes, you can customize the registration page in line with your website’s look 
 Yes. Our solution augments your existing authentication flows. You may choose to replace or add LoginID authentication based on your specific needs. 
 
 = Can I integrate this plugin with my other installed plugins such as my eCommerce plugin? =
-We can assist you with integrating the LoginID DirectWeb with your other installed plugins. Please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
+We can assist you with integrating the LoginID DirectWeb with your other installed plugins. Please email us at [support@loginid.io](support@loginid.io) or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
 
 = I need to customize the plugin or I need support and help? =
-Please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
+Please email us at [support@loginid.io](support@loginid.io) or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
 
 = Where can I report bugs or leave feedback? =
-Please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
+Please email us at [support@loginid.io](support@loginid.io) or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
 
 = I have other queries or need additional support. =
-For any other queries or if you need additional support, please email us at [email] or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
+For any other queries or if you need additional support, please email us at [support@loginid.io](support@loginid.io) or contact us via the Live Chat option on [loginid.io](https://loginid.io). 
 
 = Error: Your identity token could not be verified =
 This error means that the plugin is unable to verify the validity of the login or register claim. This can often be resulted from a bad baseURL and api key combination. Please double check your Base URL and API Key parameters in the plugin settings against your credentials on the LoginID dashboard.
