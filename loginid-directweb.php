@@ -6,7 +6,7 @@
  * Description: Provides any user the option to login without a password
  * Author: LoginID
  * Author URI: https://loginid.io
- * Version: 1.0.12
+ * Version: 1.0.13
  * Text Domain: loginid-directweb
  * Domain Path: /languages
  * License: GPL v3 - https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -46,7 +46,7 @@ if (!defined('ABSPATH')) exit;
  *
  * @since 0.1.0
  */
-if (!defined('LOGINID_DIRECTWEB_VERSION_NUM'))     define('LOGINID_DIRECTWEB_VERSION_NUM', '1.0.12'); // Plugin version constant
+if (!defined('LOGINID_DIRECTWEB_VERSION_NUM'))     define('LOGINID_DIRECTWEB_VERSION_NUM', '1.0.13'); // Plugin version constant
 if (!defined('LOGINID_DIRECTWEB'))    define('LOGINID_DIRECTWEB', trim(dirname(plugin_basename(__FILE__)), '/')); // Name of the plugin folder eg - 'loginid-directweb'
 if (!defined('LOGINID_DIRECTWEB_DIR'))  define('LOGINID_DIRECTWEB_DIR', plugin_dir_path(__FILE__)); // Plugin directory absolute path with the trailing slash. Useful for using with includes eg - /var/www/html/wp-content/plugins/loginid-directweb/
 if (!defined('LOGINID_DIRECTWEB_URL'))  define('LOGINID_DIRECTWEB_URL', plugin_dir_url(__FILE__)); // URL to the plugin folder with the trailing slash. Useful for referencing src eg - http://localhost/wp/wp-content/plugins/loginid-directweb/
