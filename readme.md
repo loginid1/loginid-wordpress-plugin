@@ -17,7 +17,7 @@
   <h3 align="center">LoginID DirectWeb</h3>
 
   <p align="center">
-    For Wordpress
+    For WordPress
     <br />
     <br />
     <a href="https://github.com/loginid1/loginid-directweb/issues">Report Bug</a>
@@ -34,7 +34,7 @@
 - [About The Project](#about-the-project)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Wordpress Setup Guide](#wordpress-setup-guide)
+  - [WordPress Setup Guide](#wordpress-setup-guide)
   - [Building From Source](#building-from-source)
 - [Roadmap](#roadmap)
 - [License](#license)
@@ -45,13 +45,13 @@
 
 ## About The Project
 
-Wordpress Plugin to enable a passwordless login experience using LoginID's Direct Web API.
+WordPress Plugin to enable a passwordless login experience using LoginID's Direct Web API.
 
 This plugin will add two custom short codes `[loginid_login]` and `[loginid_registration]`. These two short codes will generate a login form and a register form that will use LoginID's DirectWeb API to authenticate the user without a password.
 
 The user must have a FIDO2 compatible device, otherwise this form will default back to using a password authentication instead.
 
-This plugin is compatible with Wordpress' default password login, so this should be compatible with existing authentication plugins.
+This plugin is compatible with WordPress' default password login, so this should be compatible with existing authentication plugins.
 
 <!-- GETTING STARTED -->
 
@@ -63,7 +63,7 @@ As this is a wordpress plugin this project requires wordpress to run.
 
 (OPTIONAL) If you wish to modify the Javascript source files and/or PHP dependancies within this project, then you would also need to nave Node, NPM, and Composer installed.
 
-### Wordpress Setup Guide
+### WordPress Setup Guide
 
 1. Install the plugin (through the zip file or through the wordpress plugin store)
 2. Configure the plugin under Settings > LoginID DirectWeb (as shown in the image below)
@@ -144,7 +144,7 @@ Project Link: [https://github.com/loginid1/loginid-directweb](https://github.com
 ## Acknowledgements
 
 - [The Best Readme Template on Github](https://github.com/othneildrew/Best-README-Template)
-- [Wordpress Starter Plugin](https://github.com/arunbasillal/WordPress-Starter-Plugin)
+- [WordPress Starter Plugin](https://github.com/arunbasillal/WordPress-Starter-Plugin)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

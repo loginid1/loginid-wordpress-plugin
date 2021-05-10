@@ -46,7 +46,7 @@ Once you install the plugin, click on ‘Settings’. Here, you have two setup o
 2. Install the LoginID DirectWeb plugin
 3. Let LoginID automatically set up the plugin on your dashboard via the Setup Wizard. [Insert screenshot]
 4. On your dashboard, you will need to fill in the application name and your Callback URL. 
-5. Click on ‘Export to my Wordpress site’  
+5. Click on ‘Export to my WordPress site’  
 6. On your WordPress setting page, click on Save Settings (All configuration variables will be pre-filled for you)
 7. Generate your registration or login pages by clicking the corresponding links, or use our shortcode to embed the code into any of your WordPress pages.
 
@@ -57,7 +57,7 @@ Once you install the plugin, click on ‘Settings’. Here, you have two setup o
 4. Click on the Integration tab
 5. Agree to our Customer License Agreement
 6. Choose the DirectWeb integration option and follow the instruction on screen
-7. Copy your credentials or use ‘export to my Wordpress site’ to populate your configuration settings on the plugin
+7. Copy your credentials or use ‘export to my WordPress site’ to populate your configuration settings on the plugin
 8. On your WordPress setting page, click on Save Settings (All configuration variables will be pre-filled for you)
 9. Generate your registration or login pages by clicking the corresponding links, or use our shortcode to embed the code into any of your WordPress pages.
 
