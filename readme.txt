@@ -16,12 +16,12 @@ FIDO-certified strong authentication in 5 clicks.  Go passwordless and eliminate
 LoginID’s DirectWeb Plugin enables your WordPress application’s end users to register and authenticate through highly secure **FIDO-certified** public key cryptography instead of a password.
 
 **Benefits:**
-- Convenience: 
+Convenience: 
   - Eliminate the need for your users to enter a password when they log in to your website.
   - Reduce your user abandonment rates by making transactions as seamless as possible.
-- Compliance: 
+Compliance: 
   - Become GDPR and PSD2 compliant with a FIDO-certified strong authentication solution
-- Security:
+Security:
   - Boost your website’s security through the use of multifactor authentication by replacing vulnerable static username/password credentials with strong public/private key credentials.  
 
 For more information on how the DirectWeb plugin works, please view our [documentation](https://docs.loginid.io).
@@ -29,8 +29,8 @@ For more information on how the DirectWeb plugin works, please view our [documen
 == Installation ==
 
 1. Upload to the `/wp-content/plugins/` directory.
-1. Activate the plugin.
-1. Visit Settings > LoginID DirectWeb to configure this plugin.
+2. Activate the plugin.
+3. Visit Settings > LoginID DirectWeb to configure this plugin.
 
 == Frequently Asked Questions ==
 
@@ -41,24 +41,25 @@ An answer to that question.
 Once you install the plugin, click on ‘Settings’. Here, you have two setup options:
 
 *Let LoginID do the work for you (estimated time: 15s to 30s)*
+
 1. Login to your WordPress developer dashboard
-1. Install the LoginID DirectWeb plugin
-1. Let LoginID automatically set up the plugin on your dashboard via the Setup Wizard. [Insert screenshot]
-1. On your dashboard, you will need to fill in the application name and your Callback URL. [Insert screenshot]
-1. Click on ‘Export to my Wordpress site’  [Insert screenshot]
-1. On your WordPress setting page, click on Save Settings (All configuration variables will be pre-filled for you)
-1. Generate your registration or login pages by clicking the corresponding links, or use our shortcode to embed the code into any of your WordPress pages.
+2. Install the LoginID DirectWeb plugin
+3. Let LoginID automatically set up the plugin on your dashboard via the Setup Wizard. [Insert screenshot]
+4. On your dashboard, you will need to fill in the application name and your Callback URL. 
+5. Click on ‘Export to my Wordpress site’  
+6. On your WordPress setting page, click on Save Settings (All configuration variables will be pre-filled for you)
+7. Generate your registration or login pages by clicking the corresponding links, or use our shortcode to embed the code into any of your WordPress pages.
 
 *Do it yourself (DIY) (estimated time: 1min to 2mins)*
 1. Login to your WordPress developer dashboard
-1. Install the LoginID DirectWeb plugin
-1. On a new tab, register your developer account on the LoginID dashboard. [Insert screenshot]
-1. Click on the Integration tab
-1. Agree to our Customer License Agreement
-1. Choose the DirectWeb integration option and follow the instruction on screen
-1. Copy your credentials or use ‘export to my Wordpress site’ to populate your configuration settings on the plugin
-1. On your WordPress setting page, click on Save Settings (All configuration variables will be pre-filled for you)
-1. Generate your registration or login pages by clicking the corresponding links, or use our shortcode to embed the code into any of your WordPress pages.
+2. Install the LoginID DirectWeb plugin
+3. On a new tab, register your developer account on the LoginID dashboard. 
+4. Click on the Integration tab
+5. Agree to our Customer License Agreement
+6. Choose the DirectWeb integration option and follow the instruction on screen
+7. Copy your credentials or use ‘export to my Wordpress site’ to populate your configuration settings on the plugin
+8. On your WordPress setting page, click on Save Settings (All configuration variables will be pre-filled for you)
+9. Generate your registration or login pages by clicking the corresponding links, or use our shortcode to embed the code into any of your WordPress pages.
 
 = How does the plugin work? =
 When a user tries to sign in to your website, they will be prompted to register for an account on your website. Once the user completes the registration process, they will be able to sign in using strong FIDO-certified authentication versus using traditional passwords.
