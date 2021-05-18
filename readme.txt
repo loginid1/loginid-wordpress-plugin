@@ -1,4 +1,4 @@
-=== Passwordless, regulatory compliant biometric login ===
+=== FIDO-certified Passwordless biometric login ===
 Contributors: loginidauth
 Donate link: https://loginid.io
 Tags: Authentication, Security, Oauth-2.0, Identity, Biometrics, Touch-id, Webauthn, Passwordless, Fido2, Fido, Passwordless login, Fido certified, Uaf
