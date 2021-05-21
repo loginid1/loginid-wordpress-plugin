@@ -20,7 +20,7 @@ Convenience:
   - Eliminate the need for your users to enter a password when they log in to your website.
   - Reduce your user abandonment rates by making transactions as seamless as possible.
 Compliance: 
-  - Become GDPR and PSD2 compliant with a FIDO-certified strong authentication solution
+  - FIDO is aligned with the GDPR and PSD2 principals around the use of strong authentication
 Security:
   - Boost your website’s security through the use of multifactor authentication by replacing vulnerable static username/password credentials with strong public/private key credentials.  
 
