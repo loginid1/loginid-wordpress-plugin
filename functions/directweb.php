@@ -620,7 +620,7 @@ class LoginID_DirectWeb
   public function on_init()
   {
     // check for the 2 keys which is unique to this plugin's forms (also check to make sure user isn't logged in)
-    if (check_admin_referer('loginid_dw_auth_field') && isset($_POST['submit']) && isset($_POST['shortcode']) && !is_user_logged_in()) {
+    if (wp_verify_nonce(isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '', 'loginid_dw_auth_field') && isset($_POST['submit']) && isset($_POST['shortcode']) && !is_user_logged_in()) {
       // this method gotta be efficient, cuz its loaded on every page, avoid doing unnecessary work
       $submit = sanitize_text_field(wp_unslash($_POST['submit'])); // immediately sanitized
       $shortcode = sanitize_text_field(wp_unslash($_POST['shortcode'])); // immediately sanitized
@@ -963,7 +963,7 @@ class LoginID_DirectWeb
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
       // make sure to only output error in the correct section, in case both login and register is in the same page
-      if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['shortcode']) && check_admin_referer('loginid_dw_auth_field')) {
+      if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['shortcode']) && wp_verify_nonce(isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '', 'loginid_dw_auth_field')) {
         $shortcode = sanitize_text_field(wp_unslash($_POST['shortcode'])); // immediately sanitized
         $login_type = $this->validate_loginid_field($shortcode); // validate input
         if ($login_type !== false && $type === $login_type) {
