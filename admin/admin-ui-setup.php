@@ -160,13 +160,13 @@ function loginid_dw_generate_page()
 			$result = wp_insert_post($register_post);
 
 			if ($result > 0) {
-				exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . ($isRegister ? 'Register' : 'Login') .  ' page created.'))));
+				exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . ($isRegister ? 'Register' : 'Login') .  ' page created.'))));
 			}
-			exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error while creating ' . ($isRegister ? 'Register' : 'Login') . ' page.'))));
+			exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error while creating ' . ($isRegister ? 'Register' : 'Login') . ' page.'))));
 		}
-		exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error: Token Rejected'))));
+		exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error: Token Rejected'))));
 	}
-	exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error: something went very wrong.'))));
+	exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error: something went very wrong.'))));
 }
 add_action('admin_post_loginid_dw_generate_page', 'loginid_dw_generate_page');
 

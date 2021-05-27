@@ -21,7 +21,7 @@ function loginid_dw_minimum_settings_section_callback()
 {
 	$settings = loginid_dw_get_settings();
 	$ending = $settings['base_url'] !== '' && $settings['api_key'] !== '' ? '' : ' You may obtain them from <a href="' . LOGINID_DIRECTWEB_LOGINID_ORIGIN . '/register/get-started-a" target="_blank">LoginID</a> manually, or try out our setup wizard above.';
-	echo '<p>' . __('You will be able to obtain these two fields from either the setup wizard or manual setup process. The setup wizard will auto populate these two fields.' . $ending, 'loginid-directweb') . '</p>';
+	echo esc_html('<p>' . __('You will be able to obtain these two fields from either the setup wizard or manual setup process. The setup wizard will auto populate these two fields.' . $ending, 'loginid-directweb') . '</p>');
 }
 
 /**
@@ -40,8 +40,8 @@ function loginid_dw_text_input_field_callback($args)
 
 	<fieldset>
 		<!-- Text Input -->
-		<input type="text" name="loginid_dw_settings[<?php echo $settings_id ?>]" class="regular-text" value="<?php if (isset($settings[$settings_id]) && (!empty($settings[$settings_id]))) echo esc_attr($settings[$settings_id]); ?>" />
-		<p class="description"><?php _e($description, 'loginid-directweb'); ?></p>
+		<input type="text" name="loginid_dw_settings[<?php echo esc_attr($settings_id) ?>]" class="regular-text" value="<?php if (isset($settings[$settings_id]) && (!empty($settings[$settings_id]))) echo esc_attr($settings[$settings_id]); ?>" />
+		<p class="description"><?php esc_html_e($description, 'loginid-directweb'); ?></p>
 	</fieldset>
 <?php
 }
@@ -72,9 +72,9 @@ function loginid_dw_admin_interface_render()
 		settings_errors( 'loginid_dw_settings_saved_message' ); 
 	 */
 
-	if (isset($_GET['loginid-admin-msg'])) {
+	if (isset($_GET['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'loginid_dw_msg_nonce') && isset($_GET['loginid-admin-msg'])) {
 		// some other loginid hood redirected here with an admin message
-		add_settings_error('loginid_dw_settings_admin_msg', 'loginid_dw_settings_admin_msg', sanitize_text_field($_GET['loginid-admin-msg']), 'info');
+		add_settings_error('loginid_dw_settings_admin_msg', 'loginid_dw_settings_admin_msg', sanitize_text_field(wp_unslash($_GET['loginid-admin-msg'])), 'info');
 		// then show the message
 		settings_errors('loginid_dw_settings_admin_msg');
 	}
@@ -97,7 +97,7 @@ function loginid_dw_admin_interface_render()
 				<h4>This method will take less than 2 minutes to complete</h4>
 				<h4>What happens when I click Run Wizard?</h4>
 				<p>
-					When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?></a> to register an account and fill out some information about your website in order to generate your Base URL and API Key.
+					When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="<?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>"><?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?></a> to register an account and fill out some information about your website in order to generate your Base URL and API Key.
 					<br />
 					At the end of the process you will have the option to save data directly to this wordpress site with a click of a single button.
 				</p>
@@ -120,7 +120,7 @@ function loginid_dw_admin_interface_render()
 				</p>
 				<p>
 					<i><b>By clicking on the <code>Run Wizard</code> button below you consent to sending the above data to LoginID and allow LoginID to save settings for this plugin on your behalf.
-							<br />Using this wizard is >OPTIONAL< you can always visit <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>"><?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?></a> and manually input your site origin and obtain your API key and BaseUrl.
+							<br />Using this wizard is >OPTIONAL< you can always visit <a href="<?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>"><?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?></a> and manually input your site origin and obtain your API key and BaseUrl.
 								<a href="https://docs.loginid.io/websdks/dw">refer to docs</a>
 						</b></i>
 				</p>
@@ -130,8 +130,8 @@ function loginid_dw_admin_interface_render()
 					(function() {
 						const setupWizardButton = document.getElementById("__loginid_run_setup_wizard_button");
 						setupWizardButton.addEventListener('click', () => {
-							const nonce = "<?php echo wp_create_nonce('loginid_dw_nonce_wizard') ?>"
-							const remoteLocation = "<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>/wordpress-directweb-plugin?origin=" + window.location.origin + "#" + nonce;
+							const nonce = "<?php echo esc_url(wp_create_nonce('loginid_dw_nonce_wizard')) ?>"
+							const remoteLocation = "<?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>/wordpress-directweb-plugin?origin=" + window.location.origin + "#" + nonce;
 							window.location = remoteLocation;
 						})
 					})();
@@ -148,7 +148,7 @@ function loginid_dw_admin_interface_render()
 					In order for the LoginID to manage authentication on your behalf, it needs to be configured with your credentials, which you can obtain from LoginID’s dashboard by following the below steps:
 				<ol>
 					<li>
-						Register on our dashboard using the above link <a href="<?php echo LOGINID_DIRECTWEB_LOGINID_ORIGIN ?>/en/integration" target="_blank">LoginID’s dashboard </a>
+						Register on our dashboard using the above link <a href="<?php echo esc_url(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>/en/integration" target="_blank">LoginID’s dashboard </a>
 					</li>
 					<li>
 						Make sure you are on the integration page, if not use the navigation bar to select “Integration".
@@ -219,15 +219,15 @@ function loginid_dw_admin_interface_render()
 		</p>
 		<p class="description">
 			<strong>Login Form Shortcode</strong>
-			<code>[<?php echo LoginID_DirectWeb::getShortCodes()[LoginID_Operation::Login] ?>]</code>
+			<code>[<?php echo esc_html(LoginID_DirectWeb::getShortCodes()[LoginID_Operation::Login]) ?>]</code>
 		</p>
 		<p class="description">
 			<strong>Register Form Shortcode</strong>
-			<code>[<?php echo LoginID_DirectWeb::getShortCodes()[LoginID_Operation::Register] ?>]</code>
+			<code>[<?php echo esc_html(LoginID_DirectWeb::getShortCodes()[LoginID_Operation::Register]) ?>]</code>
 		</p>
 		<p class="description">
 			<strong>End User Settings Shortcode</strong>
-			<code>[<?php echo LoginID_DirectWeb::getShortCodes()['settings'] ?>]</code>
+			<code>[<?php echo esc_html(LoginID_DirectWeb::getShortCodes()['settings']) ?>]</code>
 			For bests user experience for your end users. It is recommended to only use this short code on your user settings page.
 		</p>
 		<p class="description">
@@ -269,10 +269,10 @@ function loginid_dw_attach_to_profile($user)
 					<button type="button" class="button" id="__loginid_use_an_authenticator_on_this_device">Add new device</button>
 					<div id="__loginid_use_an_authenticator_on_this_device_response"></div>
 					<div>
-						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dw_save_to_profile_nonce"); ?>">
-						<input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo $udata ?>">
-						<input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo $settings['base_url'] ?>">
-						<input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo $settings['api_key'] ?>">
+						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo esc_textarea(wp_create_nonce("loginid_dw_save_to_profile_nonce")); ?>">
+						<input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo esc_textarea($udata) ?>">
+						<input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo esc_textarea($settings['base_url']) ?>">
+						<input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo esc_textarea($settings['api_key']) ?>">
 					</div>
 				</td>
 			</tr>
@@ -285,7 +285,7 @@ function loginid_dw_attach_to_profile($user)
 						This action is not reversible.<br /> You will need another method of authentication to access this account. (like a password).
 					</div>
 					<div>
-						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo wp_create_nonce("loginid_dw_remove_from_profile_nonce"); ?>">
+						<input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo esc_attr(wp_create_nonce("loginid_dw_remove_from_profile_nonce")); ?>">
 					</div>
 				</td>
 			</tr>
