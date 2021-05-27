@@ -19,9 +19,16 @@ if (!defined('ABSPATH')) exit;
  */
 function loginid_dw_minimum_settings_section_callback()
 {
+	$allowed_html = array(
+		'a' => array(
+			'href' => array(),
+			'target' => array(),
+		),
+		'p' => array(),
+	);
 	$settings = loginid_dw_get_settings();
 	$ending = $settings['base_url'] !== '' && $settings['api_key'] !== '' ? '' : ' You may obtain them from <a href="' . LOGINID_DIRECTWEB_LOGINID_ORIGIN . '/register/get-started-a" target="_blank">LoginID</a> manually, or try out our setup wizard above.';
-	echo esc_html('<p>' . __('You will be able to obtain these two fields from either the setup wizard or manual setup process. The setup wizard will auto populate these two fields.' . $ending, 'loginid-directweb') . '</p>');
+	echo wp_kses('<p>' . __('You will be able to obtain these two fields from either the setup wizard or manual setup process. The setup wizard will auto populate these two fields.' . $ending, 'loginid-directweb') . '</p>', $allowed_html);
 }
 
 /**
@@ -130,7 +137,7 @@ function loginid_dw_admin_interface_render()
 					(function() {
 						const setupWizardButton = document.getElementById("__loginid_run_setup_wizard_button");
 						setupWizardButton.addEventListener('click', () => {
-							const nonce = "<?php echo esc_url(wp_create_nonce('loginid_dw_nonce_wizard')) ?>"
+							const nonce = "<?php echo esc_attr(wp_create_nonce('loginid_dw_nonce_wizard')) ?>"
 							const remoteLocation = "<?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>/wordpress-directweb-plugin?origin=" + window.location.origin + "#" + nonce;
 							window.location = remoteLocation;
 						})
