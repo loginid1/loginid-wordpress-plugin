@@ -46,6 +46,10 @@ async function __loginidOnAuthenticate(
       value: document.getElementById("__loginid_input_shortcode").value,
       element: document.createElement("input"),
     },
+    _wpnonce: {
+      value: document.getElementById("__loginid_input_nonce").value,
+      element: document.createElement("input"),
+    },
     ...additionalPayload,
   };
 
