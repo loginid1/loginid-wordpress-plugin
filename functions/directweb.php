@@ -862,6 +862,7 @@ class LoginID_DirectWeb
         ?>
       </div>
       <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo esc_attr(LoginID_DirectWeb::ShortCodes[$type]) ?>">
+      <input type="hidden" readonly name="_wpnonce" id="__loginid_input_nonce" value="<?php echo esc_attr(wp_create_nonce('loginid_dw_auth_field')) ?>">
       <?php if ($this->release_the_fido && isset($this->email)) {
         $settings = loginid_dw_get_settings();
       ?>
@@ -869,7 +870,6 @@ class LoginID_DirectWeb
         <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo esc_attr($settings['base_url']) ?>">
         <input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo esc_attr($settings['api_key']) ?>">
       <?php }
-      wp_nonce_field('loginid_dw_auth_field')
       ?>
     </form>
     <?php
@@ -916,38 +916,36 @@ class LoginID_DirectWeb
    */
   public function render_banner()
   {
-    if (isset($_REQUEST['__loginid_n']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['__loginid_n'])), 'loginid_dw_banner')) {
-      $bannerStatus = sanitize_text_field(isset($_REQUEST['__loginid_status']) ? wp_unslash($_REQUEST['__loginid_status']) : '');
-      $definitions = array(
-        'success' => array(
-          'msg' => 'Successfully created account with biometrics enabled',
-          'color' => '#155724', 'bgc' => '#d4edda'
-        ),
-        'failure' => array(
-          'msg' => 'Successfully created account, however, biometrics verification failed. Biometrics will not be enabled. You can trying again using your user profile settings.',
-          'color' => '#721c24', 'bgc' => '#f8d7da'
-        ),
-        'unsupported' => array(
-          'msg' => 'Successfully created account, however, your browser or device does not support FIDO2 authentication. You can try again using the user profile settings on another device. Or check out a list of supported devices here.',
-          'color' => '#721c24', 'bgc' => '#f8d7da'
-        )
-      );
+    $bannerStatus = sanitize_text_field(isset($_REQUEST['__loginid_status']) ? wp_unslash($_REQUEST['__loginid_status']) : '');
+    $definitions = array(
+      'success' => array(
+        'msg' => 'Successfully created account with biometrics enabled',
+        'color' => '#155724', 'bgc' => '#d4edda'
+      ),
+      'failure' => array(
+        'msg' => 'Successfully created account, however, biometrics verification failed. Biometrics will not be enabled. You can trying again using your user profile settings.',
+        'color' => '#721c24', 'bgc' => '#f8d7da'
+      ),
+      'unsupported' => array(
+        'msg' => 'Successfully created account, however, your browser or device does not support FIDO2 authentication. You can try again using the user profile settings on another device. Or check out a list of supported devices here.',
+        'color' => '#721c24', 'bgc' => '#f8d7da'
+      )
+    );
 
-      if (array_key_exists($bannerStatus, $definitions)) {
+    if (array_key_exists($bannerStatus, $definitions)) {
     ?>
-        <div id="__loginid_notification_header" <?php echo esc_html('style="position: absolute; top: 0; left: 0; right: 0; padding: 20px; z-index: 99999; display: flex; align-items: center; gap: 20px; background-color: ' . $definitions[$bannerStatus]['bgc'] . '; color: ' . $definitions[$bannerStatus]['color'] . ';"') ?>>
-          <div style="flex-grow: 1">
-            <?php echo esc_html($definitions[$bannerStatus]['msg']) ?>
-          </div>
-          <button id="__loginid_notification_close" style="flex-shrink: 0;">close</button>
-          <script>
-            document.getElementById("__loginid_notification_close").addEventListener('click', () => {
-              document.getElementById("__loginid_notification_header").style.display = 'None'
-            })
-          </script>
+      <div id="__loginid_notification_header" style="position: absolute; top: 0; left: 0; right: 0; padding: 20px; z-index: 99999; display: flex; align-items: center; gap: 20px; <?php echo esc_html('background-color: ' . $definitions[$bannerStatus]['bgc'] . '; color: ' . $definitions[$bannerStatus]['color'] . ';') ?>">
+        <div style="flex-grow: 1">
+          <?php echo esc_html($definitions[$bannerStatus]['msg']) ?>
         </div>
+        <button id="__loginid_notification_close" style="flex-shrink: 0;">close</button>
+        <script>
+          document.getElementById("__loginid_notification_close").addEventListener('click', () => {
+            document.getElementById("__loginid_notification_header").style.display = 'None'
+          })
+        </script>
+      </div>
 <?php
-      }
     }
   }
 
@@ -1089,7 +1087,7 @@ class LoginID_DirectWeb
   {
     wp_set_current_user($user_id);
     wp_set_auth_cookie($user_id);
-    wp_safe_redirect(home_url() . '?__loginid_n=' . wp_create_nonce('loginid_dw_banner') . '&__loginid_status=' . (string)($this->redirect_message));
+    wp_safe_redirect(home_url() . '?__loginid_status=' . (string)($this->redirect_message));
     exit();
   }
 }
