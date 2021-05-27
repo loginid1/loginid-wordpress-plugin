@@ -144,8 +144,8 @@ add_action('admin_enqueue_scripts', 'loginid_dw_admin_enqueue_css_js');
 function loginid_dw_generate_page()
 {
 	if (isset($_POST['_wpnonce']) && isset($_POST['submit'])) {
-		$which_page = sanitize_text_field($_POST['submit']);
-		$nonce = sanitize_text_field($_POST['_wpnonce']);
+		$which_page = sanitize_text_field(wp_unslash($_POST['submit']));
+		$nonce = sanitize_text_field(wp_unslash($_POST['_wpnonce']));
 		if (wp_verify_nonce($nonce, 'loginid_dw_settings_group-options') !== false && ($which_page === 'Generate Register Page' || $which_page === 'Generate Login Page')) {
 			$isRegister = $which_page === 'Generate Register Page';
 			// we want to create the login and register pages here
@@ -160,13 +160,13 @@ function loginid_dw_generate_page()
 			$result = wp_insert_post($register_post);
 
 			if ($result > 0) {
-				exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . ($isRegister ? 'Register' : 'Login') .  ' page created.')));
+				exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . ($isRegister ? 'Register' : 'Login') .  ' page created.'))));
 			}
-			exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error while creating '($isRegister ? 'Register' : 'Login') . ' page.')));
+			exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error while creating ' . ($isRegister ? 'Register' : 'Login') . ' page.'))));
 		}
-		exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error: Token Rejected')));
+		exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error: Token Rejected'))));
 	}
-	exit(wp_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error: something went very wrong.')));
+	exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&loginid-admin-msg=' . 'Error: something went very wrong.'))));
 }
 add_action('admin_post_loginid_dw_generate_page', 'loginid_dw_generate_page');
 
@@ -216,27 +216,40 @@ function loginid_dw_modify_user_table_row($val, $column_name, $user_id)
 add_filter('manage_users_custom_column', 'loginid_dw_modify_user_table_row', 10, 3);
 
 /**
+ * validates nonce
+ * returns true if nonce is valid
+ * 
+ * @param $action, the context of the nonce
+ * @since 1.0.14
+ */
+function loginid_dw_validate_nonce($action)
+{
+	return isset($_REQUEST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), $action);
+}
+
+/**
  * saves loginid to profile (ajax call)
  * 
  * @since 0.1.0
  */
 function loginid_dw_save_to_profile()
 {
-	if (!wp_verify_nonce($_REQUEST['nonce'], "loginid_dw_save_to_profile_nonce")) {
-		exit("No naughty business please");
-	}
-	if (empty($_REQUEST['loginid']) || !isset($_REQUEST['loginid'])) {
-		exit('Error: Missing required field');
-	} else {
-
-		$loginid_data = sanitize_text_field($_REQUEST['loginid']);
-		$loginid_directweb = new LoginID_DirectWeb();
-		$loginid_directweb->manual_minimal_init(wp_get_current_user()->user_email, $loginid_data);
-		if ($loginid_directweb->add_authenticator_to_user()) {
-			exit('Success: authenticator added to account. Please reload this page.');
+	if (isset($_REQUEST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), 'loginid_dw_save_to_profile_nonce')) {
+		if (empty($_REQUEST['loginid']) || !isset($_REQUEST['loginid'])) {
+			exit('Error: Missing required field');
 		} else {
-			exit('Error: failed to add authenticator to account');
+
+			$loginid_data = sanitize_text_field(wp_unslash($_REQUEST['loginid']));
+			$loginid_directweb = new LoginID_DirectWeb();
+			$loginid_directweb->manual_minimal_init(wp_get_current_user()->user_email, $loginid_data);
+			if ($loginid_directweb->add_authenticator_to_user()) {
+				exit('Success: authenticator added to account. Please reload this page.');
+			} else {
+				exit('Error: failed to add authenticator to account');
+			}
 		}
+	} else {
+		exit("No naughty business please");
 	}
 }
 
@@ -249,15 +262,16 @@ add_action('wp_ajax_loginid_save_to_profile', 'loginid_dw_save_to_profile');
  */
 function loginid_dw_remove_from_profile()
 {
-	if (!wp_verify_nonce($_REQUEST['nonce'], "loginid_dw_remove_from_profile_nonce")) {
-		exit("No naughty business please");
-	}
-	$loginid_directweb = new LoginID_DirectWeb();
-	$loginid_directweb->manual_email_init(wp_get_current_user()->user_email);
-	if ($loginid_directweb->remove_authenticator_from_user()) {
-		exit('Success: authenticator removed from account. Please reload this page.');
+	if (loginid_dw_validate_nonce("loginid_dw_remove_from_profile_nonce")) {
+		$loginid_directweb = new LoginID_DirectWeb();
+		$loginid_directweb->manual_email_init(wp_get_current_user()->user_email);
+		if ($loginid_directweb->remove_authenticator_from_user()) {
+			exit('Success: authenticator removed from account. Please reload this page.');
+		} else {
+			exit('Error: failed to remove authenticator from account');
+		}
 	} else {
-		exit('Error: failed to remove authenticator from account');
+		exit("No naughty business please");
 	}
 }
 
@@ -271,7 +285,7 @@ add_action('wp_ajax_loginid_remove_from_profile', 'loginid_dw_remove_from_profil
 function loginid_dw_wizard_callback()
 {
 	// 
-	if (wp_verify_nonce($_REQUEST['nonce'], 'loginid_dw_nonce_wizard')) {
+	if (loginid_dw_validate_nonce('loginid_dw_nonce_wizard')) {
 
 		exit("
 <html>
@@ -285,7 +299,7 @@ const output = `Wizard Redirecting ...`;
 document.getElementById(\"output\").innerHTML = output;
 
 const fields = [
-	{ name: '_wpnonce', value: `" . wp_create_nonce("loginid_dw_settings_group-options") . "` },
+	{ name: '_wpnonce', value: `" . esc_textarea(wp_create_nonce("loginid_dw_settings_group-options")) . "` },
 	{ name: '_wp_http_referer', value: '/wp-admin/options-general.php?page=loginid-directweb' },
 	{ name: 'option_page', value: 'loginid_dw_settings_group' },
 	{ name: 'submit', value: 'Save Settings' },
