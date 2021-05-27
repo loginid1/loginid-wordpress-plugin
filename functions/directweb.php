@@ -620,15 +620,15 @@ class LoginID_DirectWeb
   public function on_init()
   {
     // check for the 2 keys which is unique to this plugin's forms (also check to make sure user isn't logged in)
-    if (isset($_POST['submit']) && isset($_POST['shortcode']) && !is_user_logged_in()) {
+    if (check_admin_referer('loginid_dw_auth_field') && isset($_POST['submit']) && isset($_POST['shortcode']) && !is_user_logged_in()) {
       // this method gotta be efficient, cuz its loaded on every page, avoid doing unnecessary work
-      $submit = sanitize_text_field($_POST['submit']); // immediately sanitized
-      $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
+      $submit = sanitize_text_field(wp_unslash($_POST['submit'])); // immediately sanitized
+      $shortcode = sanitize_text_field(wp_unslash($_POST['shortcode'])); // immediately sanitized
       $login_type = $this->validate_loginid_field($shortcode); // validate input
       if ($login_type !== false) {
-        $this->email = sanitize_email($_POST['email']);
-        $this->username = sanitize_text_field(isset($_POST['username']) ? $_POST['username'] : '');
-        $this->optin = sanitize_text_field(isset($_POST['opt-in']) ? $_POST['opt-in'] : '');
+        $this->email = sanitize_email(wp_unslash(isset($_POST['email']) ? $_POST['email'] : ''));
+        $this->username = sanitize_text_field(wp_unslash(isset($_POST['username']) ? $_POST['username'] : ''));
+        $this->optin = sanitize_text_field(wp_unslash(isset($_POST['opt-in']) ? $_POST['opt-in'] : ''));
 
         // we have login type as register or login
         if ($submit === $login_type) {
@@ -636,7 +636,7 @@ class LoginID_DirectWeb
           // never trust the front end xd
 
           // from this point on we are good to go
-          $this->password = isset($_POST['password']) ? esc_attr(sanitize_text_field($_POST['password'])) : null;
+          $this->password = isset($_POST['password']) ? esc_attr(sanitize_text_field(wp_unslash($_POST['password']))) : null;
 
           // this generates errors if input is invalid, also merges them into this->wp_error
           $this->wp_errors = $this->wp_error_merge($this->wp_errors, $this->validate_email($login_type), $login_type === LoginID_Operation::Register ? $this->validate_username() : null);
@@ -649,8 +649,8 @@ class LoginID_DirectWeb
 
           if ($this->contains_no_errors()) {
             // this means that username and email validation just passed
-            $fido2_support = isset($_POST['fido2']) ? sanitize_text_field($_POST['fido2']) : null;
-            $loginid_data = isset($_POST['loginid']) ? sanitize_text_field($_POST['loginid']) : null;
+            $fido2_support = isset($_POST['fido2']) ? sanitize_text_field(wp_unslash($_POST['fido2'])) : null;
+            $loginid_data = isset($_POST['loginid']) ? sanitize_text_field(wp_unslash($_POST['loginid'])) : null;
 
             // now we need to figure out if we doing loginid login, password login or awaiting loginid direct web.
             if (isset($loginid_data)) {
@@ -800,24 +800,24 @@ class LoginID_DirectWeb
   protected function render_form($type = LoginID_Operation::Login)
   {
 ?>
-    <form id="<?php echo "__loginid_{$type}_form" ?>" method="POST" class="loginid-auth-form">
+    <form id="<?php echo esc_attr("__loginid_{$type}_form") ?>" method="POST" class="loginid-auth-form">
       <div class="loginid-auth-form-row">
         <label class="loginid-auth-form-label" for="email">Email <strong>*</strong></label>
-        <input class="loginid-auth-form-input" id="__loginid_input_email" type="text" name="email" value="<?php echo $this->email ?>">
+        <input class="loginid-auth-form-input" id="__loginid_input_email" type="text" name="email" value="<?php echo esc_attr($this->email) ?>">
       </div>
       <?php
       if ($type === LoginID_Operation::Register) {
       ?>
         <div class="loginid-auth-form-row">
           <label class="loginid-auth-form-label" for="username">Username <strong>*</strong></label>
-          <input class="loginid-auth-form-input" id="__loginid_input_username" type="text" name="username" value="<?php echo  $this->username ?>">
+          <input class="loginid-auth-form-input" id="__loginid_input_username" type="text" name="username" value="<?php echo esc_attr($this->username) ?>">
         </div>
       <?php
       }
       ?>
       <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) && ($type === LoginID_Operation::Login) ? 'class="__loginid_hide-password loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
         <label class="loginid-auth-form-label" for="password">Password <strong>*</strong></label>
-        <input class="loginid-auth-form-input" id="__loginid_input_password" type="password" name="password" value="<?php echo $this->password ?>">
+        <input class="loginid-auth-form-input" id="__loginid_input_password" type="password" name="password" value="<?php echo esc_attr($this->password) ?>">
       </div>
       <?php
       if ($type === LoginID_Operation::Register) {
@@ -844,7 +844,7 @@ class LoginID_DirectWeb
               Opt in for passwordless authentication. <br />
               When enabled, you can login using your biometrics instead of password.
             </div>
-            <input class="toggle-checkbox" name="optin" type="checkbox" style="display: none;" id="__loginid_register-passwordless-opt-in" checked="<?php echo $this->optin ?>">
+            <input class="toggle-checkbox" name="optin" type="checkbox" style="display: none;" id="__loginid_register-passwordless-opt-in" checked="<?php echo esc_attr($this->optin) ?>">
             <div class="toggle-switch" style="flex-shrink: 0;"></div>
           </label>
         </div>
@@ -852,7 +852,7 @@ class LoginID_DirectWeb
       }
       ?>
       <div class="loginid-submit-row">
-        <input class="loginid-auth-form-submit" type="submit" name="submit" value="<?php echo $this->javascript_unsupported ? $type : LoginID_Operation::Next ?>" id="__loginid_submit_button" />
+        <input class="loginid-auth-form-submit" type="submit" name="submit" value="<?php echo esc_attr($this->javascript_unsupported ? $type : LoginID_Operation::Next) ?>" id="__loginid_submit_button" />
         <?php
         if ($type === LoginID_Operation::Login) {
         ?>
@@ -861,14 +861,16 @@ class LoginID_DirectWeb
         }
         ?>
       </div>
-      <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo LoginID_DirectWeb::ShortCodes[$type] ?>">
+      <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo esc_attr(LoginID_DirectWeb::ShortCodes[$type]) ?>">
       <?php if ($this->release_the_fido && isset($this->email)) {
         $settings = loginid_dw_get_settings();
       ?>
-        <input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo $type === LoginID_Operation::Login ? $this->login_user_udata : $this->generate_hashed_string($this->email) ?>">
-        <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo $settings['base_url'] ?>">
-        <input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo $settings['api_key'] ?>">
-      <?php } ?>
+        <input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo esc_attr($type === LoginID_Operation::Login ? $this->login_user_udata : $this->generate_hashed_string($this->email)) ?>">
+        <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo esc_attr($settings['base_url']) ?>">
+        <input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo esc_attr($settings['api_key']) ?>">
+      <?php }
+      wp_nonce_field('loginid_dw_auth_field')
+      ?>
     </form>
     <?php
   }
@@ -902,7 +904,7 @@ class LoginID_DirectWeb
   protected function render_error($error)
   {
     echo '<div class="__loginid-error-style">';
-    echo $error;
+    echo esc_html($error);
     echo '</div>';
   }
 
@@ -914,36 +916,38 @@ class LoginID_DirectWeb
    */
   public function render_banner()
   {
-    $bannerStatus = sanitize_text_field(isset($_REQUEST['__loginid_status']) ? $_REQUEST['__loginid_status'] : '');
-    $definitions = array(
-      'success' => array(
-        'msg' => 'Successfully created account with biometrics enabled',
-        'color' => '#155724', 'bgc' => '#d4edda'
-      ),
-      'failure' => array(
-        'msg' => 'Successfully created account, however, biometrics verification failed. Biometrics will not be enabled. You can trying again using your user profile settings.',
-        'color' => '#721c24', 'bgc' => '#f8d7da'
-      ),
-      'unsupported' => array(
-        'msg' => 'Successfully created account, however, your browser or device does not support FIDO2 authentication. You can try again using the user profile settings on another device. Or check out a list of supported devices here.',
-        'color' => '#721c24', 'bgc' => '#f8d7da'
-      )
-    );
+    if (isset($_REQUEST['__loginid_n']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['__loginid_n'])), 'loginid_dw_banner')) {
+      $bannerStatus = sanitize_text_field(isset($_REQUEST['__loginid_status']) ? wp_unslash($_REQUEST['__loginid_status']) : '');
+      $definitions = array(
+        'success' => array(
+          'msg' => 'Successfully created account with biometrics enabled',
+          'color' => '#155724', 'bgc' => '#d4edda'
+        ),
+        'failure' => array(
+          'msg' => 'Successfully created account, however, biometrics verification failed. Biometrics will not be enabled. You can trying again using your user profile settings.',
+          'color' => '#721c24', 'bgc' => '#f8d7da'
+        ),
+        'unsupported' => array(
+          'msg' => 'Successfully created account, however, your browser or device does not support FIDO2 authentication. You can try again using the user profile settings on another device. Or check out a list of supported devices here.',
+          'color' => '#721c24', 'bgc' => '#f8d7da'
+        )
+      );
 
-    if (array_key_exists($bannerStatus, $definitions)) {
+      if (array_key_exists($bannerStatus, $definitions)) {
     ?>
-      <div id="__loginid_notification_header" <?php echo 'style="position: absolute; top: 0; left: 0; right: 0; padding: 20px; z-index: 99999; display: flex; align-items: center; gap: 20px; background-color: ' . $definitions[$bannerStatus]['bgc'] . '; color: ' . $definitions[$bannerStatus]['color'] . ';"' ?>>
-        <div style="flex-grow: 1">
-          <?php echo $definitions[$bannerStatus]['msg'] ?>
+        <div id="__loginid_notification_header" <?php echo esc_html('style="position: absolute; top: 0; left: 0; right: 0; padding: 20px; z-index: 99999; display: flex; align-items: center; gap: 20px; background-color: ' . $definitions[$bannerStatus]['bgc'] . '; color: ' . $definitions[$bannerStatus]['color'] . ';"') ?>>
+          <div style="flex-grow: 1">
+            <?php echo esc_html($definitions[$bannerStatus]['msg']) ?>
+          </div>
+          <button id="__loginid_notification_close" style="flex-shrink: 0;">close</button>
+          <script>
+            document.getElementById("__loginid_notification_close").addEventListener('click', () => {
+              document.getElementById("__loginid_notification_header").style.display = 'None'
+            })
+          </script>
         </div>
-        <button id="__loginid_notification_close" style="flex-shrink: 0;">close</button>
-        <script>
-          document.getElementById("__loginid_notification_close").addEventListener('click', () => {
-            document.getElementById("__loginid_notification_header").style.display = 'None'
-          })
-        </script>
-      </div>
 <?php
+      }
     }
   }
 
@@ -959,8 +963,8 @@ class LoginID_DirectWeb
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
       // make sure to only output error in the correct section, in case both login and register is in the same page
-      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $shortcode = sanitize_text_field($_POST['shortcode']); // immediately sanitized
+      if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['shortcode']) && check_admin_referer('loginid_dw_auth_field')) {
+        $shortcode = sanitize_text_field(wp_unslash($_POST['shortcode'])); // immediately sanitized
         $login_type = $this->validate_loginid_field($shortcode); // validate input
         if ($login_type !== false && $type === $login_type) {
           $this->output_wp_errors();
@@ -1085,7 +1089,7 @@ class LoginID_DirectWeb
   {
     wp_set_current_user($user_id);
     wp_set_auth_cookie($user_id);
-    wp_redirect(home_url() . '?__loginid_status=' . (string)($this->redirect_message));
+    wp_safe_redirect(home_url() . '?__loginid_n=' . wp_create_nonce('loginid_dw_banner') . '&__loginid_status=' . (string)($this->redirect_message));
     exit();
   }
 }
