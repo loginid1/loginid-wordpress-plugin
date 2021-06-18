@@ -26,6 +26,9 @@ Security:
 
 For more information on how the DirectWeb plugin works, please view our [documentation](https://docs.loginid.io).
 
+**Tell us how we’re doing.**
+Have the plugin in production? Tell us about your site on [marketing@loginid.io](marketing@loginid.io) and we’ll post on our social channels!
+
 == Installation ==
 
 1. Upload to the `/wp-content/plugins/` directory.
