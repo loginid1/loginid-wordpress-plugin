@@ -16,6 +16,9 @@ FIDO-certified strong authentication in 5 clicks.  Go passwordless and eliminate
 LoginID’s DirectWeb Plugin enables your WordPress application’s end users to register and authenticate through highly secure **FIDO-certified** public key cryptography instead of a password.
 
 **Benefits:**
+Privacy:
+  – Biometric information never leaves your device (based on FIDO principals), not stored in the cloud
+  - no tracking of customers
 Convenience: 
   - Eliminate the need for your users to enter a password when they log in to your website.
   - Reduce your user abandonment rates by making transactions as seamless as possible.
