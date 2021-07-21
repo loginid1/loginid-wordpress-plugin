@@ -138,6 +138,7 @@ class LoginID_DirectWeb
   protected $user_id;
   private $validated_jwt_body;
   private $login_user_udata;
+  private $current_auth_type; // flag what is currently being processed
 
   /**
    * constructor, basically sets default flags
@@ -625,6 +626,7 @@ class LoginID_DirectWeb
       $submit = sanitize_text_field(wp_unslash($_POST['submit'])); // immediately sanitized
       $shortcode = sanitize_text_field(wp_unslash($_POST['shortcode'])); // immediately sanitized
       $login_type = $this->validate_loginid_field($shortcode); // validate input
+
       if ($login_type !== false) {
         $this->email = sanitize_email(wp_unslash(isset($_POST['email']) ? $_POST['email'] : ''));
         $this->username = sanitize_text_field(wp_unslash(isset($_POST['username']) ? $_POST['username'] : ''));
@@ -634,6 +636,8 @@ class LoginID_DirectWeb
         if ($submit === $login_type) {
           // the submit should return the correct submission type or else something went wrong on the front end;
           // never trust the front end xd
+
+          $this->current_auth_type = $login_type;
 
           // from this point on we are good to go
           $this->password = isset($_POST['password']) ? esc_attr(sanitize_text_field(wp_unslash($_POST['password']))) : null;
@@ -700,7 +704,6 @@ class LoginID_DirectWeb
               $this->authenticate(LoginID_Operation::Register, LoginID_Strategy::Password);
               $this->redirect_message = 'unsupported';
             } else {
-              // something gone really wrong
               $this->wp_errors->add(LoginID_Errors::CriticalError[LoginID_Error::Code], LoginID_Errors::VersionMismatch[LoginID_Error::Message]);
             }
           } else {
@@ -803,21 +806,21 @@ class LoginID_DirectWeb
     <form id="<?php echo esc_attr("__loginid_{$type}_form") ?>" method="POST" class="loginid-auth-form">
       <div class="loginid-auth-form-row">
         <label class="loginid-auth-form-label" for="email">Email <strong>*</strong></label>
-        <input class="loginid-auth-form-input" id="__loginid_input_email" type="text" name="email" value="<?php echo esc_attr($this->email) ?>">
+        <input class="loginid-auth-form-input" id="__loginid_input_email_<?php echo esc_attr($type)?>" type="text" name="email" value="<?php echo esc_attr($this->email) ?>">
       </div>
       <?php
       if ($type === LoginID_Operation::Register) {
       ?>
         <div class="loginid-auth-form-row">
           <label class="loginid-auth-form-label" for="username">Username <strong>*</strong></label>
-          <input class="loginid-auth-form-input" id="__loginid_input_username" type="text" name="username" value="<?php echo esc_attr($this->username) ?>">
+          <input class="loginid-auth-form-input" id="__loginid_input_username_<?php echo esc_attr($type)?>" type="text" name="username" value="<?php echo esc_attr($this->username) ?>">
         </div>
       <?php
       }
       ?>
       <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) && ($type === LoginID_Operation::Login) ? 'class="__loginid_hide-password loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
         <label class="loginid-auth-form-label" for="password">Password <strong>*</strong></label>
-        <input class="loginid-auth-form-input" id="__loginid_input_password" type="password" name="password" value="<?php echo esc_attr($this->password) ?>">
+        <input class="loginid-auth-form-input" id="__loginid_input_password_<?php echo esc_attr($type)?>" type="password" name="password" value="<?php echo esc_attr($this->password) ?>">
       </div>
       <?php
       if ($type === LoginID_Operation::Register) {
@@ -852,7 +855,7 @@ class LoginID_DirectWeb
       }
       ?>
       <div class="loginid-submit-row">
-        <input class="loginid-auth-form-submit" type="submit" name="submit" value="<?php echo esc_attr($this->javascript_unsupported ? $type : LoginID_Operation::Next) ?>" id="__loginid_submit_button" />
+        <input class="loginid-auth-form-submit" type="submit" name="submit" value="<?php echo esc_attr($this->javascript_unsupported ? $type : LoginID_Operation::Next) ?>" id="__loginid_submit_button_<?php echo esc_attr($type)?>" />
         <?php
         if ($type === LoginID_Operation::Login) {
         ?>
@@ -861,14 +864,14 @@ class LoginID_DirectWeb
         }
         ?>
       </div>
-      <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo esc_attr(LoginID_DirectWeb::ShortCodes[$type]) ?>">
-      <input type="hidden" readonly name="_wpnonce" id="__loginid_input_nonce" value="<?php echo esc_attr(wp_create_nonce('loginid_dw_auth_field')) ?>">
-      <?php if ($this->release_the_fido && isset($this->email)) {
+      <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode_<?php echo esc_attr($type)?>" value="<?php echo esc_attr(LoginID_DirectWeb::ShortCodes[$type]) ?>">
+      <input type="hidden" readonly name="_wpnonce" id="__loginid_input_nonce_<?php echo esc_attr($type)?>" value="<?php echo esc_attr(wp_create_nonce('loginid_dw_auth_field')) ?>">
+      <?php if ($this->release_the_fido && isset($this->email) && $type === $this->current_auth_type) {
         $settings = loginid_dw_get_settings();
       ?>
-        <input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo esc_attr($type === LoginID_Operation::Login ? $this->login_user_udata : $this->generate_hashed_string($this->email)) ?>">
-        <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo esc_attr($settings['base_url']) ?>">
-        <input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo esc_attr($settings['api_key']) ?>">
+        <input type="hidden" disabled name="udata" id="__loginid_input_udata_<?php echo esc_attr($type)?>" value="<?php echo esc_attr($type === LoginID_Operation::Login ? $this->login_user_udata : $this->generate_hashed_string($this->email)) ?>">
+        <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl_<?php echo esc_attr($type)?>" value="<?php echo esc_attr($settings['base_url']) ?>">
+        <input type="hidden" disabled name="apikey" id="__loginid_input_apikey_<?php echo esc_attr($type)?>" value="<?php echo esc_attr($settings['api_key']) ?>">
       <?php }
       ?>
     </form>

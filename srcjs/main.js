@@ -21,40 +21,40 @@ const __loginidAuth = Object.freeze({
  *
  * @param url url in string
  * @param method method in string, POST GET or whatever
- * @param authType 'login' or 'register' use __loginidAuth.LOGIN or __loginidAuth.REGISTER
+ * @param type 'login' or 'register' use __loginidAuth.LOGIN or __loginidAuth.REGISTER
  * @param {[k: string]: {value: string, element: string}} additionalPayload additional object, optional.
  */
 async function __loginidOnAuthenticate(
   url,
   method,
-  authType,
+  type,
   additionalPayload = {}
 ) {
-  const password = document.getElementById("__loginid_input_password").value;
+  const password = document.getElementById(`__loginid_input_password_${type}`).value;
   const isFido2Supported = await __loginidIsFido2Supported();
 
   const payload = {
     email: {
-      value: document.getElementById("__loginid_input_email").value,
+      value: document.getElementById(`__loginid_input_email_${type}`).value,
       element: document.createElement("input"),
     },
     submit: {
-      value: authType,
+      value: type,
       element: document.createElement("input"),
     },
     shortcode: {
-      value: document.getElementById("__loginid_input_shortcode").value,
+      value: document.getElementById(`__loginid_input_shortcode_${type}`).value,
       element: document.createElement("input"),
     },
     _wpnonce: {
-      value: document.getElementById("__loginid_input_nonce").value,
+      value: document.getElementById(`__loginid_input_nonce_${type}`).value,
       element: document.createElement("input"),
     },
     ...additionalPayload,
   };
 
-  if (authType === __loginidAuth.REGISTER) {
-    const username = document.getElementById("__loginid_input_username").value;
+  if (type === __loginidAuth.REGISTER) {
+    const username = document.getElementById(`__loginid_input_username_${type}`).value;
     payload["username"] = {
       value: username,
       element: document.createElement("input"),
@@ -91,7 +91,7 @@ async function __loginidOnAuthenticate(
       "__loginid_hide-password"
     );
     document.getElementById("__loginid_submit_button").value =
-      String(authType).charAt(0).toUpperCase() + String(authType).slice(1);
+      String(type).charAt(0).toUpperCase() + String(type).slice(1);
     return;
   }
 
@@ -127,15 +127,15 @@ function __loginidIsDefined(domObject) {
  */
 async function __loginidOnPageLoaded(type) {
   // function assumes register from exists
-  const udataInput = document.getElementById("__loginid_input_udata");
-  const baseURLInput = document.getElementById("__loginid_input_baseurl");
-  const apiKeyInput = document.getElementById("__loginid_input_apikey");
+  const udataInput = document.getElementById(`__loginid_input_udata_${type}`);
+  const baseURLInput = document.getElementById(`__loginid_input_baseurl_${type}`);
+  const apiKeyInput = document.getElementById(`__loginid_input_apikey_${type}`);
 
   if (
     __loginidIsDefined(baseURLInput) &&
     __loginidIsDefined(apiKeyInput) &&
     __loginidIsDefined(udataInput)
-  ) {
+    ) {
     // this page has been approved for fido2 authentication
     const baseURL = baseURLInput.value;
     const apiKey = apiKeyInput.value;
@@ -242,18 +242,9 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
   }
 }
 
-// self calling function here to trigger onRegisterPageLoaded()
-(function () {
-  const registerForm = document.getElementById("__loginid_register_form");
-  const loginForm = document.getElementById("__loginid_login_form");
-  let type = __loginidIsDefined(registerForm)
-    ? __loginidAuth.REGISTER
-    : __loginidIsDefined(loginForm)
-    ? __loginidAuth.LOGIN
-    : false;
-
+function __loginidPerformInitialization(type) {
   if (type) {
-    document.getElementById("__loginid_submit_button").value = ((type) => {
+    document.getElementById(`__loginid_submit_button_${type}`).value = ((type) => {
       if (type === __loginidAuth.REGISTER) {
         return "Register";
       } else {
@@ -271,6 +262,7 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
           type
         );
       });
+      
     __loginidOnPageLoaded(type);
     const usePasswordLink = document.getElementById(
       "__loginid_use_password_instead"
@@ -290,6 +282,21 @@ async function __loginidOnProfilePageRemoveAuthenticator() {
       });
     }
   }
+}
+
+// self calling function here to trigger onRegisterPageLoaded()
+(function () {
+  const registerForm = document.getElementById("__loginid_register_form");
+  const loginForm = document.getElementById("__loginid_login_form");
+
+  if(__loginidIsDefined(registerForm)) {
+    __loginidPerformInitialization( __loginidAuth.REGISTER)
+  }
+
+  if(__loginidIsDefined(loginForm)) {
+    __loginidPerformInitialization( __loginidAuth.LOGIN)
+  }
+
 
   const useAnAuthenticatorOnThisDevice = document.getElementById(
     "__loginid_use_an_authenticator_on_this_device"
