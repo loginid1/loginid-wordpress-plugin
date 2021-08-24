@@ -1,7 +1,7 @@
 === FIDO-certified Passwordless biometric login ===
 Contributors: loginidauth
 Donate link: https://loginid.io
-Tags: Authentication, Security, Oauth-2.0, Identity, Biometrics, Touch-id, Webauthn, Passwordless, Fido2, Fido, Passwordless login, Fido certified, Uaf
+Tags: Authentication, OAuth 2.0, Security, Multifactor Authentication, FIDO, FIDO2, PSD2, Biometrics, Strong Customer Authentication, Fraud Prevention
 Requires at least: 5.4
 Tested up to: 5.7
 Stable tag: 1.0.14
@@ -13,19 +13,19 @@ FIDO-certified strong authentication in 5 clicks.  Go passwordless and eliminate
 
 == Description ==
 
-LoginID’s DirectWeb Plugin enables your WordPress application’s end users to register and authenticate through highly secure **FIDO-certified** public key cryptography instead of a password.
+LoginID’s DirectWeb Plugin enables your WordPress application’s end users  to utilize FIDO/FIDO2 certified strong customer authentication, including the ability to provide more sensitive operations such as credential management. By leveraging the end user’s existing device biometrics you can quickly integrate multi-factor authentication into your site. Our service is aligned with PSD2, GDPR, CCPA, and HIPPA.
 
 **Benefits:**
 Privacy:
-  – Biometric information never leaves your device (based on FIDO principals), not stored in the cloud
-  - no tracking of customers
+  – Biometric information never leaves your device (based on FIDO/FIDO2 principles), not stored in the cloud.
+  - No tracking of customers.
 Convenience: 
-  - Eliminate the need for your users to enter a password when they log in to your website.
+  - Eliminate the need for your users to enter a password when they log in to your website from their primary device.
   - Reduce your user abandonment rates by making transactions as seamless as possible.
 Compliance: 
-  - FIDO is aligned with the GDPR and PSD2 principals around the use of strong authentication
+  - FIDO/FIDO2 is aligned with the GDPR and PSD2 principals around the use of strong authentication.
 Security:
-  - Boost your website’s security through the use of multifactor authentication by replacing vulnerable static username/password credentials with strong public/private key credentials.  
+  - Boost your website’s security through the use of multifactor authentication with strong public/private key credentials.
 
 For more information on how the DirectWeb plugin works, please view our [documentation](https://docs.loginid.io).
 
