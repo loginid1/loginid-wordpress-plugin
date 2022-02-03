@@ -1,12 +1,10 @@
 import "core-js/features/promise"; // needed for babel compile
 import "regenerator-runtime/runtime"; // needed for babel compile
-
-import DirectWeb from "./loginid.direct_web.min.js";
-import Browser from "./loginid.browser.min.js";
+import WebSDK from "@loginid/sdk";
 
 async function __loginidIsFido2Supported() {
   try {
-    return await Browser.isFido2Supported();
+    return await (new WebSDK()).isFido2Supported();
   } catch (error) {
     return false;
   }
@@ -142,7 +140,7 @@ async function __loginidOnPageLoaded(type) {
     const udata = udataInput.value;
     let result;
     try {
-      const sdk = new DirectWeb(baseURL, apiKey);
+      const sdk = new WebSDK(baseURL, apiKey);
 
       result = await sdk[type](udata);
       // localStorage.setItem('response', JSON.stringify(result));
@@ -190,7 +188,7 @@ async function __loginidOnProfilePageAddAuthenticator() {
       const nonce = nonceInput.value;
       let result;
       try {
-        const sdk = new DirectWeb(baseURL, apiKey);
+        const sdk = new WebSDK(baseURL, apiKey);
         result = await sdk.register(udata);
       } catch ({ name, message, code, errs }) {
         result = { error: { name, message, code, errs } };
