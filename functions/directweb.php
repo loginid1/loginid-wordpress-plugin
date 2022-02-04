@@ -1136,7 +1136,7 @@ class LoginID_DirectWeb
 
     $redirect_message = $this->redirect_message !== '' ? ('?__loginid_status=' . $this->redirect_message) : '';
 
-    wp_safe_redirect($baseUrl . $redirect_message);
+    wp_safe_redirect($base_url . $redirect_message);
     exit();
   }
 }
