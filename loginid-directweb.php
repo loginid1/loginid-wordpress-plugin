@@ -102,18 +102,10 @@ function loginid_dw_plugin_support_faq_links($links_array, $plugin_file_name, $p
 add_filter('plugin_row_meta', 'loginid_dw_plugin_support_faq_links', 10, 4);
 
 
-
-/**
- *  
- *  If woo commerce exists mount hook to alternative way to obtain template from this plugin.
- */
-// if (class_exists('woocommerce')) {
-  add_filter('woocommerce_locate_template', 'loginid_dw_plugin_woo_addon_plugin_template', 1, 3);
-// }
-
 /**
  * makes woo commerce check this plugin directory for templates first
  * source: https://wisdmlabs.com/blog/override-woocommerce-templates-plugin/
+ * 
  */
 function loginid_dw_plugin_woo_addon_plugin_template($template, $template_name, $template_path)
 {

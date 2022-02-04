@@ -125,6 +125,8 @@ class LoginID_DirectWeb
     add_shortcode(self::ShortCodes[LoginID_Operation::Register], array($self, 'registration_shortcode'));
     add_shortcode(self::ShortCodes[LoginID_Operation::Login], array($self, 'login_shortcode'));
     add_shortcode(self::ShortCodes['settings'], array($self, 'settings_shortcode'));
+
+    $self->add_woo_hook();
   }
 
   protected $release_the_fido; //whether or not to release loginid direct web information for directweb login
@@ -166,6 +168,20 @@ class LoginID_DirectWeb
     $this->login_user_udata = '';
 
     $this->validated_jwt_body = null;
+  }
+
+
+  /**
+   *  If settings enabled, then add woo commerce template override from this plugin
+   * 
+   * @since 1.0.15
+   */
+  public function add_woo_hook()
+  {
+    $settings = loginid_dw_get_settings();
+    if ($settings['enable_woo_integration']) {
+      add_filter('woocommerce_locate_template', 'loginid_dw_plugin_woo_addon_plugin_template', 1, 3);
+    }
   }
 
   /**
@@ -1090,11 +1106,21 @@ class LoginID_DirectWeb
     wp_set_current_user($user_id);
     wp_set_auth_cookie($user_id);
 
+    $this->redirect();
+  }
+
+  /** 
+   * redirects user
+   * 
+   * @since 1.0.15
+   */
+  protected function redirect()
+  {
     $referer = wp_get_referer();
     if ($referer === false) {
-      $baseUrl = home_url() . wp_unslash($_SERVER['REQUEST_URI']);
+      $base_url = home_url() . wp_unslash($_SERVER['REQUEST_URI']);
     } else {
-      $baseUrl = $referer;
+      $base_url = $referer;
     }
 
     $redirect_message = $this->redirect_message !== '' ? ('?__loginid_status=' . $this->redirect_message) : '';
