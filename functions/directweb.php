@@ -125,6 +125,8 @@ class LoginID_DirectWeb
     add_shortcode(self::ShortCodes[LoginID_Operation::Register], array($self, 'registration_shortcode'));
     add_shortcode(self::ShortCodes[LoginID_Operation::Login], array($self, 'login_shortcode'));
     add_shortcode(self::ShortCodes['settings'], array($self, 'settings_shortcode'));
+
+    $self->add_woo_hook();
   }
 
   protected $release_the_fido; //whether or not to release loginid direct web information for directweb login
@@ -138,6 +140,7 @@ class LoginID_DirectWeb
   protected $user_id;
   private $validated_jwt_body;
   private $login_user_udata;
+  private $current_auth_type; // flag what is currently being processed
 
   /**
    * constructor, basically sets default flags
@@ -165,6 +168,20 @@ class LoginID_DirectWeb
     $this->login_user_udata = '';
 
     $this->validated_jwt_body = null;
+  }
+
+
+  /**
+   *  If settings enabled, then add woo commerce template override from this plugin
+   * 
+   * @since 1.0.15
+   */
+  public function add_woo_hook()
+  {
+    $settings = loginid_dw_get_settings();
+    if ($settings['enable_woo_integration']) {
+      add_filter('woocommerce_locate_template', 'loginid_dw_plugin_woo_addon_plugin_template', 1, 3);
+    }
   }
 
   /**
@@ -625,6 +642,7 @@ class LoginID_DirectWeb
       $submit = sanitize_text_field(wp_unslash($_POST['submit'])); // immediately sanitized
       $shortcode = sanitize_text_field(wp_unslash($_POST['shortcode'])); // immediately sanitized
       $login_type = $this->validate_loginid_field($shortcode); // validate input
+
       if ($login_type !== false) {
         $this->email = sanitize_email(wp_unslash(isset($_POST['email']) ? $_POST['email'] : ''));
         $this->username = sanitize_text_field(wp_unslash(isset($_POST['username']) ? $_POST['username'] : ''));
@@ -634,6 +652,8 @@ class LoginID_DirectWeb
         if ($submit === $login_type) {
           // the submit should return the correct submission type or else something went wrong on the front end;
           // never trust the front end xd
+
+          $this->current_auth_type = $login_type;
 
           // from this point on we are good to go
           $this->password = isset($_POST['password']) ? esc_attr(sanitize_text_field(wp_unslash($_POST['password']))) : null;
@@ -700,7 +720,6 @@ class LoginID_DirectWeb
               $this->authenticate(LoginID_Operation::Register, LoginID_Strategy::Password);
               $this->redirect_message = 'unsupported';
             } else {
-              // something gone really wrong
               $this->wp_errors->add(LoginID_Errors::CriticalError[LoginID_Error::Code], LoginID_Errors::VersionMismatch[LoginID_Error::Message]);
             }
           } else {
@@ -797,27 +816,38 @@ class LoginID_DirectWeb
    * @since 0.1.0
    * @param string $type, basically 'login' or 'register'
    */
-  protected function render_form($type = LoginID_Operation::Login)
+  protected function render_form($type = LoginID_Operation::Login, $attrs = [], $tag = '')
   {
+    // normalize attribute keys, lowercase
+    $attrs = array_change_key_case((array) $attrs, CASE_LOWER);
+
+    $parsed_attrs = shortcode_atts(
+      array(
+        'hidden' => "false",
+      ),
+      $attrs,
+      $tag
+    )
+
 ?>
-    <form id="<?php echo esc_attr("__loginid_{$type}_form") ?>" method="POST" class="loginid-auth-form">
+    <form id="<?php echo esc_attr("__loginid_{$type}_form") ?>" method="POST" class="loginid-auth-form <?php echo $type === LoginID_Operation::Register ? 'register' : 'login' ?>" <?php echo $parsed_attrs['hidden'] === 'true' ? 'hidden="true"' : '' ?>>
       <div class="loginid-auth-form-row">
         <label class="loginid-auth-form-label" for="email">Email <strong>*</strong></label>
-        <input class="loginid-auth-form-input" id="__loginid_input_email" type="text" name="email" value="<?php echo esc_attr($this->email) ?>">
+        <input class="input-text loginid-auth-form-input" id="__loginid_input_email_<?php echo esc_attr($type) ?>" type="text" name="email" value="<?php echo esc_attr($this->email) ?>">
       </div>
       <?php
       if ($type === LoginID_Operation::Register) {
       ?>
         <div class="loginid-auth-form-row">
           <label class="loginid-auth-form-label" for="username">Username <strong>*</strong></label>
-          <input class="loginid-auth-form-input" id="__loginid_input_username" type="text" name="username" value="<?php echo esc_attr($this->username) ?>">
+          <input class="input-text loginid-auth-form-input" id="__loginid_input_username_<?php echo esc_attr($type) ?>" type="text" name="username" value="<?php echo esc_attr($this->username) ?>">
         </div>
       <?php
       }
       ?>
       <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) && ($type === LoginID_Operation::Login) ? 'class="__loginid_hide-password loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
         <label class="loginid-auth-form-label" for="password">Password <strong>*</strong></label>
-        <input class="loginid-auth-form-input" id="__loginid_input_password" type="password" name="password" value="<?php echo esc_attr($this->password) ?>">
+        <input class="input-text loginid-auth-form-input" id="__loginid_input_password_<?php echo esc_attr($type) ?>" type="password" name="password" value="<?php echo esc_attr($this->password) ?>">
       </div>
       <?php
       if ($type === LoginID_Operation::Register) {
@@ -852,7 +882,7 @@ class LoginID_DirectWeb
       }
       ?>
       <div class="loginid-submit-row">
-        <input class="loginid-auth-form-submit" type="submit" name="submit" value="<?php echo esc_attr($this->javascript_unsupported ? $type : LoginID_Operation::Next) ?>" id="__loginid_submit_button" />
+        <input class="loginid-auth-form-submit" type="submit" name="submit" value="<?php echo esc_attr($this->javascript_unsupported ? $type : LoginID_Operation::Next) ?>" id="__loginid_submit_button_<?php echo esc_attr($type) ?>" />
         <?php
         if ($type === LoginID_Operation::Login) {
         ?>
@@ -861,14 +891,14 @@ class LoginID_DirectWeb
         }
         ?>
       </div>
-      <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode" value="<?php echo esc_attr(LoginID_DirectWeb::ShortCodes[$type]) ?>">
-      <input type="hidden" readonly name="_wpnonce" id="__loginid_input_nonce" value="<?php echo esc_attr(wp_create_nonce('loginid_dw_auth_field')) ?>">
-      <?php if ($this->release_the_fido && isset($this->email)) {
+      <input type="hidden" readonly name="shortcode" id="__loginid_input_shortcode_<?php echo esc_attr($type) ?>" value="<?php echo esc_attr(LoginID_DirectWeb::ShortCodes[$type]) ?>">
+      <input type="hidden" readonly name="_wpnonce" id="__loginid_input_nonce_<?php echo esc_attr($type) ?>" value="<?php echo esc_attr(wp_create_nonce('loginid_dw_auth_field')) ?>">
+      <?php if ($this->release_the_fido && isset($this->email) && $type === $this->current_auth_type) {
         $settings = loginid_dw_get_settings();
       ?>
-        <input type="hidden" disabled name="udata" id="__loginid_input_udata" value="<?php echo esc_attr($type === LoginID_Operation::Login ? $this->login_user_udata : $this->generate_hashed_string($this->email)) ?>">
-        <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl" value="<?php echo esc_attr($settings['base_url']) ?>">
-        <input type="hidden" disabled name="apikey" id="__loginid_input_apikey" value="<?php echo esc_attr($settings['api_key']) ?>">
+        <input type="hidden" disabled name="udata" id="__loginid_input_udata_<?php echo esc_attr($type) ?>" value="<?php echo esc_attr($type === LoginID_Operation::Login ? $this->login_user_udata : $this->generate_hashed_string($this->email)) ?>">
+        <input type="hidden" disabled name="baseurl" id="__loginid_input_baseurl_<?php echo esc_attr($type) ?>" value="<?php echo esc_attr($settings['base_url']) ?>">
+        <input type="hidden" disabled name="apikey" id="__loginid_input_apikey_<?php echo esc_attr($type) ?>" value="<?php echo esc_attr($settings['api_key']) ?>">
       <?php }
       ?>
     </form>
@@ -956,7 +986,7 @@ class LoginID_DirectWeb
    * @since 0.1.0
    * @param string $type, basically 'login' or 'register'
    */
-  public function render($type = LoginID_Operation::Login)
+  public function render($type = LoginID_Operation::Login, $attrs = [], $tag = '')
   {
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
@@ -970,7 +1000,7 @@ class LoginID_DirectWeb
       }
 
       // make sure to only output error in the correct section, in case both login and register is in the same page
-      $this->render_form($type);
+      $this->render_form($type, $attrs, $tag);
     }
   }
 
@@ -979,10 +1009,10 @@ class LoginID_DirectWeb
    * 
    * @since 0.1.0
    */
-  public function registration_shortcode()
+  public function registration_shortcode($attrs = [], $tag = '')
   {
     ob_start();
-    $this->render(LoginID_Operation::Register);
+    $this->render(LoginID_Operation::Register, $attrs, $tag);
     return ob_get_clean();
   }
 
@@ -991,10 +1021,10 @@ class LoginID_DirectWeb
    * 
    * @since 0.1.0
    */
-  public function login_shortcode()
+  public function login_shortcode($attrs = [], $tag = '')
   {
     ob_start();
-    $this->render(LoginID_Operation::Login); // defaults to login, but we set this for consistency
+    $this->render(LoginID_Operation::Login, $attrs, $tag); // defaults to login, but we set this for consistency
     return ob_get_clean();
   }
 
@@ -1077,7 +1107,6 @@ class LoginID_DirectWeb
     return !$this->contains_no_errors;
   }
 
-
   /** 
    * give user cookie to log them in, then redirect
    * 
@@ -1087,7 +1116,27 @@ class LoginID_DirectWeb
   {
     wp_set_current_user($user_id);
     wp_set_auth_cookie($user_id);
-    wp_safe_redirect(home_url() . '?__loginid_status=' . (string)($this->redirect_message));
+
+    $this->redirect();
+  }
+
+  /** 
+   * redirects user
+   * 
+   * @since 1.0.15
+   */
+  protected function redirect()
+  {
+    $referer = wp_get_referer();
+    if ($referer === false) {
+      $base_url = home_url() . wp_unslash($_SERVER['REQUEST_URI']);
+    } else {
+      $base_url = $referer;
+    }
+
+    $redirect_message = $this->redirect_message !== '' ? ('?__loginid_status=' . $this->redirect_message) : '';
+
+    wp_safe_redirect($base_url . $redirect_message);
     exit();
   }
 }
