@@ -21,13 +21,13 @@ if (!defined('ABSPATH')) exit;
  */
 function loginid_dw_add_menu_links()
 {
-	add_options_page(
-		__('LoginID DirectWeb', 'loginid-directweb'),
-		__('LoginID DirectWeb', 'loginid-directweb'),
-		'update_core', // super admin and administrator (single site)
-		'loginid-directweb',
-		'loginid_dw_admin_interface_render'
-	);
+  add_options_page(
+    __('LoginID DirectWeb', 'loginid-directweb'),
+    __('LoginID DirectWeb', 'loginid-directweb'),
+    'update_core', // super admin and administrator (single site)
+    'loginid-directweb',
+    'loginid_dw_admin_interface_render'
+  );
 }
 add_action('admin_menu', 'loginid_dw_add_menu_links');
 
@@ -39,40 +39,50 @@ add_action('admin_menu', 'loginid_dw_add_menu_links');
 function loginid_dw_register_settings()
 {
 
-	// Register Setting
-	register_setting(
-		'loginid_dw_settings_group', 			// Group name
-		'loginid_dw_settings', 					// Setting name = html form <input> name on settings form
-		'loginid_dw_validator_and_sanitizer'	// Input sanitizer
-	);
+  // Register Setting
+  register_setting(
+    'loginid_dw_settings_group',       // Group name
+    'loginid_dw_settings',           // Setting name = html form <input> name on settings form
+    'loginid_dw_validator_and_sanitizer'  // Input sanitizer
+  );
 
-	// Register A New Section
-	add_settings_section(
-		'loginid_dw_minimum_settings_section',							// ID
-		__('Configure the Plugin', 'loginid-directweb'),		// Title
-		'loginid_dw_minimum_settings_section_callback',					// Callback Function
-		'loginid-directweb'											// Page slug
-	);
+  // Register A New Section
+  add_settings_section(
+    'loginid_dw_minimum_settings_section',              // ID
+    __('Configure the Plugin', 'loginid-directweb'),    // Title
+    'loginid_dw_minimum_settings_section_callback',          // Callback Function
+    'loginid-directweb'                      // Page slug
+  );
 
-	// BaseURL
-	add_settings_field(
-		'loginid_dw_base_url_field',							// ID
-		__('Base URL', 'loginid-directweb'),					// Title
-		'loginid_dw_text_input_field_callback',					// Callback function
-		'loginid-directweb',											// Page slug
-		'loginid_dw_minimum_settings_section',							// Settings Section ID
-		array('base_url', 'This plugin will use the server at this URL to authenticate users. Obtain from ' . LOGINID_DIRECTWEB_LOGINID_ORIGIN . '/en/integration') //params to pass to callback
-	);
+  // BaseURL
+  add_settings_field(
+    'loginid_dw_base_url_field',              // ID
+    __('Base URL', 'loginid-directweb'),          // Title
+    'loginid_dw_text_input_field_callback',          // Callback function
+    'loginid-directweb',                      // Page slug
+    'loginid_dw_minimum_settings_section',              // Settings Section ID
+    array('base_url', 'This plugin will use the server at this URL to authenticate users. Obtain from <a href="' . LOGINID_DIRECTWEB_LOGINID_ORIGIN . '/en/integration" target="_blank">LoginID</a>') //params to pass to callback
+  );
 
-	// BaseURL
-	add_settings_field(
-		'loginid_dw_api_key_field',							// ID
-		__('API Key', 'loginid-directweb'),					// Title
-		'loginid_dw_text_input_field_callback',					// Callback function
-		'loginid-directweb',											// Page slug
-		'loginid_dw_minimum_settings_section',							// Settings Section ID
-		array('api_key', 'unique key obtained from ' . LOGINID_DIRECTWEB_LOGINID_ORIGIN . '/en/integration') //params to pass to callback
-	);
+  // BaseURL
+  add_settings_field(
+    'loginid_dw_api_key_field',              // ID
+    __('API Key', 'loginid-directweb'),          // Title
+    'loginid_dw_text_input_field_callback',          // Callback function
+    'loginid-directweb',                      // Page slug
+    'loginid_dw_minimum_settings_section',              // Settings Section ID
+    array('api_key', 'unique key obtained from <a href="' . LOGINID_DIRECTWEB_LOGINID_ORIGIN . '/en/integration" target="_blank">LoginID</a> ') //params to pass to callback
+  );
+
+  // enable woo commerce if available
+  add_settings_field(
+    'loginid_dw_enable_woo_integration_field',
+    __("Enable Woo Integration", "loginid-directweb"),
+    'loginid_dw_checkbox_input_field_callback',
+    'loginid-directweb',
+    'loginid_dw_minimum_settings_section',
+    array('enable_woo_integration', 'Enabling this option will override the my account page login/register flow and login at checkout flow for woo commerce')
+  );
 }
 add_action('admin_init', 'loginid_dw_register_settings');
 
@@ -83,15 +93,23 @@ add_action('admin_init', 'loginid_dw_register_settings');
  */
 function loginid_dw_validator_and_sanitizer($settings)
 {
-	// list of inputs that requires sanitation
-	$to_be_sanitized = array('base_url', 'api_key');
+  // list of inputs that requires sanitation
+  $to_be_sanitized = array('base_url', 'api_key');
 
-	foreach ($to_be_sanitized as $field) {
-		// Sanitize each text field
-		$settings[$field] = sanitize_text_field($settings[$field]);
-	}
+  foreach ($to_be_sanitized as $field) {
+    // Sanitize each text field
+    $settings[$field] = sanitize_text_field($settings[$field]);
+  }
 
-	return $settings;
+  $checkboxes_to_be_sanitized = array('enable_woo_integration');
+  foreach ($checkboxes_to_be_sanitized as $checkbox) {
+    // make sure the value is either 1 or doesn't exist
+    if (isset($settings[$checkbox])) {
+      $settings[$checkbox] = 1;
+    }
+  }
+
+  return $settings;
 }
 
 /**
@@ -104,14 +122,14 @@ function loginid_dw_validator_and_sanitizer($settings)
 function loginid_dw_get_settings()
 {
 
-	$defaults = array(
-		'base_url' 	=> '',
-		'api_key' 	=> '',
-	);
+  $defaults = array(
+    'base_url'   => '',
+    'api_key'   => '',
+  );
 
-	$settings = get_option('loginid_dw_settings', $defaults);
+  $settings = get_option('loginid_dw_settings', $defaults);
 
-	return $settings;
+  return $settings;
 }
 
 /**
@@ -122,17 +140,17 @@ function loginid_dw_get_settings()
 function loginid_dw_admin_enqueue_css_js($hook)
 {
 
-	if ($hook == "settings_page_loginid-directweb") {
-		// Load only on plugin options page
-		// main JS for settings page detection
-		wp_enqueue_script('loginid_dw-admin-settings-js', LOGINID_DIRECTWEB_URL . 'admin/css/main.js', '', LOGINID_DIRECTWEB_VERSION_NUM);
-		// Main CSS
-		wp_enqueue_style('loginid_dw-admin-main-css', LOGINID_DIRECTWEB_URL . 'admin/css/main.css', '', LOGINID_DIRECTWEB_VERSION_NUM);
-	}
-	if ($hook === "profile.php" || $hook === "user-edit.php") {
-		// main js processes loginid direct web api stuff
-		wp_enqueue_script('loginid_dw-admin-main-js', LOGINID_DIRECTWEB_URL . 'includes/main.js', array(), false, true);
-	}
+  if ($hook == "settings_page_loginid-directweb") {
+    // Load only on plugin options page
+    // main JS for settings page detection
+    wp_enqueue_script('loginid_dw-admin-settings-js', LOGINID_DIRECTWEB_URL . 'admin/css/main.js', '', LOGINID_DIRECTWEB_VERSION_NUM);
+    // Main CSS
+    wp_enqueue_style('loginid_dw-admin-main-css', LOGINID_DIRECTWEB_URL . 'admin/css/main.css', '', LOGINID_DIRECTWEB_VERSION_NUM);
+  }
+  if ($hook === "profile.php" || $hook === "user-edit.php") {
+    // main js processes loginid direct web api stuff
+    wp_enqueue_script('loginid_dw-admin-main-js', LOGINID_DIRECTWEB_URL . 'includes/main.js', array(), false, true);
+  }
 }
 add_action('admin_enqueue_scripts', 'loginid_dw_admin_enqueue_css_js');
 
@@ -143,30 +161,30 @@ add_action('admin_enqueue_scripts', 'loginid_dw_admin_enqueue_css_js');
  */
 function loginid_dw_generate_page()
 {
-	if (isset($_POST['_wpnonce']) && isset($_POST['submit'])) {
-		$which_page = sanitize_text_field(wp_unslash($_POST['submit']));
-		$nonce = sanitize_text_field(wp_unslash($_POST['_wpnonce']));
-		if (wp_verify_nonce($nonce, 'loginid_dw_settings_group-options') !== false && ($which_page === 'Generate Register Page' || $which_page === 'Generate Login Page')) {
-			$isRegister = $which_page === 'Generate Register Page';
-			// we want to create the login and register pages here
-			// Create register post object
-			$register_post = array(
-				'post_title'    => wp_strip_all_tags($isRegister ? 'Register' : 'Login'),
-				'post_content'  => '[' . LoginID_DirectWeb::getShortCodes()[$isRegister ? LoginID_Operation::Register : LoginID_Operation::Login] . ']',
-				'post_status'   => 'publish',
-				'post_type'     => 'page',
-			);
-			// Insert the post into the database
-			$result = wp_insert_post($register_post);
+  if (isset($_POST['_wpnonce']) && isset($_POST['submit'])) {
+    $which_page = sanitize_text_field(wp_unslash($_POST['submit']));
+    $nonce = sanitize_text_field(wp_unslash($_POST['_wpnonce']));
+    if (wp_verify_nonce($nonce, 'loginid_dw_settings_group-options') !== false && ($which_page === 'Generate Register Page' || $which_page === 'Generate Login Page')) {
+      $isRegister = $which_page === 'Generate Register Page';
+      // we want to create the login and register pages here
+      // Create register post object
+      $register_post = array(
+        'post_title'    => wp_strip_all_tags($isRegister ? 'Register' : 'Login'),
+        'post_content'  => '[' . LoginID_DirectWeb::getShortCodes()[$isRegister ? LoginID_Operation::Register : LoginID_Operation::Login] . ']',
+        'post_status'   => 'publish',
+        'post_type'     => 'page',
+      );
+      // Insert the post into the database
+      $result = wp_insert_post($register_post);
 
-			if ($result > 0) {
-				exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . ($isRegister ? 'Register' : 'Login') .  ' page created.'))));
-			}
-			exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error while creating ' . ($isRegister ? 'Register' : 'Login') . ' page.'))));
-		}
-		exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error: Token Rejected'))));
-	}
-	exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error: something went very wrong.'))));
+      if ($result > 0) {
+        exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . ($isRegister ? 'Register' : 'Login') .  ' page created.'))));
+      }
+      exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error while creating ' . ($isRegister ? 'Register' : 'Login') . ' page.'))));
+    }
+    exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error: Token Rejected'))));
+  }
+  exit(esc_url(wp_safe_redirect(admin_url('options-general.php?page=loginid-directweb&nonce=' . wp_create_nonce('loginid_dw_msg_nonce') . '&loginid-admin-msg=' . 'Error: something went very wrong.'))));
 }
 add_action('admin_post_loginid_dw_generate_page', 'loginid_dw_generate_page');
 
@@ -177,19 +195,19 @@ add_action('admin_post_loginid_dw_generate_page', 'loginid_dw_generate_page');
  */
 function loginid_dw_modify_user_table($columns)
 {
-	$new_columns = array();
-	$is_created = false;
-	foreach ($columns as $name => $label) {
-		$new_columns[$name] = $label;
-		if ($name === 'username') {
-			$new_columns['loginid'] = 'LoginID';
-			$is_created = true;
-		}
-	}
-	if ($is_created === false) {
-		$new_columns['loginid'] = 'LoginID';
-	}
-	return $new_columns;
+  $new_columns = array();
+  $is_created = false;
+  foreach ($columns as $name => $label) {
+    $new_columns[$name] = $label;
+    if ($name === 'username') {
+      $new_columns['loginid'] = 'LoginID';
+      $is_created = true;
+    }
+  }
+  if ($is_created === false) {
+    $new_columns['loginid'] = 'LoginID';
+  }
+  return $new_columns;
 }
 add_filter('manage_users_columns', 'loginid_dw_modify_user_table');
 
@@ -205,13 +223,13 @@ add_filter('manage_users_columns', 'loginid_dw_modify_user_table');
  */
 function loginid_dw_modify_user_table_row($val, $column_name, $user_id)
 {
-	// our specific column
-	if ($column_name === 'loginid') {
-		return get_the_author_meta(LoginID_DB_Fields::udata_user_id, $user_id);
-	} else {
-		// not our column return regular value
-		return $val;
-	}
+  // our specific column
+  if ($column_name === 'loginid') {
+    return get_the_author_meta(LoginID_DB_Fields::udata_user_id, $user_id);
+  } else {
+    // not our column return regular value
+    return $val;
+  }
 }
 add_filter('manage_users_custom_column', 'loginid_dw_modify_user_table_row', 10, 3);
 
@@ -224,7 +242,7 @@ add_filter('manage_users_custom_column', 'loginid_dw_modify_user_table_row', 10,
  */
 function loginid_dw_validate_nonce($action)
 {
-	return isset($_REQUEST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), $action);
+  return isset($_REQUEST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), $action);
 }
 
 /**
@@ -234,23 +252,23 @@ function loginid_dw_validate_nonce($action)
  */
 function loginid_dw_save_to_profile()
 {
-	if (isset($_REQUEST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), 'loginid_dw_save_to_profile_nonce')) {
-		if (empty($_REQUEST['loginid']) || !isset($_REQUEST['loginid'])) {
-			exit('Error: Missing required field');
-		} else {
+  if (isset($_REQUEST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), 'loginid_dw_save_to_profile_nonce')) {
+    if (empty($_REQUEST['loginid']) || !isset($_REQUEST['loginid'])) {
+      exit('Error: Missing required field');
+    } else {
 
-			$loginid_data = sanitize_text_field(wp_unslash($_REQUEST['loginid']));
-			$loginid_directweb = new LoginID_DirectWeb();
-			$loginid_directweb->manual_minimal_init(wp_get_current_user()->user_email, $loginid_data);
-			if ($loginid_directweb->add_authenticator_to_user()) {
-				exit('Success: authenticator added to account. Please reload this page.');
-			} else {
-				exit('Error: failed to add authenticator to account');
-			}
-		}
-	} else {
-		exit("No naughty business please");
-	}
+      $loginid_data = sanitize_text_field(wp_unslash($_REQUEST['loginid']));
+      $loginid_directweb = new LoginID_DirectWeb();
+      $loginid_directweb->manual_minimal_init(wp_get_current_user()->user_email, $loginid_data);
+      if ($loginid_directweb->add_authenticator_to_user()) {
+        exit('Success: authenticator added to account. Please reload this page.');
+      } else {
+        exit('Error: failed to add authenticator to account');
+      }
+    }
+  } else {
+    exit("No naughty business please");
+  }
 }
 
 add_action('wp_ajax_loginid_save_to_profile', 'loginid_dw_save_to_profile');
@@ -262,17 +280,17 @@ add_action('wp_ajax_loginid_save_to_profile', 'loginid_dw_save_to_profile');
  */
 function loginid_dw_remove_from_profile()
 {
-	if (loginid_dw_validate_nonce("loginid_dw_remove_from_profile_nonce")) {
-		$loginid_directweb = new LoginID_DirectWeb();
-		$loginid_directweb->manual_email_init(wp_get_current_user()->user_email);
-		if ($loginid_directweb->remove_authenticator_from_user()) {
-			exit('Success: authenticator removed from account. Please reload this page.');
-		} else {
-			exit('Error: failed to remove authenticator from account');
-		}
-	} else {
-		exit("No naughty business please");
-	}
+  if (loginid_dw_validate_nonce("loginid_dw_remove_from_profile_nonce")) {
+    $loginid_directweb = new LoginID_DirectWeb();
+    $loginid_directweb->manual_email_init(wp_get_current_user()->user_email);
+    if ($loginid_directweb->remove_authenticator_from_user()) {
+      exit('Success: authenticator removed from account. Please reload this page.');
+    } else {
+      exit('Error: failed to remove authenticator from account');
+    }
+  } else {
+    exit("No naughty business please");
+  }
 }
 
 add_action('wp_ajax_loginid_remove_from_profile', 'loginid_dw_remove_from_profile');
@@ -284,10 +302,10 @@ add_action('wp_ajax_loginid_remove_from_profile', 'loginid_dw_remove_from_profil
  */
 function loginid_dw_wizard_callback()
 {
-	// 
-	if (loginid_dw_validate_nonce('loginid_dw_nonce_wizard')) {
+  // 
+  if (loginid_dw_validate_nonce('loginid_dw_nonce_wizard')) {
 
-		exit("
+    exit("
 <html>
 <body>
 <noscript>Javascript is required for this to work</noscript>
@@ -336,8 +354,8 @@ hiddenForm.remove();
 </body>
 </html>
 ");
-	}
-	exit("
+  }
+  exit("
 <html>
 <body>
 <p id=\"output\">Something went wrong, please try again later</p>
@@ -356,7 +374,7 @@ add_action('wp_ajax_loginid_wizard_callback', 'loginid_dw_wizard_callback');
 function loginid_dw_nopriv_wizard_callback()
 {
 
-	exit("
+  exit("
 <html>
 <body>
 <p id=\"output\">You must be authenticated to perform this action</p>
