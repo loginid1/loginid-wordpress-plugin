@@ -6,7 +6,8 @@
   display: none !important;
 }
 
-.__loginid_error-style {
+form.loginid-auth-form {
+  margin-bottom: 1em;
 }
 
 .loginid-submit-row {
@@ -19,7 +20,6 @@
 .loginid-auth-form-input {
   box-sizing: border-box;
   width: 100%;
-  margin: 0;
 }
 
 .toggle-switch {

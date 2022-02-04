@@ -816,10 +816,21 @@ class LoginID_DirectWeb
    * @since 0.1.0
    * @param string $type, basically 'login' or 'register'
    */
-  protected function render_form($type = LoginID_Operation::Login)
+  protected function render_form($type = LoginID_Operation::Login, $attrs = [], $tag = '')
   {
+    // normalize attribute keys, lowercase
+    $attrs = array_change_key_case((array) $attrs, CASE_LOWER);
+
+    $parsed_attrs = shortcode_atts(
+      array(
+        'hidden' => "false",
+      ),
+      $attrs,
+      $tag
+    )
+
 ?>
-    <form id="<?php echo esc_attr("__loginid_{$type}_form") ?>" method="POST" class="loginid-auth-form">
+    <form id="<?php echo esc_attr("__loginid_{$type}_form") ?>" method="POST" class="loginid-auth-form <?php echo $type === LoginID_Operation::Register ? 'register' : 'login' ?>" <?php echo $parsed_attrs['hidden'] === 'true' ? 'hidden="true"' : '' ?>>
       <div class="loginid-auth-form-row">
         <label class="loginid-auth-form-label" for="email">Email <strong>*</strong></label>
         <input class="input-text loginid-auth-form-input" id="__loginid_input_email_<?php echo esc_attr($type) ?>" type="text" name="email" value="<?php echo esc_attr($this->email) ?>">
@@ -975,7 +986,7 @@ class LoginID_DirectWeb
    * @since 0.1.0
    * @param string $type, basically 'login' or 'register'
    */
-  public function render($type = LoginID_Operation::Login)
+  public function render($type = LoginID_Operation::Login, $attrs = [], $tag = '')
   {
     // don't render if user is logged in (except for in previews)
     if (!is_user_logged_in() || is_preview()) {
@@ -989,7 +1000,7 @@ class LoginID_DirectWeb
       }
 
       // make sure to only output error in the correct section, in case both login and register is in the same page
-      $this->render_form($type);
+      $this->render_form($type, $attrs, $tag);
     }
   }
 
@@ -998,10 +1009,10 @@ class LoginID_DirectWeb
    * 
    * @since 0.1.0
    */
-  public function registration_shortcode()
+  public function registration_shortcode($attrs = [], $tag = '')
   {
     ob_start();
-    $this->render(LoginID_Operation::Register);
+    $this->render(LoginID_Operation::Register, $attrs, $tag);
     return ob_get_clean();
   }
 
@@ -1010,10 +1021,10 @@ class LoginID_DirectWeb
    * 
    * @since 0.1.0
    */
-  public function login_shortcode()
+  public function login_shortcode($attrs = [], $tag = '')
   {
     ob_start();
-    $this->render(LoginID_Operation::Login); // defaults to login, but we set this for consistency
+    $this->render(LoginID_Operation::Login, $attrs, $tag); // defaults to login, but we set this for consistency
     return ob_get_clean();
   }
 
