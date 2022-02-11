@@ -13,7 +13,7 @@ FIDO-certified strong authentication in 5 clicks.  Go passwordless and eliminate
 
 == Description ==
 
-LoginID’s DirectWeb Plugin enables your WordPress application’s end users  to utilize FIDO/FIDO2 certified strong customer authentication, including the ability to provide more sensitive operations such as credential management. By leveraging the end user’s existing device biometrics you can quickly integrate multi-factor authentication into your site. Our service is aligned with PSD2, GDPR, CCPA, and HIPPA.
+LoginID’s DirectWeb Plugin enables your WordPress application’s end users  to utilize FIDO/FIDO2 certified passwordless authentication, including the ability to provide more sensitive operations such as credential management. By leveraging the end user’s existing device biometrics you can quickly integrate multi-factor authentication into your site. Our service is aligned with PSD2, GDPR, CCPA, and HIPPA.
 
 **Benefits:**
 Privacy:
