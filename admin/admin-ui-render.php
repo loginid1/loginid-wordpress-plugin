@@ -295,7 +295,7 @@ function loginid_dw_attach_to_profile($user)
       <tr style="display: none" id="__loginid_set_authenticator">
         <th><label>Setup Authenticator</label></th>
         <td>
-          <button type="button" class="button" id="__loginid_use_an_authenticator_on_this_device">Add new device</button>
+          <button type="submit" class="button" id="__loginid_use_an_authenticator_on_this_device">Add new device</button>
           <div id="__loginid_use_an_authenticator_on_this_device_response"></div>
           <div>
             <input type="hidden" disabled name="nonce" id="__loginid_input_nonce" value="<?php echo esc_textarea(wp_create_nonce("loginid_dw_save_to_profile_nonce")); ?>">
@@ -309,7 +309,7 @@ function loginid_dw_attach_to_profile($user)
       <tr style="display: none" id="__loginid_remove_authenticator">
         <th><label>Remove Authenticator</label></th>
         <td>
-          <button type="button" class="button" id="__loginid_remove_authenticator_button">Remove device</button>
+          <button class="button" id="__loginid_remove_authenticator_button" type="submit">Remove device</button>
           <div id="__loginid_remove_authenticator_response">
             This action is not reversible.<br /> You will need another method of authentication to access this account. (like a password).
           </div>

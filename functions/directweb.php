@@ -181,6 +181,7 @@ class LoginID_DirectWeb
     $settings = loginid_dw_get_settings();
     if ($settings['enable_woo_integration']) {
       add_filter('woocommerce_locate_template', 'loginid_dw_plugin_woo_addon_plugin_template', 1, 3);
+      add_action( 'woocommerce_before_edit_account_form', 'loginid_dw_plugin_woo_account_detail_hook', 10, 0 );
     }
   }
 
@@ -830,7 +831,7 @@ class LoginID_DirectWeb
     )
 
 ?>
-    <form id="<?php echo esc_attr("__loginid_{$type}_form") ?>" method="POST" class="loginid-auth-form <?php echo $type === LoginID_Operation::Register ? 'register' : 'login' ?>" <?php echo $parsed_attrs['hidden'] === 'true' ? 'hidden="true"' : '' ?>>
+    <form id="<?php echo esc_attr("__loginid_{$type}_form") ?>" method="POST" class="loginid-auth-form <?php echo $type === LoginID_Operation::Register ? 'register' : 'login' ?> <?php echo isset($this->email) ? 'active' : ''?>" <?php echo $parsed_attrs['hidden'] === 'true' ? 'hidden="true"' : '' ?>>
       <div class="loginid-auth-form-row">
         <label class="loginid-auth-form-label" for="email">Email <strong>*</strong></label>
         <input class="input-text loginid-auth-form-input" id="__loginid_input_email_<?php echo esc_attr($type) ?>" type="text" name="email" value="<?php echo esc_attr($this->email) ?>">
@@ -844,6 +845,13 @@ class LoginID_DirectWeb
         </div>
       <?php
       }
+      if ($type === LoginID_Operation::Login && (!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password)) {
+        ?>
+          <div id="__loginid_login-passwordless-message" class="loginid-auth-form-row">
+            <p>Please input email associated with your passwordless account.</p>
+          </div>
+        <?php
+        }
       ?>
       <div id="__loginid_password_div" <?php echo ((!$this->manually_display_password) && (!$this->javascript_unsupported) && empty($this->password) && ($type === LoginID_Operation::Login) ? 'class="__loginid_hide-password loginid-auth-form-row"' : 'class="loginid-auth-form-row"') ?>>
         <label class="loginid-auth-form-label" for="password">Password <strong>*</strong></label>
@@ -1139,4 +1147,10 @@ class LoginID_DirectWeb
     wp_safe_redirect($base_url . $redirect_message);
     exit();
   }
+}
+
+function loginid_dw_plugin_woo_account_detail_hook() {
+  
+    $output =  '<p><fieldset>' . do_shortcode("[loginid_settings]") . '</fieldset></p>';
+    echo $output;
 }

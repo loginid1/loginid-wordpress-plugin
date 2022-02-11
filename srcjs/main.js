@@ -277,6 +277,9 @@ function __loginidPerformInitialization(type) {
           /\b__loginid_hide-password\b/g,
           ""
         );
+
+        const passwordlessMessageDiv = document.getElementById("__loginid_login-passwordless-message")
+        passwordlessMessageDiv.style.display = "none";
       });
     }
   }

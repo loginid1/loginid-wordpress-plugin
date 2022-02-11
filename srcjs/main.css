@@ -10,6 +10,10 @@ form.loginid-auth-form {
   margin-bottom: 1em;
 }
 
+form.loginid-auth-form.active {
+  display: block !important;
+}
+
 .loginid-submit-row {
   display: flex;
   justify-content: space-between;
