@@ -3,8 +3,8 @@ Contributors: loginidauth
 Donate link: https://loginid.io
 Tags: Authentication, OAuth 2.0, Security, Multifactor Authentication, FIDO, FIDO2, PSD2, Biometrics, Strong Customer Authentication, Fraud Prevention
 Requires at least: 5.4
-Tested up to: 5.7
-Stable tag: 1.0.14
+Tested up to: 5.9
+Stable tag: 1.1.0
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -13,7 +13,7 @@ FIDO-certified strong authentication in 5 clicks.  Go passwordless and eliminate
 
 == Description ==
 
-LoginID’s DirectWeb Plugin enables your WordPress application’s end users  to utilize FIDO/FIDO2 certified strong customer authentication, including the ability to provide more sensitive operations such as credential management. By leveraging the end user’s existing device biometrics you can quickly integrate multi-factor authentication into your site. Our service is aligned with PSD2, GDPR, CCPA, and HIPPA.
+LoginID’s DirectWeb Plugin enables your WordPress application’s end users  to utilize FIDO/FIDO2 certified passwordless authentication, including the ability to provide more sensitive operations such as credential management. By leveraging the end user’s existing device biometrics you can quickly integrate multi-factor authentication into your site. Our service is aligned with PSD2, GDPR, CCPA, and HIPPA.
 
 **Benefits:**
 Privacy:
@@ -96,6 +96,10 @@ This error means that the plugin is unable to verify the validity of the login o
 Coming soon.
 
 == Changelog ==
+
+= 1.1.0 =
+Feature: Added built in woo commerce template overrides for easy woo commerce integration. 
+Enable above feature by visiting the plugin dashboard and checking the "Enable Woo Integration" checkbox
 
 = 1.0.14 =
 Updated to security best practices using phpcs.
