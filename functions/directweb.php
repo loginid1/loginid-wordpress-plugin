@@ -181,7 +181,6 @@ class LoginID_DirectWeb
     $settings = loginid_dw_get_settings();
     if ($settings['enable_woo_integration']) {
       add_filter('woocommerce_locate_template', 'loginid_dw_plugin_woo_addon_plugin_template', 1, 3);
-      add_action( 'woocommerce_before_edit_account_form', 'loginid_dw_plugin_woo_account_detail_hook', 10, 0 );
     }
   }
 
@@ -1147,10 +1146,4 @@ class LoginID_DirectWeb
     wp_safe_redirect($base_url . $redirect_message);
     exit();
   }
-}
-
-function loginid_dw_plugin_woo_account_detail_hook() {
-  
-    $output =  '<p><fieldset>' . do_shortcode("[loginid_settings]") . '</fieldset></p>';
-    echo $output;
 }

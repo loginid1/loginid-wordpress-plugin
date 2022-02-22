@@ -67,7 +67,7 @@ function loginid_dw_register_settings()
   // BaseURL
   add_settings_field(
     'loginid_dw_api_key_field',              // ID
-    __('API Key', 'loginid-directweb'),          // Title
+    __('Client Id', 'loginid-directweb'),          // Title
     'loginid_dw_text_input_field_callback',          // Callback function
     'loginid-directweb',                      // Page slug
     'loginid_dw_minimum_settings_section',              // Settings Section ID
