@@ -126,12 +126,12 @@ function loginid_dw_admin_interface_render()
         <h4>This method will take less than 2 minutes to complete</h4>
         <h4>What happens when I click Run Wizard?</h4>
         <p>
-          When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="<?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>"><?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?></a> to register an account and fill out some information about your website in order to generate your Base URL and API Key.
+          When you click the <strong> Run Wizard</strong> button below, you will be redirected to <a href="<?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>"><?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?></a> to register an account and fill out some information about your website in order to generate your Base URL and Client Id.
           <br />
           At the end of the process you will have the option to save data directly to this wordpress site with a click of a single button.
         </p>
         <p class="description">
-          LoginID setup wizard will automate most actions during the process of obtaining <strong> Base URL </strong> and <strong> API Key </strong> below.
+          LoginID setup wizard will automate most actions during the process of obtaining <strong> Base URL </strong> and <strong> Client Id </strong> below.
           <br />
           This will necessitate the collection of certain data from this site.
           <br />
@@ -143,13 +143,13 @@ function loginid_dw_admin_interface_render()
               <script>
                 document.write(window.location.origin)
               </script>
-            </code> Required field to generate your API_key, this is so that your api key is tied down to your current domain (layer of protection against hacking)</li>
+            </code> Required field to generate your API_key, this is so that your Client Id is tied down to your current domain (layer of protection against hacking)</li>
           <li><strong>_wpnonce</strong> <code>example: 12abcd</code> Key to authorize changes to your wordpress settings. (used for automatic saving of settings). <b>LoginID will be using wp nonce transiently during credentials creation process and will not store it on loginID system.</b> This hash lives a maximum of 24 hours and can only be used to change BaseURL and APIKey settings for this plugin.</li>
         </ol>
         </p>
         <p>
           <i><b>By clicking on the <code>Run Wizard</code> button below you consent to sending the above data to LoginID and allow LoginID to save settings for this plugin on your behalf.
-              <br />Using this wizard is >OPTIONAL< you can always visit <a href="<?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>"><?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?></a> and manually input your site origin and obtain your API key and BaseUrl.
+              <br />Using this wizard is >OPTIONAL< you can always visit <a href="<?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?>"><?php echo esc_html(LOGINID_DIRECTWEB_LOGINID_ORIGIN) ?></a> and manually input your site origin and obtain your Client Id and BaseUrl.
                 <a href="https://docs.loginid.io/websdks/dw">refer to docs</a>
             </b></i>
         </p>
@@ -203,7 +203,7 @@ function loginid_dw_admin_interface_render()
             Once you create a new integration you will be provided with the following on our dashboard which you can copy and paste into the below fields.
             <ol type="a">
               <li>
-                The API key is used to configure LoginID’s JavaScript SDK from your web application
+                The Client Id is used to configure LoginID’s JavaScript SDK from your web application
               </li>
               <li>
                 Base URL which provides our SDK which LoginID environment the integration will be using

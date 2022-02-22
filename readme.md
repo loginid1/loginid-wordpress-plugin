@@ -70,13 +70,13 @@ As this is a wordpress plugin this project requires wordpress to run.
 
    ![Settings](img/settings.png)
 
-3. Choose one of the following methods of obtaining your Base URL and API Key from LoginID. You can either
+3. Choose one of the following methods of obtaining your Base URL and Client Id from LoginID. You can either
 
-   - Run the setup Wizard by clicking on the `Run Setup Wizard` button. An expanded menu will be displayed to disclose exactly what this wizard does. It sends some of your site information directly to LoginID so the create integration form will be pre-populated with data, and presents you with the option to directly save the BaseURL and API Key directly to your wordpress site. (You can always perform this action manually).
+   - Run the setup Wizard by clicking on the `Run Setup Wizard` button. An expanded menu will be displayed to disclose exactly what this wizard does. It sends some of your site information directly to LoginID so the create integration form will be pre-populated with data, and presents you with the option to directly save the BaseURL and Client Id directly to your wordpress site. (You can always perform this action manually).
 
 ![Setup Wizard](img/setup-wizard.png)
 
-- Or Visit [LoginID Dashboard](https://sandbox-usw1.api.loginid.io/integrations) on the integrations page, and manually input required site data. This method will collect less data, but requires you to manually copy and paste over the BaseURL and API Key from LoginID.(shown in the following two screenshots).
+- Or Visit [LoginID Dashboard](https://sandbox-usw1.api.loginid.io/integrations) on the integrations page, and manually input required site data. This method will collect less data, but requires you to manually copy and paste over the BaseURL and Client Id from LoginID.(shown in the following two screenshots).
 
 Copy from the LoginID dashboard
 
