@@ -1,0 +1,11 @@
+image: docker:19.03.12
+services:
+  - docker:19.03.12-dind
+
+include:
+  - project: 'loginid/software/ci'
+    ref: main
+    file: '/templates/security/all.gitlab-ci.yml'
+
+stages:
+  - test
