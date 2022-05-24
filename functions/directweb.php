@@ -4,6 +4,7 @@
 if (!defined('ABSPATH')) exit;
 
 use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
 
 /**
  * this class serves basically as an enum
@@ -379,7 +380,7 @@ class LoginID_DirectWeb
 
                 // verify using openssl_verify(original string, signature, public key, algorithm)
                 try {
-                  $result = JWT::decode($jwt, $public_key, array($jwt_header->alg));
+                  $result = JWT::decode($jwt, new Key($public_key, $jwt_header->alg));
                   // verification successful; now we know the jwt is legit at this point
                   $this->validated_jwt_body = $result;
                   return true;

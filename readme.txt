@@ -5,7 +5,7 @@ Tags: Authentication, OAuth 2.0, Security, Multifactor Authentication, FIDO, FID
 Requires at least: 5.4
 Tested up to: 5.9
 Stable tag: 1.1.0
-Requires PHP: 7.0
+Requires PHP: 7.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -96,6 +96,9 @@ This error means that the plugin is unable to verify the validity of the login o
 Coming soon.
 
 == Changelog ==
+
+= 1.1.1 =
+Security patch. Bumped firebase/php-jwt and minimist to latest versions
 
 = 1.1.0 =
 Feature: Added built in woo commerce template overrides for easy woo commerce integration. 

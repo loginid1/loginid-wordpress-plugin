@@ -2,7 +2,7 @@
     "name": "loginid/loginid-dire",
     "type": "wordpress-plugin",
     "require": {
-        "firebase/php-jwt": "^5.2"
+        "firebase/php-jwt": "^6.2"
     },
     "license": "GPL v3"
 }
