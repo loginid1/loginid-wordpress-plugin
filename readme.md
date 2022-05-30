@@ -20,9 +20,9 @@
     For WordPress
     <br />
     <br />
-    <a href="https://github.com/loginid1/loginid-directweb/issues">Report Bug</a>
+    <a href="https://github.com/loginid1/loginid-wordpress-plugin/issues">Report Bug</a>
     ·
-    <a href="https://github.com/loginid1/loginid-directweb/issues">Request Feature</a>
+    <a href="https://github.com/loginid1/loginid-wordpress-plugin/issues">Request Feature</a>
   </p>
 </p>
 
@@ -40,6 +40,7 @@
 - [License](#license)
 - [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
+- [Footnotes](#footnotes)
 
 <!-- ABOUT THE PROJECT -->
 
@@ -99,7 +100,7 @@ cd htdocs/wp-contents/plugins
 2. Download or clone this repo
 
 ```sh
-git clone https://github.com/loginid1/loginid-directweb.git
+git clone https://github.com/loginid1/loginid-wordpress-plugin.git
 ```
 
 3. Install php dependencies
@@ -121,7 +122,7 @@ npm run dev
 
 ## Roadmap
 
-See the [open issues](https://github.com/loginid1/loginid-directweb/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/loginid1/loginid-wordpress-plugin/issues) for a list of proposed features (and known issues).
 
 <!-- LICENSE -->
 
@@ -137,7 +138,7 @@ LoginID - dev@loginid.io
 
 If you need plugin help feel free to contact jimmy@loginid.io (usually reply within 48 hours).
 
-Project Link: [https://github.com/loginid1/loginid-directweb](https://github.com/loginid1/loginid-directweb)
+Project Link: [https://github.com/loginid1/loginid-wordpress-plugin](https://github.com/loginid1/loginid-wordpress-plugin)
 
 <!-- ACKNOWLEDGEMENTS -->
 
@@ -149,16 +150,23 @@ Project Link: [https://github.com/loginid1/loginid-directweb](https://github.com
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/loginid1/loginid-directweb.svg?style=flat-square
-[contributors-url]: https://github.com/loginid1/loginid-directweb/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/loginid1/loginid-directweb.svg?style=flat-square
-[forks-url]: https://github.com/loginid1/loginid-directweb/network/members
-[stars-shield]: https://img.shields.io/github/stars/loginid1/loginid-directweb.svg?style=flat-square
-[stars-url]: https://github.com/loginid1/loginid-directweb/stargazers
-[issues-shield]: https://img.shields.io/github/issues/loginid1/loginid-directweb.svg?style=flat-square
-[issues-url]: https://github.com/loginid1/loginid-directweb/issues
-[license-shield]: https://img.shields.io/github/license/loginid1/loginid-directweb.svg?style=flat-square
-[license-url]: https://github.com/loginid1/loginid-directweb/blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/loginid1/loginid-wordpress-plugin.svg?style=flat-square
+[contributors-url]: https://github.com/loginid1/loginid-wordpress-plugin/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/loginid1/loginid-wordpress-plugin.svg?style=flat-square
+[forks-url]: https://github.com/loginid1/loginid-wordpress-plugin/network/members
+[stars-shield]: https://img.shields.io/github/stars/loginid1/loginid-wordpress-plugin.svg?style=flat-square
+[stars-url]: https://github.com/loginid1/loginid-wordpress-plugin/stargazers
+[issues-shield]: https://img.shields.io/github/issues/loginid1/loginid-wordpress-plugin.svg?style=flat-square
+[issues-url]: https://github.com/loginid1/loginid-wordpress-plugin/issues
+[license-shield]: https://img.shields.io/github/license/loginid1/loginid-wordpress-plugin.svg?style=flat-square
+[license-url]: https://github.com/loginid1/loginid-wordpress-plugin/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/loginid
 [product-screenshot]: images/screenshot.png
+
+## Footnotes
+- The plugin was originally interanlly named loginid-directweb-plugin-for-wordpress. (loginid_dwp)
+- Wordpress itself doesn't allow plugin names to contain "plugin" or "wordpress" as it is redundant for listing on the plugin repository.
+- This plugin was thus renamed to loginid-directweb (loginid_dw)
+- Due to naming confusing the repo name changed back to loginid-wordpress-plugin.
+- The plugin's internal prefix in code will remain logini_dw_*
