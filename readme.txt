@@ -99,6 +99,8 @@ Coming soon.
 
 = 1.1.1 =
 Security patch. Bumped firebase/php-jwt and minimist to latest versions
+Now requiring php 7.1 or later because firebase/php-jwt no longer support php 7.0
+Refactor any links to our code repository from https://github.com/loginid1/loginid-directweb to https://github.com/loginid1/loginid-wordpress-plugin
 
 = 1.1.0 =
 Feature: Added built in woo commerce template overrides for easy woo commerce integration. 
